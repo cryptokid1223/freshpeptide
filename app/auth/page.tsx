@@ -26,19 +26,11 @@ export default function AuthPage() {
       const { error: authError } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: `${window.location.origin}/consent`,
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
       if (authError) throw authError;
-
-      // Also create profile if doesn't exist
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase
-          .from('profiles')
-          .upsert({ id: user.id, email }, { onConflict: 'id' });
-      }
       
       setMessage('Check your email for the magic link!');
       localStorage.setItem('user_email', email);
