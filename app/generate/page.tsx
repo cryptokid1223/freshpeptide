@@ -34,15 +34,26 @@ export default function GeneratePage() {
 
     try {
       const intakeData = localStorage.getItem('intake_data');
-      const { data: { user } } = await supabase.auth.getUser();
-
+      
       if (!intakeData) {
-        throw new Error('No intake data found');
+        throw new Error('No intake data found. Please complete the questionnaire first.');
       }
 
-      if (!user) {
-        throw new Error('Not authenticated');
+      // Get the current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error('Session error:', sessionError);
+        throw new Error('Authentication error. Please sign in again.');
       }
+
+      if (!session?.user) {
+        console.error('No session found');
+        throw new Error('Not authenticated. Please sign in again.');
+      }
+
+      const user = session.user;
+      console.log('Generating brief for user:', user.id);
 
       const response = await fetch('/api/generate-brief', {
         method: 'POST',
@@ -61,6 +72,7 @@ export default function GeneratePage() {
       }
 
       const data = await response.json();
+      console.log('Brief generated successfully:', data.model);
       setBrief(data.brief);
       
       // Save to localStorage for quick access
@@ -75,6 +87,7 @@ export default function GeneratePage() {
           model_name: data.model,
         });
     } catch (err) {
+      console.error('Generate error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsGenerating(false);
