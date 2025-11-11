@@ -1,12 +1,34 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ResearchBanner } from '@/components/ResearchBanner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 export default function Home() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if user is authenticated
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      setIsLoading(false);
+    };
+
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <ResearchBanner />
@@ -26,25 +48,59 @@ export default function Home() {
             may align with research literature related to those goals.
           </p>
           
-          <div className="flex gap-4 justify-center">
-            <Link href="/auth">
-              <Button 
-                size="lg" 
-                className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
-              >
-                Start Questions
-              </Button>
-            </Link>
-            <Link href="/library">
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 px-8 py-6 text-lg transition-all"
-              >
-                Browse Library
-              </Button>
-            </Link>
-          </div>
+          {!isLoading && (
+            <div className="flex gap-4 justify-center">
+              {isAuthenticated ? (
+                <>
+                  <Link href="/dashboard">
+                    <Button 
+                      size="lg" 
+                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
+                    >
+                      Go to Dashboard
+                    </Button>
+                  </Link>
+                  <Link href="/generate">
+                    <Button 
+                      size="lg" 
+                      className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
+                    >
+                      Generate New Stack
+                    </Button>
+                  </Link>
+                  <Link href="/library">
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 px-8 py-6 text-lg transition-all"
+                    >
+                      Browse Library
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/auth">
+                    <Button 
+                      size="lg" 
+                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
+                    >
+                      Start Questions
+                    </Button>
+                  </Link>
+                  <Link href="/library">
+                    <Button 
+                      size="lg" 
+                      variant="outline"
+                      className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 px-8 py-6 text-lg transition-all"
+                    >
+                      Browse Library
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Feature Cards */}

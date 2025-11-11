@@ -1,12 +1,42 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ResearchBanner } from './ResearchBanner';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { Button } from './ui/button';
 
 export function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Check authentication status
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+      setUserEmail(session?.user?.email || null);
+    };
+
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsAuthenticated(!!session);
+      setUserEmail(session?.user?.email || null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    localStorage.clear(); // Clear all local data
+    router.push('/');
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-slate-100">
@@ -20,25 +50,49 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                 FreshPeptide
               </Link>
               
-              <div className="flex gap-6">
-                <Link 
-                  href="/dashboard" 
-                  className={`hover:text-cyan-400 transition-colors ${pathname === '/dashboard' ? 'text-cyan-400' : ''}`}
-                >
-                  Dashboard
-                </Link>
-                <Link 
-                  href="/library" 
-                  className={`hover:text-cyan-400 transition-colors ${pathname === '/library' ? 'text-cyan-400' : ''}`}
-                >
-                  Library
-                </Link>
-                <Link 
-                  href="/account" 
-                  className={`hover:text-cyan-400 transition-colors ${pathname === '/account' ? 'text-cyan-400' : ''}`}
-                >
-                  Account
-                </Link>
+              <div className="flex items-center gap-6">
+                {isAuthenticated && (
+                  <>
+                    <Link 
+                      href="/dashboard" 
+                      className={`hover:text-cyan-400 transition-colors ${pathname === '/dashboard' ? 'text-cyan-400' : ''}`}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link 
+                      href="/library" 
+                      className={`hover:text-cyan-400 transition-colors ${pathname === '/library' ? 'text-cyan-400' : ''}`}
+                    >
+                      Library
+                    </Link>
+                    <Link 
+                      href="/account" 
+                      className={`hover:text-cyan-400 transition-colors ${pathname === '/account' ? 'text-cyan-400' : ''}`}
+                    >
+                      Account
+                    </Link>
+                    
+                    <div className="flex items-center gap-4 ml-4 pl-4 border-l border-slate-700">
+                      {userEmail && (
+                        <span className="text-sm text-slate-400">{userEmail}</span>
+                      )}
+                      <Button
+                        onClick={handleSignOut}
+                        variant="outline"
+                        size="sm"
+                        className="border-red-500 text-red-400 hover:bg-red-500/10"
+                      >
+                        Sign Out
+                      </Button>
+                    </div>
+                  </>
+                )}
+                
+                {!isAuthenticated && (
+                  <Link href="/library" className="hover:text-cyan-400 transition-colors">
+                    Library
+                  </Link>
+                )}
               </div>
             </div>
           </div>
