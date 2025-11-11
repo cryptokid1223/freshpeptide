@@ -1,24 +1,33 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/MainLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 type AuthMode = 'signin' | 'signup';
 
 export default function AuthPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Check URL parameter for mode
+    const urlMode = searchParams.get('mode');
+    if (urlMode === 'signup' || urlMode === 'signin') {
+      setMode(urlMode as AuthMode);
+    }
+  }, [searchParams]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,29 +104,24 @@ export default function AuthPage() {
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-md mx-auto">
           <Card className="bg-slate-800/50 border-slate-700 p-8">
-            <h1 className="text-3xl font-bold text-cyan-400 mb-2 text-center">
-              Welcome to FreshPeptide
-            </h1>
-            <p className="text-slate-400 text-center mb-8">
-              {mode === 'signin' ? 'Sign in to your account' : 'Create a new account'}
-            </p>
-
             {/* Tab Buttons */}
-            <div className="flex gap-2 mb-6">
+            <div className="flex gap-2 mb-8">
               <Button
                 type="button"
                 onClick={() => {
                   setMode('signin');
                   setError('');
                   setMessage('');
+                  setEmail('');
+                  setPassword('');
                 }}
-                className={`flex-1 ${
+                className={`flex-1 py-6 text-lg ${
                   mode === 'signin'
-                    ? 'bg-cyan-600 hover:bg-cyan-700'
-                    : 'bg-slate-700 hover:bg-slate-600'
+                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
+                    : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
                 }`}
               >
-                Sign In
+                ✅ Sign In
               </Button>
               <Button
                 type="button"
@@ -125,16 +129,27 @@ export default function AuthPage() {
                   setMode('signup');
                   setError('');
                   setMessage('');
+                  setEmail('');
+                  setPassword('');
                 }}
-                className={`flex-1 ${
+                className={`flex-1 py-6 text-lg ${
                   mode === 'signup'
-                    ? 'bg-cyan-600 hover:bg-cyan-700'
-                    : 'bg-slate-700 hover:bg-slate-600'
+                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
+                    : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
                 }`}
               >
-                Sign Up
+                ✨ Sign Up
               </Button>
             </div>
+
+            <h1 className="text-3xl font-bold text-cyan-400 mb-3 text-center">
+              {mode === 'signin' ? 'Welcome Back!' : 'Create Your Account'}
+            </h1>
+            <p className="text-slate-400 text-center mb-8">
+              {mode === 'signin' 
+                ? 'Sign in to access your dashboard and peptide stack' 
+                : 'Sign up to get personalized AI-powered peptide recommendations'}
+            </p>
 
             {message && (
               <div className="mb-4 p-4 bg-green-900/20 border border-green-700 rounded-lg">
@@ -232,18 +247,34 @@ export default function AuthPage() {
               </form>
             )}
 
-            <div className="mt-6 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
-              <p className="text-sm text-slate-300">
-                {mode === 'signin' ? (
-                  <>
-                    <strong className="text-blue-400">Returning user?</strong> Sign in with your email and password to access your dashboard.
-                  </>
-                ) : (
-                  <>
-                    <strong className="text-blue-400">New user?</strong> Create an account and verify your email to get started.
-                  </>
-                )}
-              </p>
+            <div className="mt-6 space-y-3">
+              {mode === 'signup' && (
+                <div className="p-4 bg-green-900/20 border border-green-700 rounded-lg">
+                  <p className="text-sm text-slate-300">
+                    <strong className="text-green-400">✨ New here?</strong> After creating your account, you'll verify your email and answer a quick questionnaire to get personalized AI recommendations.
+                  </p>
+                </div>
+              )}
+              
+              {mode === 'signin' && (
+                <div className="p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
+                  <p className="text-sm text-slate-300">
+                    <strong className="text-blue-400">👋 Welcome back!</strong> Sign in to access your dashboard and view your personalized peptide stack.
+                  </p>
+                </div>
+              )}
+
+              <div className="text-center">
+                <button
+                  type="button"
+                  onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+                  className="text-cyan-400 hover:text-cyan-300 text-sm underline"
+                >
+                  {mode === 'signin' 
+                    ? "Don't have an account? Sign Up" 
+                    : 'Already have an account? Sign In'}
+                </button>
+              </div>
             </div>
           </Card>
         </div>

@@ -35,73 +35,106 @@ export default function Home() {
       
       <main className="container mx-auto px-4 py-16">
         {/* Hero Section */}
-        <div className="text-center mb-16 pt-8">
+        <div className="text-center mb-12 pt-8">
           <h1 className="text-6xl font-bold text-cyan-400 mb-4 tracking-tight">
             FreshPeptide
           </h1>
-          <p className="text-2xl text-slate-300 mb-8">
-            Research & Educational Peptide Platform
+          <p className="text-2xl text-slate-300 mb-4">
+            AI-Powered Peptide Research Platform
           </p>
-          <p className="text-lg text-slate-400 max-w-3xl mx-auto mb-12">
-            This demo showcases a comprehensive peptide research platform that collects user health data,
-            goals, and preferences, then leverages AI to generate educational briefs about peptides that 
-            may align with research literature related to those goals.
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+            Get personalized peptide recommendations based on your health profile and goals
           </p>
-          
-          {!isLoading && (
-            <div className="flex gap-4 justify-center">
-              {isAuthenticated ? (
-                <>
-                  <Link href="/dashboard">
-                    <Button 
-                      size="lg" 
-                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
-                    >
-                      Go to Dashboard
-                    </Button>
-                  </Link>
-                  <Link href="/generate">
-                    <Button 
-                      size="lg" 
-                      className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
-                    >
-                      Generate New Stack
-                    </Button>
-                  </Link>
-                  <Link href="/library">
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 px-8 py-6 text-lg transition-all"
-                    >
-                      Browse Library
-                    </Button>
-                  </Link>
-                </>
-              ) : (
-                <>
-                  <Link href="/auth">
-                    <Button 
-                      size="lg" 
-                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
-                    >
-                      Sign In / Sign Up
-                    </Button>
-                  </Link>
-                  <Link href="/library">
-                    <Button 
-                      size="lg" 
-                      variant="outline"
-                      className="border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 px-8 py-6 text-lg transition-all"
-                    >
-                      Browse Library
-                    </Button>
-                  </Link>
-                </>
-              )}
-            </div>
-          )}
         </div>
+
+        {!isLoading && (
+          <>
+            {isAuthenticated ? (
+              /* Logged In View */
+              <div className="max-w-4xl mx-auto mb-16">
+                <Card className="bg-slate-800/50 border-slate-700 p-8">
+                  <h2 className="text-3xl font-bold text-cyan-400 mb-6 text-center">
+                    Welcome Back! 👋
+                  </h2>
+                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <Link href="/dashboard" className="flex-1">
+                      <Button 
+                        size="lg" 
+                        className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-6 text-lg"
+                      >
+                        📊 View Dashboard
+                      </Button>
+                    </Link>
+                    <Link href="/generate" className="flex-1">
+                      <Button 
+                        size="lg" 
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6 text-lg"
+                      >
+                        🧬 Generate Stack
+                      </Button>
+                    </Link>
+                    <Link href="/library" className="flex-1">
+                      <Button 
+                        size="lg" 
+                        variant="outline"
+                        className="w-full border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 py-6 text-lg"
+                      >
+                        📚 Browse Library
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+              </div>
+            ) : (
+              /* Not Logged In View - Simple Auth Section */
+              <div className="max-w-2xl mx-auto mb-16">
+                <Card className="bg-slate-800/50 border-slate-700 p-8">
+                  <h2 className="text-3xl font-bold text-cyan-400 mb-2 text-center">
+                    Get Started
+                  </h2>
+                  <p className="text-slate-400 text-center mb-8">
+                    Create an account or sign in to get your personalized peptide recommendations
+                  </p>
+                  
+                  <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                    <Link href="/auth?mode=signup" className="block">
+                      <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer">
+                        <div className="text-4xl mb-3">✨</div>
+                        <h3 className="text-xl font-bold text-white mb-2">New User?</h3>
+                        <p className="text-cyan-100 text-sm mb-4">Create a free account</p>
+                        <div className="bg-white text-cyan-700 font-semibold py-2 px-4 rounded">
+                          Sign Up
+                        </div>
+                      </div>
+                    </Link>
+
+                    <Link href="/auth?mode=signin" className="block">
+                      <div className="bg-slate-700 hover:bg-slate-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer border border-slate-600">
+                        <div className="text-4xl mb-3">👤</div>
+                        <h3 className="text-xl font-bold text-white mb-2">Have an Account?</h3>
+                        <p className="text-slate-300 text-sm mb-4">Sign in to continue</p>
+                        <div className="bg-transparent border-2 border-white text-white font-semibold py-2 px-4 rounded">
+                          Sign In
+                        </div>
+                      </div>
+                    </Link>
+                  </div>
+
+                  <div className="text-center">
+                    <Link href="/library">
+                      <Button 
+                        variant="ghost"
+                        className="text-cyan-400 hover:text-cyan-300"
+                      >
+                        or browse the peptide library →
+                      </Button>
+                    </Link>
+                  </div>
+                </Card>
+              </div>
+            )}
+          </>
+        )}
 
         {/* Feature Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-16">
