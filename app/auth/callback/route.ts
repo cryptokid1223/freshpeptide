@@ -23,10 +23,22 @@ export async function GET(request: Request) {
           { id: data.user.id, email: data.user.email },
           { onConflict: 'id' }
         );
+
+      // Check if user has completed intake
+      const { data: intakeData } = await supabase
+        .from('intake')
+        .select('intake_data')
+        .eq('user_id', data.user.id)
+        .single();
+
+      if (intakeData?.intake_data && Object.keys(intakeData.intake_data).length > 0) {
+        // User has completed intake, go to dashboard
+        return NextResponse.redirect(new URL('/dashboard', request.url));
+      }
     }
   }
 
-  // Redirect to consent page after successful auth
+  // New user or hasn't completed intake, go to consent
   return NextResponse.redirect(new URL('/consent', request.url));
 }
 

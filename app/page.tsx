@@ -85,7 +85,7 @@ export default function Home() {
                       size="lg" 
                       className="bg-cyan-600 hover:bg-cyan-700 text-white px-8 py-6 text-lg transition-all transform hover:scale-105"
                     >
-                      Start Questions
+                      Sign In / Sign Up
                     </Button>
                   </Link>
                   <Link href="/library">
