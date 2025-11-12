@@ -200,27 +200,29 @@ async function generateRealBrief(intakeData: any): Promise<BriefOutput> {
     return mapping[value] || value;
   };
 
-  const systemPrompt = `You are an expert peptide research consultant and medical educator with deep knowledge of peptide therapeutics, pharmacology, and medical literature. Your role is to analyze user health data and provide comprehensive, evidence-based educational information about peptides that align with their goals.
+  const systemPrompt = `You are an expert peptide research consultant and medical educator with deep knowledge of peptide therapeutics, pharmacology, and medical literature. Your role is to analyze health data and provide comprehensive, evidence-based educational information about peptides in a personal, conversational tone.
 
 CRITICAL INSTRUCTIONS:
-1. Analyze ALL user data thoroughly: demographics, medical conditions, medications, allergies, lifestyle (sleep, exercise, alcohol), and goals
-2. Create a personalized peptide stack (2-4 peptides) specifically tailored to their goals and health profile
-3. Consider contraindications based on their medical conditions, medications, and lifestyle
-4. Provide detailed, actionable information for each peptide including:
+1. Analyze ALL data thoroughly: demographics, medical conditions, medications, allergies, lifestyle (sleep, exercise, alcohol), and goals
+2. Create a personalized peptide stack (2-4 peptides) specifically tailored to the individual's goals and health profile
+3. Consider contraindications based on medical conditions, medications, and lifestyle
+4. Use PERSONAL language - say "you", "your", not "the user" or "the patient"
+5. Write in a warm, professional, conversational tone - like you're speaking directly to them
+6. Provide detailed, actionable information for each peptide including:
    - Specific mechanisms of action
    - Detailed information about the peptide
    - Exact dosage recommendations with units (mcg, mg, IU)
    - Precise timing (frequency, time of day, relation to food, cycle duration)
    - Comprehensive list of potential benefits
    - Complete list of side effects
-5. Include 4-6 real medical research articles with actual titles, years, journals, summaries, and PubMed URLs
-6. Consider drug interactions with their current medications
-7. Provide specific monitoring recommendations based on their health profile
-8. Always emphasize this is educational content and requires medical supervision
+7. Include 4-6 real medical research articles with actual titles, years, journals, summaries, and PubMed URLs
+8. Consider drug interactions with current medications
+9. Provide specific monitoring recommendations based on health profile
+10. Always emphasize this is educational content and requires medical supervision
 
 Return ONLY valid JSON in this exact structure (no markdown, no additional text):
 {
-  "goalAlignment": "Detailed analysis of how the user's specific goals, health profile, age, and lifestyle factors align with peptide research. Reference their specific conditions and goals.",
+  "goalAlignment": "Write directly to the person using 'you' and 'your'. Explain how YOUR specific goals, health profile, age, and lifestyle factors align with peptide research. Reference YOUR specific conditions and goals in a warm, personal way.",
   "recommendedStack": {
     "name": "Creative stack name based on their goals",
     "description": "Detailed description of why this specific combination was chosen for THIS user",
@@ -229,9 +231,9 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
   "candidatePeptides": [
     {
       "name": "Full peptide name with abbreviation",
-      "why": "Why this specific peptide is ideal for THIS user's goals and health profile",
-      "mechanism": "Detailed scientific mechanism of action",
-      "detailedInfo": "Comprehensive information about the peptide, its history, research status, and relevant studies",
+      "why": "Write directly to the person: Why this specific peptide is ideal for YOUR goals and YOUR health profile. Use 'you' and 'your'",
+      "mechanism": "Detailed scientific mechanism of action explained in an accessible way",
+      "detailedInfo": "Comprehensive information about the peptide, its history, research status, and relevant studies. Written in a conversational tone.",
       "recommendedDosage": "Specific dosage with units (e.g., '250-500 mcg daily' or '2mg twice weekly')",
       "timing": {
         "frequency": "Specific frequency (e.g., 'Once daily', 'Twice weekly', '3 times daily')",
@@ -239,11 +241,11 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
         "withFood": "Specific instructions (e.g., 'On empty stomach - wait 30 min before eating', 'Can be taken with or without food')",
         "cycleDuration": "Recommended cycle length and breaks (e.g., '8-12 weeks, then 4 week break')"
       },
-      "potentialBenefits": ["Array of 4-6 specific benefits relevant to user's goals"],
-      "sideEffects": ["Array of 3-6 potential side effects to monitor"]
+      "potentialBenefits": ["Array of 4-6 specific benefits relevant to YOUR goals. Use personal language."],
+      "sideEffects": ["Array of 3-6 potential side effects YOU should monitor"]
     }
   ],
-  "keyRisks": ["Array of 6-10 specific risks considering user's health profile"],
+  "keyRisks": ["Array of 6-10 specific risks considering YOUR health profile. Written directly to the person."],
   "evidenceList": [
     {
       "title": "Actual published research title",
@@ -254,13 +256,13 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
     }
   ],
   "medicalConsiderations": {
-    "drugInteractions": ["Specific interactions with medications user is taking"],
-    "contraindications": ["Specific contraindications based on user's conditions"],
-    "monitoringRecommendations": ["Specific tests and monitoring based on user's profile"]
+    "drugInteractions": ["Specific interactions with YOUR current medications. Use 'you' and 'your'."],
+    "contraindications": ["Specific contraindications based on YOUR conditions"],
+    "monitoringRecommendations": ["Specific tests and monitoring recommendations for YOU based on YOUR profile"]
   }
 }`;
 
-  const userMessage = `Please analyze this user's complete health profile and create a personalized peptide stack:
+  const userMessage = `Analyze this individual's complete health profile and create a personalized peptide stack. Write the analysis as if you're speaking DIRECTLY to them using "you" and "your":
 
 DEMOGRAPHICS:
 - Age: ${intakeData.demographics?.age} years old
@@ -282,7 +284,7 @@ GOALS:
 ${intakeData.goals?.selectedGoals?.map((goal: string) => `- ${goal}`).join('\n')}
 ${intakeData.goals?.customGoal ? `\nAdditional Goals/Notes: ${intakeData.goals.customGoal}` : ''}
 
-Based on this complete profile, create a comprehensive, personalized peptide education brief. Consider their age, medical conditions, current medications, lifestyle factors, and specific goals. Provide evidence-based recommendations with proper dosing, timing, and safety considerations specific to THIS individual.`;
+Create a comprehensive, personalized peptide education brief written DIRECTLY to this person using "you" and "your". Make it warm, personal, and conversational while remaining professional. Consider their age, medical conditions, medications, lifestyle, and goals. Provide evidence-based recommendations with proper dosing, timing, and safety considerations.`;
 
   try {
     const completion = await openai.chat.completions.create({

@@ -208,19 +208,6 @@ export default function DashboardPage() {
               </Card>
             </Link>
 
-            <Card 
-              className="bg-slate-800/50 border-slate-700 p-6 hover:bg-slate-800/70 transition-all cursor-pointer"
-              onClick={() => {
-                if (confirm('Are you sure you want to reset all data?')) {
-                  localStorage.clear();
-                  router.push('/');
-                }
-              }}
-            >
-              <div className="text-3xl mb-2">🔄</div>
-              <h3 className="text-lg font-semibold text-cyan-400 mb-1">Reset Demo</h3>
-              <p className="text-sm text-slate-400">Start over from beginning</p>
-            </Card>
           </div>
         </div>
       </div>
