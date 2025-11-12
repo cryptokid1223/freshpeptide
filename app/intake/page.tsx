@@ -44,31 +44,47 @@ export default function IntakePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
-  // Initialize form data from localStorage
-  const [intakeData, setIntakeData] = useState<any>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('intake_data');
-      return saved ? JSON.parse(saved) : {};
-    }
-    return {};
-  });
+  // Initialize form data - will be loaded from Supabase
+  const [intakeData, setIntakeData] = useState<any>({});
 
   useEffect(() => {
-    // Check authentication with Supabase
-    const checkAuth = async () => {
+    // Check authentication with Supabase and load existing intake data
+    const checkAuthAndLoadData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       const consentGiven = localStorage.getItem('consent_given');
       
       if (!session) {
         router.push('/auth');
+        return;
       } else if (!consentGiven) {
         router.push('/consent');
+        return;
+      }
+      
+      setIsAuthenticated(true);
+
+      // Load existing intake data from Supabase database
+      const { data: intakeRecord } = await supabase
+        .from('intake')
+        .select('intake_data')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (intakeRecord?.intake_data && Object.keys(intakeRecord.intake_data).length > 0) {
+        console.log('Loading existing intake data from database');
+        setIntakeData(intakeRecord.intake_data);
+        // Also save to localStorage as cache
+        localStorage.setItem('intake_data', JSON.stringify(intakeRecord.intake_data));
       } else {
-        setIsAuthenticated(true);
+        // Try localStorage as fallback (for backward compatibility)
+        const savedIntake = localStorage.getItem('intake_data');
+        if (savedIntake) {
+          setIntakeData(JSON.parse(savedIntake));
+        }
       }
     };
     
-    checkAuth();
+    checkAuthAndLoadData();
   }, [router]);
 
   // Auto-save function

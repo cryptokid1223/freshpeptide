@@ -16,7 +16,7 @@ export default function DashboardPage() {
   const [brief, setBrief] = useState<BriefOutput | null>(null);
 
   useEffect(() => {
-    // Check authentication with Supabase
+    // Check authentication with Supabase and load data from database
     const loadDashboardData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -27,16 +27,27 @@ export default function DashboardPage() {
       
       setUserEmail(session.user.email || '');
 
-      // Load intake data from localStorage
-      const savedIntake = localStorage.getItem('intake_data');
-      if (savedIntake) {
-        setIntakeData(JSON.parse(savedIntake));
+      // Load intake data from Supabase database
+      const { data: intakeRecord } = await supabase
+        .from('intake')
+        .select('intake_data')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      if (intakeRecord?.intake_data) {
+        setIntakeData(intakeRecord.intake_data);
       }
 
-      // Load brief from localStorage
-      const savedBrief = localStorage.getItem('generated_brief');
-      if (savedBrief) {
-        setBrief(JSON.parse(savedBrief));
+      // Load most recent brief from Supabase database
+      const { data: briefRecords } = await supabase
+        .from('briefs')
+        .select('brief_output')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (briefRecords && briefRecords.length > 0) {
+        setBrief(briefRecords[0].brief_output as BriefOutput);
       }
     };
 

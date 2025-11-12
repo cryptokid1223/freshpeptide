@@ -97,27 +97,35 @@ export default function Home() {
                   </p>
                   
                   <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                    <Link href="/auth" className="block">
-                      <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer">
-                        <div className="text-4xl mb-3">✨</div>
-                        <h3 className="text-xl font-bold text-white mb-2">New User?</h3>
-                        <p className="text-cyan-100 text-sm mb-4">Create a free account</p>
-                        <div className="bg-white text-cyan-700 font-semibold py-2 px-4 rounded">
-                          Sign Up
-                        </div>
+                    <div 
+                      onClick={() => {
+                        localStorage.setItem('authMode', 'signup');
+                        window.location.href = '/auth';
+                      }}
+                      className="bg-gradient-to-br from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer"
+                    >
+                      <div className="text-4xl mb-3">✨</div>
+                      <h3 className="text-xl font-bold text-white mb-2">New User?</h3>
+                      <p className="text-cyan-100 text-sm mb-4">Create a free account</p>
+                      <div className="bg-white text-cyan-700 font-semibold py-2 px-4 rounded">
+                        Sign Up
                       </div>
-                    </Link>
+                    </div>
 
-                    <Link href="/auth" className="block">
-                      <div className="bg-slate-700 hover:bg-slate-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer border border-slate-600">
-                        <div className="text-4xl mb-3">👤</div>
-                        <h3 className="text-xl font-bold text-white mb-2">Have an Account?</h3>
-                        <p className="text-slate-300 text-sm mb-4">Sign in to continue</p>
-                        <div className="bg-transparent border-2 border-white text-white font-semibold py-2 px-4 rounded">
-                          Sign In
-                        </div>
+                    <div 
+                      onClick={() => {
+                        localStorage.setItem('authMode', 'signin');
+                        window.location.href = '/auth';
+                      }}
+                      className="bg-slate-700 hover:bg-slate-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer border border-slate-600"
+                    >
+                      <div className="text-4xl mb-3">👤</div>
+                      <h3 className="text-xl font-bold text-white mb-2">Have an Account?</h3>
+                      <p className="text-slate-300 text-sm mb-4">Sign in to continue</p>
+                      <div className="bg-transparent border-2 border-white text-white font-semibold py-2 px-4 rounded">
+                        Sign In
                       </div>
-                    </Link>
+                    </div>
                   </div>
 
                   <div className="text-center">

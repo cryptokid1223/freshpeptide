@@ -15,7 +15,7 @@ export default function GeneratePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check authentication and intake completion
+    // Check authentication and intake completion from Supabase
     const checkAuthAndIntake = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -24,16 +24,32 @@ export default function GeneratePage() {
         return;
       }
 
-      const intakeCompleted = localStorage.getItem('intake_completed');
-      if (!intakeCompleted) {
+      // Check if user has completed intake from Supabase
+      const { data: intakeRecord } = await supabase
+        .from('intake')
+        .select('intake_data')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      const hasCompletedIntake = intakeRecord?.intake_data && 
+        typeof intakeRecord.intake_data === 'object' && 
+        Object.keys(intakeRecord.intake_data).length > 5;
+
+      if (!hasCompletedIntake) {
         router.push('/intake');
         return;
       }
 
-      // Check if brief already exists
-      const savedBrief = localStorage.getItem('generated_brief');
-      if (savedBrief) {
-        setBrief(JSON.parse(savedBrief));
+      // Load most recent brief from Supabase database if it exists
+      const { data: briefRecords } = await supabase
+        .from('briefs')
+        .select('brief_output')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false })
+        .limit(1);
+
+      if (briefRecords && briefRecords.length > 0) {
+        setBrief(briefRecords[0].brief_output as BriefOutput);
       }
     };
 
@@ -45,12 +61,6 @@ export default function GeneratePage() {
     setError(null);
 
     try {
-      const intakeData = localStorage.getItem('intake_data');
-      
-      if (!intakeData) {
-        throw new Error('No intake data found. Please complete the questionnaire first.');
-      }
-
       // Get the current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
@@ -67,6 +77,17 @@ export default function GeneratePage() {
       const user = session.user;
       console.log('Generating brief for user:', user.id);
 
+      // Load intake data from Supabase database
+      const { data: intakeRecord, error: intakeError } = await supabase
+        .from('intake')
+        .select('intake_data')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (!intakeRecord?.intake_data || Object.keys(intakeRecord.intake_data).length === 0) {
+        throw new Error('No intake data found. Please complete the questionnaire first.');
+      }
+
       const response = await fetch('/api/generate-brief', {
         method: 'POST',
         headers: {
@@ -74,7 +95,7 @@ export default function GeneratePage() {
         },
         body: JSON.stringify({
           userId: user.id,
-          intakeData: JSON.parse(intakeData),
+          intakeData: intakeRecord.intake_data,
         }),
       });
 

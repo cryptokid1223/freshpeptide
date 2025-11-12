@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/MainLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,12 +13,22 @@ type AuthMode = 'signin' | 'signup';
 
 export default function AuthPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<AuthMode>('signup');
+  // Default to signin mode (better for returning users)
+  const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
+
+  // Check localStorage for auth mode preference from homepage
+  useEffect(() => {
+    const storedMode = localStorage.getItem('authMode') as AuthMode | null;
+    if (storedMode === 'signup' || storedMode === 'signin') {
+      setMode(storedMode);
+      localStorage.removeItem('authMode'); // Clear after reading
+    }
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,17 +46,24 @@ export default function AuthPage() {
 
       if (data.user) {
         // Check if user has completed intake
-        const { data: intakeData } = await supabase
+        const { data: intakeData, error: intakeError } = await supabase
           .from('intake')
           .select('intake_data')
           .eq('user_id', data.user.id)
-          .single();
+          .maybeSingle(); // Use maybeSingle instead of single to avoid error if no row exists
 
-        if (intakeData?.intake_data && Object.keys(intakeData.intake_data).length > 0) {
+        // Check if user has meaningful intake data
+        const hasCompletedIntake = intakeData?.intake_data && 
+          typeof intakeData.intake_data === 'object' && 
+          Object.keys(intakeData.intake_data).length > 5; // Must have substantial data, not just empty object
+
+        if (hasCompletedIntake) {
           // User has completed intake, go to dashboard
+          console.log('User has completed intake, redirecting to dashboard');
           router.push('/dashboard');
         } else {
           // User hasn't completed intake, go to consent
+          console.log('User needs to complete intake, redirecting to consent');
           router.push('/consent');
         }
       }
