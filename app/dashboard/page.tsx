@@ -16,6 +16,8 @@ export default function DashboardPage() {
   const [intakeData, setIntakeData] = useState<any>(null);
   const [brief, setBrief] = useState<BriefOutput | null>(null);
   const [dataStatus, setDataStatus] = useState<string>('Loading...');
+  const [showDebug, setShowDebug] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   useEffect(() => {
     // Check authentication with Supabase and load data from database
@@ -70,6 +72,77 @@ export default function DashboardPage() {
     loadDashboardData();
   }, [router]);
 
+  const testDatabaseConnection = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setDebugInfo({ error: 'Not authenticated' });
+        return;
+      }
+
+      // Try to read from intake table
+      const { data: intakeRecord, error: intakeError } = await supabase
+        .from('intake')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      // Try to read from briefs table
+      const { data: briefRecords, error: briefError } = await supabase
+        .from('briefs')
+        .select('*')
+        .eq('user_id', session.user.id);
+
+      setDebugInfo({
+        userId: session.user.id,
+        userEmail: session.user.email,
+        intakeRecord: intakeRecord,
+        intakeError: intakeError?.message,
+        briefRecords: briefRecords,
+        briefError: briefError?.message,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error: any) {
+      setDebugInfo({ error: error.message });
+    }
+  };
+
+  const testWriteToDatabase = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        alert('Not authenticated');
+        return;
+      }
+
+      // Try to write test data
+      const testData = {
+        demographics: { test: true, timestamp: new Date().toISOString() },
+        medical: { test: true },
+        lifestyle: { test: true },
+        goals: { test: true }
+      };
+
+      const { data: result, error } = await supabase
+        .from('intake')
+        .upsert({
+          user_id: session.user.id,
+          intake_data: testData,
+          updated_at: new Date().toISOString(),
+        }, { onConflict: 'user_id' });
+
+      if (error) {
+        alert('Write FAILED: ' + error.message);
+        setDebugInfo({ writeError: error.message, writeResult: result });
+      } else {
+        alert('Write SUCCESS! Data saved to database.');
+        testDatabaseConnection(); // Refresh debug info
+      }
+    } catch (error: any) {
+      alert('Exception: ' + error.message);
+    }
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8 sm:py-16">
@@ -84,6 +157,35 @@ export default function DashboardPage() {
                 <strong>Data Status:</strong> {dataStatus}
               </p>
               <p className="text-xs text-slate-400 mt-1">User ID: {userId.substring(0, 8)}...</p>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  onClick={() => {
+                    setShowDebug(!showDebug);
+                    if (!showDebug) testDatabaseConnection();
+                  }}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs border-blue-500 text-blue-300"
+                >
+                  {showDebug ? 'Hide' : 'Show'} Raw Data
+                </Button>
+                <Button
+                  onClick={testWriteToDatabase}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs border-green-500 text-green-300"
+                >
+                  Test Write
+                </Button>
+              </div>
+              
+              {showDebug && debugInfo && (
+                <div className="mt-3 p-3 bg-slate-900 rounded text-xs font-mono overflow-auto max-h-96">
+                  <pre className="text-green-400 whitespace-pre-wrap break-words">
+                    {JSON.stringify(debugInfo, null, 2)}
+                  </pre>
+                </div>
+              )}
             </div>
           </div>
 
