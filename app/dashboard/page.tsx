@@ -12,8 +12,10 @@ import type { BriefOutput } from '@/lib/supabase';
 export default function DashboardPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string>('');
+  const [userId, setUserId] = useState<string>('');
   const [intakeData, setIntakeData] = useState<any>(null);
   const [brief, setBrief] = useState<BriefOutput | null>(null);
+  const [dataStatus, setDataStatus] = useState<string>('Loading...');
 
   useEffect(() => {
     // Check authentication with Supabase and load data from database
@@ -26,28 +28,42 @@ export default function DashboardPage() {
       }
       
       setUserEmail(session.user.email || '');
+      setUserId(session.user.id);
+      console.log('📊 Dashboard loading for user:', session.user.email, session.user.id);
 
       // Load intake data from Supabase database
-      const { data: intakeRecord } = await supabase
+      const { data: intakeRecord, error: intakeError } = await supabase
         .from('intake')
         .select('intake_data')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
+      console.log('Intake query result:', { intakeRecord, intakeError });
+
       if (intakeRecord?.intake_data) {
+        console.log('✅ Found intake data in database');
         setIntakeData(intakeRecord.intake_data);
+        setDataStatus('Loaded from database ✅');
+      } else {
+        console.log('❌ No intake data found in database');
+        setDataStatus('No intake data found in database');
       }
 
       // Load most recent brief from Supabase database
-      const { data: briefRecords } = await supabase
+      const { data: briefRecords, error: briefError } = await supabase
         .from('briefs')
         .select('brief_output')
         .eq('user_id', session.user.id)
         .order('created_at', { ascending: false })
         .limit(1);
 
+      console.log('Brief query result:', { briefRecords, briefError });
+
       if (briefRecords && briefRecords.length > 0) {
+        console.log('✅ Found brief in database');
         setBrief(briefRecords[0].brief_output as BriefOutput);
+      } else {
+        console.log('❌ No brief found in database');
       }
     };
 
@@ -61,6 +77,14 @@ export default function DashboardPage() {
           <div className="mb-6 sm:mb-8">
             <h1 className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-2">Dashboard</h1>
             <p className="text-sm sm:text-base text-slate-400 truncate">Welcome back, {userEmail}</p>
+            
+            {/* Diagnostic Info */}
+            <div className="mt-4 p-3 bg-blue-900/20 border border-blue-700 rounded-lg">
+              <p className="text-xs sm:text-sm text-blue-300">
+                <strong>Data Status:</strong> {dataStatus}
+              </p>
+              <p className="text-xs text-slate-400 mt-1">User ID: {userId.substring(0, 8)}...</p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">

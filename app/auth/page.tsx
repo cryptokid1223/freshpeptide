@@ -192,7 +192,7 @@ export default function AuthPage() {
 
             {message && (
               <div className="mb-4 p-4 bg-green-900/20 border border-green-700 rounded-lg">
-                <p className="text-green-400 text-center">{message}</p>
+                <p className="text-green-400 text-center text-sm sm:text-base">{message}</p>
               </div>
             )}
 
