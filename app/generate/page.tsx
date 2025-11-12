@@ -13,6 +13,7 @@ export default function GeneratePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [brief, setBrief] = useState<BriefOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState<string>('');
 
   useEffect(() => {
     // Check authentication and intake completion from Supabase
@@ -45,14 +46,17 @@ export default function GeneratePage() {
       console.log('Generate page intake check:', { hasCompletedIntake, intake });
 
       if (!hasCompletedIntake) {
-        console.log('Incomplete intake, redirecting to /intake');
-        router.push('/intake');
+        console.log('Incomplete intake');
+        setStatusMessage('⚠️ Please complete all intake sections first');
+        setError('Intake questionnaire not completed. Please go to the intake page and complete all 4 sections.');
+        // Don't redirect - let them see the error
         return;
       }
 
       // Set consent flag for consistency
       localStorage.setItem('consent_given', 'true');
       localStorage.setItem('intake_completed', 'true');
+      setStatusMessage('✅ Ready to generate');
 
       // Load most recent brief from Supabase database if it exists
       const { data: briefRecords } = await supabase
@@ -73,9 +77,11 @@ export default function GeneratePage() {
   const handleGenerate = async () => {
     setIsGenerating(true);
     setError(null);
+    setStatusMessage('🔄 Starting generation...');
 
     try {
       // Get the current session
+      setStatusMessage('🔐 Checking authentication...');
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError) {
@@ -92,6 +98,7 @@ export default function GeneratePage() {
       console.log('Generating brief for user:', user.id);
 
       // Load intake data from Supabase database
+      setStatusMessage('📋 Loading your questionnaire data...');
       const { data: intakeRecord, error: intakeError } = await supabase
         .from('intake')
         .select('intake_data')
@@ -102,6 +109,9 @@ export default function GeneratePage() {
         throw new Error('No intake data found. Please complete the questionnaire first.');
       }
 
+      console.log('✅ Intake data loaded, calling AI...');
+      setStatusMessage('🤖 Calling AI to analyze your profile...');
+      
       const response = await fetch('/api/generate-brief', {
         method: 'POST',
         headers: {
@@ -114,28 +124,44 @@ export default function GeneratePage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to generate brief');
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        try {
+          const errorData = JSON.parse(errorText);
+          throw new Error(errorData.error || 'Failed to generate brief');
+        } catch {
+          throw new Error('Failed to generate brief: ' + response.status);
+        }
       }
 
+      setStatusMessage('💾 Saving your personalized stack...');
       const data = await response.json();
-      console.log('Brief generated successfully:', data.model);
+      console.log('✅ Brief generated successfully:', data.model);
       setBrief(data.brief);
       
       // Save to localStorage for quick access
       localStorage.setItem('generated_brief', JSON.stringify(data.brief));
       
       // Save to Supabase
-      await supabase
+      const { error: saveError } = await supabase
         .from('briefs')
         .insert({
           user_id: user.id,
           brief_output: data.brief,
           model_name: data.model,
         });
+
+      if (saveError) {
+        console.error('Error saving brief to Supabase:', saveError);
+        // Don't fail - brief is still shown to user
+      }
+
+      setStatusMessage('✅ Complete! Your stack is ready.');
     } catch (err) {
       console.error('Generate error:', err);
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMsg = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMsg);
+      setStatusMessage('❌ Generation failed');
     } finally {
       setIsGenerating(false);
     }
@@ -156,18 +182,32 @@ export default function GeneratePage() {
                 highlights risks, and provides evidence citations.
               </p>
 
+              {/* Status Message */}
+              {statusMessage && (
+                <div className="mb-4 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
+                  <p className="text-blue-300 text-center text-sm sm:text-base">{statusMessage}</p>
+                </div>
+              )}
+
+              {/* Error Message */}
+              {error && (
+                <div className="mb-4 p-4 bg-red-900/20 border border-red-700 rounded-lg">
+                  <p className="text-red-400 text-sm sm:text-base">{error}</p>
+                  <Button 
+                    onClick={() => router.push('/intake')} 
+                    className="mt-3 w-full bg-cyan-600 hover:bg-cyan-700"
+                  >
+                    Go to Intake Page
+                  </Button>
+                </div>
+              )}
+
               <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-4 mb-6">
                 <p className="text-slate-300 text-sm">
                   <strong className="text-amber-400">Remember:</strong> This is educational content 
                   only and not medical advice. Always consult healthcare professionals.
                 </p>
               </div>
-
-              {error && (
-                <div className="bg-red-900/20 border border-red-700 rounded-lg p-4 mb-6">
-                  <p className="text-red-400">{error}</p>
-                </div>
-              )}
 
               <Button
                 onClick={handleGenerate}
