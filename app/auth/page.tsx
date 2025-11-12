@@ -45,25 +45,41 @@ export default function AuthPage() {
       if (authError) throw authError;
 
       if (data.user) {
-        // Check if user has completed intake
+        // Check if user has completed intake by checking all required sections
         const { data: intakeData, error: intakeError } = await supabase
           .from('intake')
           .select('intake_data')
           .eq('user_id', data.user.id)
-          .maybeSingle(); // Use maybeSingle instead of single to avoid error if no row exists
+          .maybeSingle();
 
-        // Check if user has meaningful intake data
-        const hasCompletedIntake = intakeData?.intake_data && 
-          typeof intakeData.intake_data === 'object' && 
-          Object.keys(intakeData.intake_data).length > 5; // Must have substantial data, not just empty object
+        console.log('Sign-in intake check:', {
+          hasRecord: !!intakeData,
+          intakeData: intakeData?.intake_data,
+          dataKeys: intakeData?.intake_data ? Object.keys(intakeData.intake_data) : []
+        });
+
+        // Check if user has ALL required intake sections completed
+        const intake = intakeData?.intake_data;
+        const hasCompletedIntake = intake && 
+          intake.demographics && 
+          intake.medical && 
+          intake.lifestyle && 
+          intake.goals &&
+          Object.keys(intake.demographics).length > 0 &&
+          Object.keys(intake.medical).length > 0 &&
+          Object.keys(intake.lifestyle).length > 0 &&
+          Object.keys(intake.goals).length > 0;
 
         if (hasCompletedIntake) {
-          // User has completed intake, go to dashboard
-          console.log('User has completed intake, redirecting to dashboard');
+          // User has completed full intake, go to dashboard
+          console.log('✅ User has completed intake, redirecting to dashboard');
+          // Set localStorage flags for consistency
+          localStorage.setItem('consent_given', 'true');
+          localStorage.setItem('intake_completed', 'true');
           router.push('/dashboard');
         } else {
           // User hasn't completed intake, go to consent
-          console.log('User needs to complete intake, redirecting to consent');
+          console.log('❌ User needs to complete intake, redirecting to consent');
           router.push('/consent');
         }
       }
@@ -109,11 +125,11 @@ export default function AuthPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-md mx-auto">
-          <Card className="bg-slate-800/50 border-slate-700 p-8">
+          <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
             {/* Tab Buttons */}
-            <div className="flex gap-2 mb-8">
+            <div className="flex gap-2 mb-6 sm:mb-8">
               <Button
                 type="button"
                 onClick={() => {
@@ -123,7 +139,7 @@ export default function AuthPage() {
                   setEmail('');
                   setPassword('');
                 }}
-                className={`flex-1 py-6 text-lg ${
+                className={`flex-1 py-4 sm:py-6 text-base sm:text-lg ${
                   mode === 'signin'
                     ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
                     : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
@@ -140,7 +156,7 @@ export default function AuthPage() {
                   setEmail('');
                   setPassword('');
                 }}
-                className={`flex-1 py-6 text-lg ${
+                className={`flex-1 py-4 sm:py-6 text-base sm:text-lg ${
                   mode === 'signup'
                     ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
                     : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
@@ -150,10 +166,10 @@ export default function AuthPage() {
               </Button>
             </div>
 
-            <h1 className="text-3xl font-bold text-cyan-400 mb-3 text-center">
+            <h1 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-2 sm:mb-3 text-center">
               {mode === 'signin' ? 'Welcome Back!' : 'Create Your Account'}
             </h1>
-            <p className="text-slate-400 text-center mb-8">
+            <p className="text-sm sm:text-base text-slate-400 text-center mb-6 sm:mb-8 px-2">
               {mode === 'signin' 
                 ? 'Sign in to access your dashboard and peptide stack' 
                 : 'Sign up to get personalized AI-powered peptide recommendations'}

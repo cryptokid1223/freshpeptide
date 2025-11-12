@@ -33,16 +33,16 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       <ResearchBanner />
       
-      <main className="container mx-auto px-4 py-16">
+      <main className="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
         {/* Hero Section */}
-        <div className="text-center mb-12 pt-8">
-          <h1 className="text-6xl font-bold text-cyan-400 mb-4 tracking-tight">
+        <div className="text-center mb-8 sm:mb-12 pt-4 sm:pt-8">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-cyan-400 mb-3 sm:mb-4 tracking-tight">
             FreshPeptide
           </h1>
-          <p className="text-2xl text-slate-300 mb-4">
+          <p className="text-xl sm:text-2xl text-slate-300 mb-3 sm:mb-4 px-2">
             AI-Powered Peptide Research Platform
           </p>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto mb-8">
+          <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto mb-6 sm:mb-8 px-4">
             Get personalized peptide recommendations based on your health profile and goals
           </p>
         </div>
@@ -51,16 +51,16 @@ export default function Home() {
           <>
             {isAuthenticated ? (
               /* Logged In View */
-              <div className="max-w-4xl mx-auto mb-16">
-                <Card className="bg-slate-800/50 border-slate-700 p-8">
-                  <h2 className="text-3xl font-bold text-cyan-400 mb-6 text-center">
+              <div className="max-w-4xl mx-auto mb-8 sm:mb-16">
+                <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-4 sm:mb-6 text-center">
                     Welcome Back! 👋
                   </h2>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
                     <Link href="/dashboard" className="flex-1">
                       <Button 
                         size="lg" 
-                        className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-6 text-lg"
+                        className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-4 sm:py-6 text-base sm:text-lg"
                       >
                         📊 View Dashboard
                       </Button>
@@ -68,7 +68,7 @@ export default function Home() {
                     <Link href="/generate" className="flex-1">
                       <Button 
                         size="lg" 
-                        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-6 text-lg"
+                        className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 sm:py-6 text-base sm:text-lg"
                       >
                         🧬 Generate Stack
                       </Button>
@@ -77,7 +77,7 @@ export default function Home() {
                       <Button 
                         size="lg" 
                         variant="outline"
-                        className="w-full border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 py-6 text-lg"
+                        className="w-full border-cyan-400 text-cyan-400 hover:bg-cyan-400/10 py-4 sm:py-6 text-base sm:text-lg"
                       >
                         📚 Browse Library
                       </Button>
@@ -87,27 +87,27 @@ export default function Home() {
               </div>
             ) : (
               /* Not Logged In View - Simple Auth Section */
-              <div className="max-w-2xl mx-auto mb-16">
-                <Card className="bg-slate-800/50 border-slate-700 p-8">
-                  <h2 className="text-3xl font-bold text-cyan-400 mb-2 text-center">
+              <div className="max-w-2xl mx-auto mb-8 sm:mb-16">
+                <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-2 text-center">
                     Get Started
                   </h2>
-                  <p className="text-slate-400 text-center mb-8">
+                  <p className="text-sm sm:text-base text-slate-400 text-center mb-6 sm:mb-8 px-2">
                     Create an account or sign in to get your personalized peptide recommendations
                   </p>
                   
-                  <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
                     <div 
                       onClick={() => {
                         localStorage.setItem('authMode', 'signup');
                         window.location.href = '/auth';
                       }}
-                      className="bg-gradient-to-br from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer"
+                      className="bg-gradient-to-br from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 p-5 sm:p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer active:scale-95"
                     >
-                      <div className="text-4xl mb-3">✨</div>
-                      <h3 className="text-xl font-bold text-white mb-2">New User?</h3>
-                      <p className="text-cyan-100 text-sm mb-4">Create a free account</p>
-                      <div className="bg-white text-cyan-700 font-semibold py-2 px-4 rounded">
+                      <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">✨</div>
+                      <h3 className="text-lg sm:text-xl font-bold text-white mb-1 sm:mb-2">New User?</h3>
+                      <p className="text-cyan-100 text-xs sm:text-sm mb-3 sm:mb-4">Create a free account</p>
+                      <div className="bg-white text-cyan-700 font-semibold py-2 px-4 rounded text-sm sm:text-base">
                         Sign Up
                       </div>
                     </div>
@@ -117,12 +117,12 @@ export default function Home() {
                         localStorage.setItem('authMode', 'signin');
                         window.location.href = '/auth';
                       }}
-                      className="bg-slate-700 hover:bg-slate-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer border border-slate-600"
+                      className="bg-slate-700 hover:bg-slate-600 p-5 sm:p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer border border-slate-600 active:scale-95"
                     >
-                      <div className="text-4xl mb-3">👤</div>
-                      <h3 className="text-xl font-bold text-white mb-2">Have an Account?</h3>
-                      <p className="text-slate-300 text-sm mb-4">Sign in to continue</p>
-                      <div className="bg-transparent border-2 border-white text-white font-semibold py-2 px-4 rounded">
+                      <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">👤</div>
+                      <h3 className="text-lg sm:text-xl font-bold text-white mb-1 sm:mb-2">Have an Account?</h3>
+                      <p className="text-slate-300 text-xs sm:text-sm mb-3 sm:mb-4">Sign in to continue</p>
+                      <div className="bg-transparent border-2 border-white text-white font-semibold py-2 px-4 rounded text-sm sm:text-base">
                         Sign In
                       </div>
                     </div>
@@ -145,35 +145,35 @@ export default function Home() {
         )}
 
         {/* Feature Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-16">
-          <Card className="bg-slate-800/50 border-slate-700 p-6 hover:bg-slate-800/70 transition-all">
-            <div className="text-4xl mb-4">📋</div>
-            <h3 className="text-xl font-semibold text-cyan-400 mb-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-16">
+          <Card className="bg-slate-800/50 border-slate-700 p-5 sm:p-6 hover:bg-slate-800/70 transition-all">
+            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">📋</div>
+            <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 mb-2">
               Comprehensive Intake
             </h3>
-            <p className="text-slate-300">
+            <p className="text-sm sm:text-base text-slate-300">
               Multi-step health questionnaire covering demographics, medical history, 
               lifestyle, and goals.
             </p>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700 p-6 hover:bg-slate-800/70 transition-all">
-            <div className="text-4xl mb-4">🤖</div>
-            <h3 className="text-xl font-semibold text-cyan-400 mb-2">
+          <Card className="bg-slate-800/50 border-slate-700 p-5 sm:p-6 hover:bg-slate-800/70 transition-all">
+            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🤖</div>
+            <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 mb-2">
               AI-Powered Analysis
             </h3>
-            <p className="text-slate-300">
+            <p className="text-sm sm:text-base text-slate-300">
               Server-side AI generates educational briefs mapping goals to research-backed 
               peptide classes with evidence citations.
             </p>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700 p-6 hover:bg-slate-800/70 transition-all">
-            <div className="text-4xl mb-4">📚</div>
-            <h3 className="text-xl font-semibold text-cyan-400 mb-2">
+          <Card className="bg-slate-800/50 border-slate-700 p-5 sm:p-6 hover:bg-slate-800/70 transition-all">
+            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">📚</div>
+            <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 mb-2">
               Searchable Library
             </h3>
-            <p className="text-slate-300">
+            <p className="text-sm sm:text-base text-slate-300">
               Explore a curated database of peptides with mechanisms, regulatory status, 
               evidence, and safety information.
             </p>
@@ -181,83 +181,83 @@ export default function Home() {
         </div>
 
         {/* Demo Flow Section */}
-        <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-8 mb-16">
-          <h2 className="text-3xl font-bold text-cyan-400 mb-6 text-center">
+        <div className="bg-slate-800/30 border border-slate-700 rounded-lg p-4 sm:p-8 mb-8 sm:mb-16">
+          <h2 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-4 sm:mb-6 text-center">
             How It Works
           </h2>
-          <div className="space-y-4 max-w-2xl mx-auto">
-            <div className="flex items-start gap-4">
-              <div className="bg-cyan-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+          <div className="space-y-3 sm:space-y-4 max-w-2xl mx-auto">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="bg-cyan-600 text-white rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center font-bold flex-shrink-0 text-sm sm:text-base">
                 1
               </div>
               <div>
-                <h4 className="font-semibold text-slate-200 mb-1">Sign In</h4>
-                <p className="text-slate-400">Simple email authentication to get started</p>
+                <h4 className="font-semibold text-slate-200 mb-1 text-sm sm:text-base">Sign In</h4>
+                <p className="text-slate-400 text-xs sm:text-sm">Simple email authentication to get started</p>
               </div>
             </div>
             
-            <div className="flex items-start gap-4">
-              <div className="bg-cyan-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="bg-cyan-600 text-white rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center font-bold flex-shrink-0 text-sm sm:text-base">
                 2
               </div>
               <div>
-                <h4 className="font-semibold text-slate-200 mb-1">Review Consent</h4>
-                <p className="text-slate-400">Acknowledge research and educational purposes</p>
+                <h4 className="font-semibold text-slate-200 mb-1 text-sm sm:text-base">Review Consent</h4>
+                <p className="text-slate-400 text-xs sm:text-sm">Acknowledge research and educational purposes</p>
               </div>
             </div>
             
-            <div className="flex items-start gap-4">
-              <div className="bg-cyan-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="bg-cyan-600 text-white rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center font-bold flex-shrink-0 text-sm sm:text-base">
                 3
               </div>
               <div>
-                <h4 className="font-semibold text-slate-200 mb-1">Complete Intake</h4>
-                <p className="text-slate-400">4-step questionnaire with auto-save functionality</p>
+                <h4 className="font-semibold text-slate-200 mb-1 text-sm sm:text-base">Complete Intake</h4>
+                <p className="text-slate-400 text-xs sm:text-sm">4-step questionnaire with auto-save functionality</p>
               </div>
             </div>
             
-            <div className="flex items-start gap-4">
-              <div className="bg-cyan-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="bg-cyan-600 text-white rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center font-bold flex-shrink-0 text-sm sm:text-base">
                 4
               </div>
               <div>
-                <h4 className="font-semibold text-slate-200 mb-1">Generate Brief</h4>
-                <p className="text-slate-400">AI analyzes your inputs and creates educational content</p>
+                <h4 className="font-semibold text-slate-200 mb-1 text-sm sm:text-base">Generate Brief</h4>
+                <p className="text-slate-400 text-xs sm:text-sm">AI analyzes your inputs and creates educational content</p>
               </div>
             </div>
             
-            <div className="flex items-start gap-4">
-              <div className="bg-cyan-600 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold flex-shrink-0">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="bg-cyan-600 text-white rounded-full w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center font-bold flex-shrink-0 text-sm sm:text-base">
                 5
               </div>
               <div>
-                <h4 className="font-semibold text-slate-200 mb-1">Review Results</h4>
-                <p className="text-slate-400">Access your personalized brief and explore the peptide library</p>
+                <h4 className="font-semibold text-slate-200 mb-1 text-sm sm:text-base">Review Results</h4>
+                <p className="text-slate-400 text-xs sm:text-sm">Access your personalized brief and explore the peptide library</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Important Disclaimers */}
-        <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-6">
-          <h3 className="text-xl font-semibold text-amber-400 mb-3">
+        <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-4 sm:p-6">
+          <h3 className="text-lg sm:text-xl font-semibold text-amber-400 mb-3">
             ⚠️ Important Information
           </h3>
-          <ul className="space-y-2 text-slate-300">
+          <ul className="space-y-2 text-slate-300 text-sm sm:text-base">
             <li className="flex items-start gap-2">
-              <span className="text-amber-400">•</span>
+              <span className="text-amber-400 flex-shrink-0">•</span>
               <span>This is a research and demonstration platform only</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-amber-400">•</span>
+              <span className="text-amber-400 flex-shrink-0">•</span>
               <span>No medical advice is provided or implied</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-amber-400">•</span>
+              <span className="text-amber-400 flex-shrink-0">•</span>
               <span>All AI outputs are educational and should not guide medical decisions</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-amber-400">•</span>
+              <span className="text-amber-400 flex-shrink-0">•</span>
               <span>Consult qualified healthcare professionals for any health-related decisions</span>
             </li>
           </ul>

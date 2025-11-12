@@ -4774,28 +4774,28 @@ export default function LibraryPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-cyan-400 mb-2">Peptide Library</h1>
-            <p className="text-slate-400">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-2">Peptide Library</h1>
+            <p className="text-sm sm:text-base text-slate-400">
               Explore our curated database of 234 research peptides with detailed information
             </p>
           </div>
 
           {/* Peptide of the Day */}
-          <Card className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-500/50 p-6 mb-8">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="bg-cyan-500 text-slate-900 px-3 py-1 rounded-full text-sm font-bold">
+          <Card className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-500/50 p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
+              <div className="bg-cyan-500 text-slate-900 px-3 py-1 rounded-full text-xs sm:text-sm font-bold inline-block w-fit">
                 ✨ Peptide of the Day
               </div>
-              <p className="text-slate-400 text-sm">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              <p className="text-slate-400 text-xs sm:text-sm">
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </p>
             </div>
-            <h2 className="text-2xl font-bold text-cyan-300 mb-2">{peptideOfTheDay.name}</h2>
-            <p className="text-amber-400 text-sm mb-3">{peptideOfTheDay.regulatory_status}</p>
-            <p className="text-slate-200 text-sm mb-4">{peptideOfTheDay.summary}</p>
+            <h2 className="text-xl sm:text-2xl font-bold text-cyan-300 mb-2">{peptideOfTheDay.name}</h2>
+            <p className="text-amber-400 text-xs sm:text-sm mb-2 sm:mb-3">{peptideOfTheDay.regulatory_status}</p>
+            <p className="text-slate-200 text-xs sm:text-sm mb-3 sm:mb-4">{peptideOfTheDay.summary}</p>
             <button
               onClick={() => {
                 setSearchQuery('');
@@ -4816,9 +4816,9 @@ export default function LibraryPage() {
           </Card>
 
           {/* Category Filters */}
-          <div className="mb-6">
-            <h3 className="text-sm font-semibold text-slate-300 mb-3">Browse by Category:</h3>
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-4 sm:mb-6">
+            <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3">Browse by Category:</h3>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {CATEGORIES.map((category) => (
                 <button
                   key={category.id}
@@ -4827,7 +4827,7 @@ export default function LibraryPage() {
                     setSearchQuery('');
                     setSelectedPeptide(null); // Reset selected peptide when changing category
                   }}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
                     selectedCategory === category.id
                       ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/50'
                       : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-600'
@@ -4841,13 +4841,13 @@ export default function LibraryPage() {
           </div>
 
           {/* Search */}
-          <div className="mb-6">
+          <div className="mb-4 sm:mb-6">
             <Input
               type="text"
-              placeholder="Search peptides by name, mechanism, or summary..."
+              placeholder="Search peptides..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-800 border-slate-600 text-slate-100 text-lg py-6"
+              className="bg-slate-800 border-slate-600 text-slate-100 text-sm sm:text-lg py-4 sm:py-6"
             />
             {(selectedCategory !== 'all' || searchQuery) && (
               <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
@@ -4871,19 +4871,19 @@ export default function LibraryPage() {
           </div>
 
           {/* Results */}
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* List */}
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {filteredPeptides.map((peptide) => (
                 <Card
                   key={peptide.id}
-                  className={`bg-slate-800/50 border-slate-700 p-6 cursor-pointer transition-all hover:bg-slate-800/70 
+                  className={`bg-slate-800/50 border-slate-700 p-4 sm:p-6 cursor-pointer transition-all hover:bg-slate-800/70 
                     ${selectedPeptide?.id === peptide.id ? 'border-cyan-500 bg-slate-800/70' : ''}`}
                   onClick={() => setSelectedPeptide(peptide)}
                 >
-                  <h3 className="text-xl font-semibold text-cyan-400 mb-2">{peptide.name}</h3>
-                  <p className="text-sm text-amber-400 mb-2">{peptide.regulatory_status}</p>
-                  <p className="text-slate-300 text-sm">{peptide.summary}</p>
+                  <h3 className="text-base sm:text-xl font-semibold text-cyan-400 mb-2">{peptide.name}</h3>
+                  <p className="text-xs sm:text-sm text-amber-400 mb-2">{peptide.regulatory_status}</p>
+                  <p className="text-slate-300 text-xs sm:text-sm line-clamp-3">{peptide.summary}</p>
                 </Card>
               ))}
 

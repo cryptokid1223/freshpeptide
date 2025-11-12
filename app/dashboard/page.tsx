@@ -56,14 +56,14 @@ export default function DashboardPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-6xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-cyan-400 mb-2">Dashboard</h1>
-            <p className="text-slate-400">Welcome back, {userEmail}</p>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-2">Dashboard</h1>
+            <p className="text-sm sm:text-base text-slate-400 truncate">Welcome back, {userEmail}</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
             {/* Intake Status Card */}
             <Card className="bg-slate-800/50 border-slate-700 p-6">
               <div className="flex items-center gap-4 mb-4">

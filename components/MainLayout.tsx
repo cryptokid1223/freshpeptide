@@ -44,52 +44,47 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       
       {pathname !== '/' && (
         <nav className="bg-slate-800/50 backdrop-blur-sm border-b border-slate-700">
-          <div className="container mx-auto px-4 py-4">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors">
+          <div className="container mx-auto px-4 py-3 sm:py-4">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <Link href="/" className="text-xl sm:text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors">
                 FreshPeptide
               </Link>
               
-              <div className="flex items-center gap-6">
+              <div className="flex items-center gap-3 sm:gap-6 flex-wrap">
                 {isAuthenticated && (
                   <>
                     <Link 
                       href="/dashboard" 
-                      className={`hover:text-cyan-400 transition-colors ${pathname === '/dashboard' ? 'text-cyan-400' : ''}`}
+                      className={`text-sm sm:text-base hover:text-cyan-400 transition-colors ${pathname === '/dashboard' ? 'text-cyan-400' : ''}`}
                     >
                       Dashboard
                     </Link>
                     <Link 
                       href="/library" 
-                      className={`hover:text-cyan-400 transition-colors ${pathname === '/library' ? 'text-cyan-400' : ''}`}
+                      className={`text-sm sm:text-base hover:text-cyan-400 transition-colors ${pathname === '/library' ? 'text-cyan-400' : ''}`}
                     >
                       Library
                     </Link>
                     <Link 
                       href="/account" 
-                      className={`hover:text-cyan-400 transition-colors ${pathname === '/account' ? 'text-cyan-400' : ''}`}
+                      className={`text-sm sm:text-base hover:text-cyan-400 transition-colors ${pathname === '/account' ? 'text-cyan-400' : ''}`}
                     >
                       Account
                     </Link>
                     
-                    <div className="flex items-center gap-4 ml-4 pl-4 border-l border-slate-700">
-                      {userEmail && (
-                        <span className="text-sm text-slate-400">{userEmail}</span>
-                      )}
-                      <Button
-                        onClick={handleSignOut}
-                        variant="outline"
-                        size="sm"
-                        className="border-red-500 text-red-400 hover:bg-red-500/10"
-                      >
-                        Sign Out
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={handleSignOut}
+                      variant="outline"
+                      size="sm"
+                      className="border-red-500 text-red-400 hover:bg-red-500/10 text-xs sm:text-sm ml-2"
+                    >
+                      Sign Out
+                    </Button>
                   </>
                 )}
                 
                 {!isAuthenticated && (
-                  <Link href="/library" className="hover:text-cyan-400 transition-colors">
+                  <Link href="/library" className="text-sm sm:text-base hover:text-cyan-400 transition-colors">
                     Library
                   </Link>
                 )}
@@ -101,10 +96,10 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
       
       <main>{children}</main>
       
-      <footer className="bg-slate-900/50 border-t border-slate-700 py-8 mt-16">
+      <footer className="bg-slate-900/50 border-t border-slate-700 py-6 sm:py-8 mt-8 sm:mt-16">
         <div className="container mx-auto px-4 text-center text-slate-400">
-          <p className="mb-2">FreshPeptide - Research & Educational Platform</p>
-          <p className="text-sm">
+          <p className="mb-2 text-sm sm:text-base">FreshPeptide - Research & Educational Platform</p>
+          <p className="text-xs sm:text-sm px-4">
             This platform is for research and demonstration purposes only. 
             All information provided is for educational use and does not constitute medical advice.
           </p>
