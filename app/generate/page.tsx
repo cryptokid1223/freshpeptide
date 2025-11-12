@@ -15,17 +15,29 @@ export default function GeneratePage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check if intake is completed
-    const intakeCompleted = localStorage.getItem('intake_completed');
-    if (!intakeCompleted) {
-      router.push('/intake');
-    }
+    // Check authentication and intake completion
+    const checkAuthAndIntake = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        router.push('/auth');
+        return;
+      }
 
-    // Check if brief already exists
-    const savedBrief = localStorage.getItem('generated_brief');
-    if (savedBrief) {
-      setBrief(JSON.parse(savedBrief));
-    }
+      const intakeCompleted = localStorage.getItem('intake_completed');
+      if (!intakeCompleted) {
+        router.push('/intake');
+        return;
+      }
+
+      // Check if brief already exists
+      const savedBrief = localStorage.getItem('generated_brief');
+      if (savedBrief) {
+        setBrief(JSON.parse(savedBrief));
+      }
+    };
+
+    checkAuthAndIntake();
   }, [router]);
 
   const handleGenerate = async () => {

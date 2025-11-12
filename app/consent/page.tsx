@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function ConsentPage() {
   const router = useRouter();
@@ -16,13 +17,17 @@ export default function ConsentPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated
-    const userEmail = localStorage.getItem('user_email');
-    if (!userEmail) {
-      router.push('/auth');
-    } else {
-      setIsAuthenticated(true);
-    }
+    // Check if user is authenticated with Supabase
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push('/auth');
+      } else {
+        setIsAuthenticated(true);
+      }
+    };
+    
+    checkAuth();
   }, [router]);
 
   const handleContinue = () => {

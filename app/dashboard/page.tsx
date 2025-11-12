@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 import type { BriefOutput } from '@/lib/supabase';
 
 export default function DashboardPage() {
@@ -15,25 +16,31 @@ export default function DashboardPage() {
   const [brief, setBrief] = useState<BriefOutput | null>(null);
 
   useEffect(() => {
-    // Load user data
-    const email = localStorage.getItem('user_email');
-    if (!email) {
-      router.push('/auth');
-      return;
-    }
-    setUserEmail(email);
+    // Check authentication with Supabase
+    const loadDashboardData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        router.push('/auth');
+        return;
+      }
+      
+      setUserEmail(session.user.email || '');
 
-    // Load intake data
-    const savedIntake = localStorage.getItem('intake_data');
-    if (savedIntake) {
-      setIntakeData(JSON.parse(savedIntake));
-    }
+      // Load intake data from localStorage
+      const savedIntake = localStorage.getItem('intake_data');
+      if (savedIntake) {
+        setIntakeData(JSON.parse(savedIntake));
+      }
 
-    // Load brief
-    const savedBrief = localStorage.getItem('generated_brief');
-    if (savedBrief) {
-      setBrief(JSON.parse(savedBrief));
-    }
+      // Load brief from localStorage
+      const savedBrief = localStorage.getItem('generated_brief');
+      if (savedBrief) {
+        setBrief(JSON.parse(savedBrief));
+      }
+    };
+
+    loadDashboardData();
   }, [router]);
 
   return (

@@ -54,14 +54,21 @@ export default function IntakePage() {
   });
 
   useEffect(() => {
-    // Check authentication and consent
-    const userEmail = localStorage.getItem('user_email');
-    const consentGiven = localStorage.getItem('consent_given');
-    if (!userEmail || !consentGiven) {
-      router.push('/auth');
-    } else {
-      setIsAuthenticated(true);
-    }
+    // Check authentication with Supabase
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const consentGiven = localStorage.getItem('consent_given');
+      
+      if (!session) {
+        router.push('/auth');
+      } else if (!consentGiven) {
+        router.push('/consent');
+      } else {
+        setIsAuthenticated(true);
+      }
+    };
+    
+    checkAuth();
   }, [router]);
 
   // Auto-save function
