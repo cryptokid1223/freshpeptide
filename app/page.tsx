@@ -97,7 +97,7 @@ export default function Home() {
                   </p>
                   
                   <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                    <Link href="/auth?mode=signup" className="block">
+                    <Link href="/auth" className="block">
                       <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 hover:from-cyan-500 hover:to-cyan-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer">
                         <div className="text-4xl mb-3">✨</div>
                         <h3 className="text-xl font-bold text-white mb-2">New User?</h3>
@@ -108,7 +108,7 @@ export default function Home() {
                       </div>
                     </Link>
 
-                    <Link href="/auth?mode=signin" className="block">
+                    <Link href="/auth" className="block">
                       <div className="bg-slate-700 hover:bg-slate-600 p-6 rounded-lg text-center transition-all transform hover:scale-105 cursor-pointer border border-slate-600">
                         <div className="text-4xl mb-3">👤</div>
                         <h3 className="text-xl font-bold text-white mb-2">Have an Account?</h3>
