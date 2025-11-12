@@ -14,7 +14,7 @@ CREATE TABLE profiles (
 -- Intake table
 CREATE TABLE intake (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  user_id UUID UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   intake_data JSONB NOT NULL DEFAULT '{}'::jsonb,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
