@@ -128,6 +128,23 @@ export default function AuthPage() {
       if (authError) throw authError;
 
       if (data.user) {
+        console.log('✅ User created:', data.user.id, data.user.email);
+        
+        // CRITICAL: Create profile in profiles table
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: data.user.id,
+            email: data.user.email,
+          });
+
+        if (profileError) {
+          console.error('Profile creation error:', profileError);
+          // Don't throw - profile might already exist
+        } else {
+          console.log('✅ Profile created successfully');
+        }
+        
         setMessage('Account created! Check your email to verify your account.');
       }
     } catch (error: any) {
