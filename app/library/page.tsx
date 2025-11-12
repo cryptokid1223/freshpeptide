@@ -4798,9 +4798,16 @@ export default function LibraryPage() {
             <p className="text-slate-200 text-sm mb-4">{peptideOfTheDay.summary}</p>
             <button
               onClick={() => {
-                setSelectedPeptide(peptideOfTheDay);
-                setSelectedCategory('all');
                 setSearchQuery('');
+                setSelectedCategory('all');
+                setSelectedPeptide(peptideOfTheDay);
+                // Small delay to ensure state updates, then scroll to detail panel
+                setTimeout(() => {
+                  const detailPanel = document.getElementById('detail-panel');
+                  if (detailPanel) {
+                    detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }
+                }, 100);
               }}
               className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
             >
@@ -4818,6 +4825,7 @@ export default function LibraryPage() {
                   onClick={() => {
                     setSelectedCategory(category.id);
                     setSearchQuery('');
+                    setSelectedPeptide(null); // Reset selected peptide when changing category
                   }}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     selectedCategory === category.id
@@ -4851,6 +4859,7 @@ export default function LibraryPage() {
                     onClick={() => {
                       setSelectedCategory('all');
                       setSearchQuery('');
+                      setSelectedPeptide(null);
                     }}
                     className="text-cyan-400 hover:text-cyan-300 underline"
                   >
@@ -4889,6 +4898,7 @@ export default function LibraryPage() {
                     onClick={() => {
                       setSelectedCategory('all');
                       setSearchQuery('');
+                      setSelectedPeptide(null);
                     }}
                     className="text-cyan-400 hover:text-cyan-300 text-sm underline"
                   >
@@ -4899,7 +4909,7 @@ export default function LibraryPage() {
             </div>
 
             {/* Detail Panel */}
-            <div className="sticky top-4">
+            <div id="detail-panel" className="sticky top-4">
               {selectedPeptide ? (
                 <Card className="bg-slate-800/50 border-slate-700 p-6">
                   <h2 className="text-2xl font-bold text-cyan-400 mb-2">
