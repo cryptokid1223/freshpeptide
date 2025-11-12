@@ -24,21 +24,35 @@ export default function GeneratePage() {
         return;
       }
 
-      // Check if user has completed intake from Supabase
+      // Check if user has completed intake from Supabase - check all 4 sections
       const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
-      const hasCompletedIntake = intakeRecord?.intake_data && 
-        typeof intakeRecord.intake_data === 'object' && 
-        Object.keys(intakeRecord.intake_data).length > 5;
+      const intake = intakeRecord?.intake_data;
+      const hasCompletedIntake = intake && 
+        intake.demographics && 
+        intake.medical && 
+        intake.lifestyle && 
+        intake.goals &&
+        Object.keys(intake.demographics).length > 0 &&
+        Object.keys(intake.medical).length > 0 &&
+        Object.keys(intake.lifestyle).length > 0 &&
+        Object.keys(intake.goals).length > 0;
+
+      console.log('Generate page intake check:', { hasCompletedIntake, intake });
 
       if (!hasCompletedIntake) {
+        console.log('Incomplete intake, redirecting to /intake');
         router.push('/intake');
         return;
       }
+
+      // Set consent flag for consistency
+      localStorage.setItem('consent_given', 'true');
+      localStorage.setItem('intake_completed', 'true');
 
       // Load most recent brief from Supabase database if it exists
       const { data: briefRecords } = await supabase

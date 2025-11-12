@@ -51,15 +51,15 @@ export default function IntakePage() {
     // Check authentication with Supabase and load existing intake data
     const checkAuthAndLoadData = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      const consentGiven = localStorage.getItem('consent_given');
       
       if (!session) {
         router.push('/auth');
         return;
-      } else if (!consentGiven) {
-        router.push('/consent');
-        return;
       }
+      
+      // Don't check consent in localStorage - just set it to true since they're authenticated
+      // This allows cross-device access
+      localStorage.setItem('consent_given', 'true');
       
       setIsAuthenticated(true);
 
