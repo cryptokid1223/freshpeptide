@@ -3037,11 +3037,11 @@ const PEPTIDES = [
     slug: 'pasireotide-lar',
     name: 'Pasireotide LAR (Signifor LAR)',
     regulatory_status: 'FDA-approved',
-    summary: 'Long-acting multireceptor somatostatin analog for Cushing's disease and acromegaly maintenance therapy.',
+    summary: 'Long-acting multireceptor somatostatin analog for Cushing disease and acromegaly maintenance therapy.',
     mechanism: 'Targets SSTR1–5 especially SSTR5 to suppress ACTH and GH secretion.',
     evidence: [
       {
-        title: 'Long-acting pasireotide in Cushing's disease',
+        title: 'Long-acting pasireotide in Cushing disease',
         year: 2015,
         source: 'PubMed',
         summary: 'Clinical trial of pasireotide LAR in Cushing disease',
