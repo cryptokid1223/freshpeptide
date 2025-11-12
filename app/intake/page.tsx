@@ -71,15 +71,21 @@ export default function IntakePage() {
         .maybeSingle();
 
       if (intakeRecord?.intake_data && Object.keys(intakeRecord.intake_data).length > 0) {
-        console.log('Loading existing intake data from database');
+        console.log('📥 Loading existing intake data from Supabase database');
+        console.log('Loaded data:', intakeRecord.intake_data);
+        console.log('Data sections:', Object.keys(intakeRecord.intake_data));
         setIntakeData(intakeRecord.intake_data);
         // Also save to localStorage as cache
         localStorage.setItem('intake_data', JSON.stringify(intakeRecord.intake_data));
       } else {
+        console.log('No intake data found in Supabase, checking localStorage');
         // Try localStorage as fallback (for backward compatibility)
         const savedIntake = localStorage.getItem('intake_data');
         if (savedIntake) {
+          console.log('Found data in localStorage, using as fallback');
           setIntakeData(JSON.parse(savedIntake));
+        } else {
+          console.log('No intake data found anywhere - starting fresh');
         }
       }
     };
@@ -100,16 +106,28 @@ export default function IntakePage() {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase
+        console.log('💾 Saving intake data to Supabase for user:', user.email);
+        console.log('Data being saved:', updatedData);
+        console.log('Data sections:', Object.keys(updatedData));
+        
+        const { data: result, error: upsertError } = await supabase
           .from('intake')
           .upsert({
             user_id: user.id,
             intake_data: updatedData,
             updated_at: new Date().toISOString(),
           }, { onConflict: 'user_id' });
+        
+        if (upsertError) {
+          console.error('❌ Supabase upsert error:', upsertError);
+        } else {
+          console.log('✅ Intake data saved successfully to Supabase');
+        }
+      } else {
+        console.error('❌ No user found when trying to save');
       }
     } catch (error) {
-      console.error('Error saving to Supabase:', error);
+      console.error('❌ Error saving to Supabase:', error);
     }
     
     setLastSaved(new Date());
@@ -125,14 +143,44 @@ export default function IntakePage() {
 
   const CurrentStepComponent = steps[currentStep].component;
 
-  const handleNext = (data: any) => {
-    saveData(data);
+  const handleNext = async (data: any) => {
+    await saveData(data);
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
-      // Final step completed
+      // Final step completed - ensure data is fully saved
+      console.log('🎉 All intake steps completed!');
+      console.log('Final intake data:', { ...intakeData, ...data });
+      
+      // Mark as completed
       localStorage.setItem('intake_completed', 'true');
-      router.push('/generate');
+      
+      // Verify data is in Supabase before proceeding
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          // Double-check the data was saved
+          const { data: verifyRecord } = await supabase
+            .from('intake')
+            .select('intake_data')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          
+          console.log('✅ Verification: Data in Supabase:', verifyRecord?.intake_data);
+          
+          if (verifyRecord?.intake_data) {
+            console.log('✅ Confirmed: All data saved. Routing to /generate');
+            router.push('/generate');
+          } else {
+            console.error('⚠️ Warning: Data not found in Supabase after save');
+            router.push('/generate');
+          }
+        }
+      } catch (error) {
+        console.error('Error verifying save:', error);
+        router.push('/generate');
+      }
     }
   };
 

@@ -17,17 +17,43 @@ export default function ConsentPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated with Supabase
-    const checkAuth = async () => {
+    // Check if user is authenticated and if they've already completed intake
+    const checkAuthAndIntake = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push('/auth');
-      } else {
-        setIsAuthenticated(true);
+        return;
+      }
+      
+      setIsAuthenticated(true);
+
+      // Check if user has already completed intake - if so, redirect to dashboard
+      const { data: intakeRecord } = await supabase
+        .from('intake')
+        .select('intake_data')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+
+      const intake = intakeRecord?.intake_data;
+      const hasCompletedIntake = intake && 
+        intake.demographics && 
+        intake.medical && 
+        intake.lifestyle && 
+        intake.goals &&
+        Object.keys(intake.demographics).length > 0 &&
+        Object.keys(intake.medical).length > 0 &&
+        Object.keys(intake.lifestyle).length > 0 &&
+        Object.keys(intake.goals).length > 0;
+
+      if (hasCompletedIntake) {
+        console.log('User already completed intake, redirecting to dashboard');
+        localStorage.setItem('consent_given', 'true');
+        localStorage.setItem('intake_completed', 'true');
+        router.push('/dashboard');
       }
     };
     
-    checkAuth();
+    checkAuthAndIntake();
   }, [router]);
 
   const handleContinue = () => {

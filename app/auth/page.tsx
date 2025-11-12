@@ -52,11 +52,18 @@ export default function AuthPage() {
           .eq('user_id', data.user.id)
           .maybeSingle();
 
-        console.log('Sign-in intake check:', {
-          hasRecord: !!intakeData,
-          intakeData: intakeData?.intake_data,
-          dataKeys: intakeData?.intake_data ? Object.keys(intakeData.intake_data) : []
-        });
+        console.log('==========================================');
+        console.log('SIGN-IN INTAKE CHECK FOR USER:', data.user.email);
+        console.log('Has intake record:', !!intakeData);
+        console.log('Intake data:', intakeData?.intake_data);
+        if (intakeData?.intake_data) {
+          console.log('Top-level keys:', Object.keys(intakeData.intake_data));
+          console.log('Demographics:', intakeData.intake_data.demographics);
+          console.log('Medical:', intakeData.intake_data.medical);
+          console.log('Lifestyle:', intakeData.intake_data.lifestyle);
+          console.log('Goals:', intakeData.intake_data.goals);
+        }
+        console.log('==========================================');
 
         // Check if user has ALL required intake sections completed
         const intake = intakeData?.intake_data;
@@ -70,17 +77,25 @@ export default function AuthPage() {
           Object.keys(intake.lifestyle).length > 0 &&
           Object.keys(intake.goals).length > 0;
 
+        console.log('Has completed intake?', hasCompletedIntake);
+
         if (hasCompletedIntake) {
           // User has completed full intake, go to dashboard
-          console.log('✅ User has completed intake, redirecting to dashboard');
+          console.log('✅ ROUTING TO DASHBOARD');
           // Set localStorage flags for consistency
           localStorage.setItem('consent_given', 'true');
           localStorage.setItem('intake_completed', 'true');
-          router.push('/dashboard');
+          setMessage('Welcome back! Loading your dashboard...');
+          setTimeout(() => {
+            router.push('/dashboard');
+          }, 500);
         } else {
           // User hasn't completed intake, go to consent
-          console.log('❌ User needs to complete intake, redirecting to consent');
-          router.push('/consent');
+          console.log('❌ ROUTING TO CONSENT - User needs to complete intake');
+          setMessage('Please complete the intake questionnaire to continue.');
+          setTimeout(() => {
+            router.push('/consent');
+          }, 1000);
         }
       }
     } catch (error: any) {
