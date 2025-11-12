@@ -4714,25 +4714,63 @@ const PEPTIDES = [
   },
 ];
 
+// Category definitions based on therapeutic areas
+const CATEGORIES = [
+  { id: 'all', label: 'All Peptides', keywords: [] },
+  { id: 'endocrine', label: 'Endocrine/Metabolic', keywords: ['endocrine', 'metabolic', 'diabetes', 'growth', 'thyroid'] },
+  { id: 'oncology', label: 'Oncology', keywords: ['oncology', 'cancer', 'tumor', 'angiogenesis'] },
+  { id: 'pain', label: 'Pain/Neurology', keywords: ['pain', 'neuro', 'opioid', 'neuropeptide'] },
+  { id: 'cardio', label: 'Cardiovascular', keywords: ['cardio', 'vascular', 'heart'] },
+  { id: 'infectious', label: 'Infectious Disease', keywords: ['infectious-disease', 'antibiotic', 'antiviral', 'antimicrobial'] },
+  { id: 'immunology', label: 'Immunology', keywords: ['immunology', 'vaccine', 'immune'] },
+  { id: 'reproductive', label: 'Reproductive', keywords: ['reproductive', 'maternal-fetal'] },
+  { id: 'derm', label: 'Dermatology/Cosmetic', keywords: ['dermatology', 'cosmetic', 'skin'] },
+  { id: 'research', label: 'Research Tools', keywords: ['research', 'drug-delivery', 'biotech'] },
+];
+
+// Get peptide of the day based on current date
+function getPeptideOfTheDay() {
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - new Date(today.getFullYear(), 0, 0).getTime()) / 86400000);
+  const index = dayOfYear % PEPTIDES.length;
+  return PEPTIDES[index];
+}
+
 export default function LibraryPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPeptide, setSelectedPeptide] = useState<any>(null);
   const [filteredPeptides, setFilteredPeptides] = useState(PEPTIDES);
+  const peptideOfTheDay = getPeptideOfTheDay();
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredPeptides(PEPTIDES);
-    } else {
+    let filtered = PEPTIDES;
+
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      const category = CATEGORIES.find(c => c.id === selectedCategory);
+      if (category) {
+        filtered = filtered.filter(p => {
+          // Check if peptide's summary or mechanism contains any category keywords
+          const text = `${p.summary} ${p.mechanism}`.toLowerCase();
+          return category.keywords.some(keyword => text.includes(keyword));
+        });
+      }
+    }
+
+    // Apply search filter
+    if (searchQuery.trim() !== '') {
       const query = searchQuery.toLowerCase();
-      const filtered = PEPTIDES.filter(
+      filtered = filtered.filter(
         (p) =>
           p.name.toLowerCase().includes(query) ||
           p.summary.toLowerCase().includes(query) ||
           p.mechanism?.toLowerCase().includes(query)
       );
-      setFilteredPeptides(filtered);
     }
-  }, [searchQuery]);
+
+    setFilteredPeptides(filtered);
+  }, [searchQuery, selectedCategory]);
 
   return (
     <MainLayout>
@@ -4741,8 +4779,57 @@ export default function LibraryPage() {
           <div className="mb-8">
             <h1 className="text-4xl font-bold text-cyan-400 mb-2">Peptide Library</h1>
             <p className="text-slate-400">
-              Explore our curated database of research peptides with detailed information
+              Explore our curated database of 234 research peptides with detailed information
             </p>
+          </div>
+
+          {/* Peptide of the Day */}
+          <Card className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-500/50 p-6 mb-8">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="bg-cyan-500 text-slate-900 px-3 py-1 rounded-full text-sm font-bold">
+                ✨ Peptide of the Day
+              </div>
+              <p className="text-slate-400 text-sm">
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              </p>
+            </div>
+            <h2 className="text-2xl font-bold text-cyan-300 mb-2">{peptideOfTheDay.name}</h2>
+            <p className="text-amber-400 text-sm mb-3">{peptideOfTheDay.regulatory_status}</p>
+            <p className="text-slate-200 text-sm mb-4">{peptideOfTheDay.summary}</p>
+            <button
+              onClick={() => {
+                setSelectedPeptide(peptideOfTheDay);
+                setSelectedCategory('all');
+                setSearchQuery('');
+              }}
+              className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+            >
+              Learn More →
+            </button>
+          </Card>
+
+          {/* Category Filters */}
+          <div className="mb-6">
+            <h3 className="text-sm font-semibold text-slate-300 mb-3">Browse by Category:</h3>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((category) => (
+                <button
+                  key={category.id}
+                  onClick={() => {
+                    setSelectedCategory(category.id);
+                    setSearchQuery('');
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    selectedCategory === category.id
+                      ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/50'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-600'
+                  }`}
+                >
+                  {category.label}
+                  {category.id === 'all' && ` (${PEPTIDES.length})`}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Search */}
@@ -4754,6 +4841,24 @@ export default function LibraryPage() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="bg-slate-800 border-slate-600 text-slate-100 text-lg py-6"
             />
+            {(selectedCategory !== 'all' || searchQuery) && (
+              <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
+                <span>
+                  Showing {filteredPeptides.length} peptide{filteredPeptides.length !== 1 ? 's' : ''}
+                </span>
+                {(selectedCategory !== 'all' || searchQuery) && (
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      setSearchQuery('');
+                    }}
+                    className="text-cyan-400 hover:text-cyan-300 underline"
+                  >
+                    Clear filters
+                  </button>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Results */}
@@ -4775,7 +4880,20 @@ export default function LibraryPage() {
 
               {filteredPeptides.length === 0 && (
                 <Card className="bg-slate-800/50 border-slate-700 p-6 text-center">
-                  <p className="text-slate-400">No peptides found matching your search.</p>
+                  <p className="text-slate-400 mb-2">
+                    {searchQuery
+                      ? `No peptides found matching "${searchQuery}"`
+                      : `No peptides found in this category`}
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSelectedCategory('all');
+                      setSearchQuery('');
+                    }}
+                    className="text-cyan-400 hover:text-cyan-300 text-sm underline"
+                  >
+                    View all peptides
+                  </button>
                 </Card>
               )}
             </div>
