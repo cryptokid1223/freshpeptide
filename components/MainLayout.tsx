@@ -77,6 +77,17 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                       )}
                     </Link>
                     <Link 
+                      href="/tracking" 
+                      className={`text-sm font-medium transition-all hover:text-[var(--accent)] relative ${
+                        pathname === '/tracking' ? 'text-[var(--accent)]' : 'text-[var(--text-dim)]'
+                      }`}
+                    >
+                      Tracking
+                      {pathname === '/tracking' && (
+                        <span className="absolute -bottom-3.5 left-0 right-0 h-0.5 bg-[var(--accent)]"></span>
+                      )}
+                    </Link>
+                    <Link 
                       href="/account" 
                       className={`text-sm font-medium transition-all hover:text-[var(--accent)] relative ${
                         pathname === '/account' ? 'text-[var(--accent)]' : 'text-[var(--text-dim)]'
