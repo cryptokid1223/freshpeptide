@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TypeWriter } from '@/components/ui/TypeWriter';
 import Link from 'next/link';
-import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 
 // Categories
@@ -184,13 +183,10 @@ export default function LibraryPage() {
         {/* Header with Library Logo */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
-            <Image 
+            <img 
               src="/library.png" 
               alt="Peptide Library" 
-              width={200} 
-              height={200}
-              className="object-contain"
-              priority
+              className="w-48 h-48 object-contain"
             />
           </div>
           <div className="text-3xl md:text-4xl font-light text-[#5C4A3A] min-h-[48px]">
@@ -204,15 +200,12 @@ export default function LibraryPage() {
 
         {/* Peptide of the Day - Clean & Warm */}
         <div className="bg-gradient-to-br from-[#F5EFE7] to-white border-2 border-[#D4C4B0] rounded-2xl p-8 mb-10 shadow-sm">
-          <div className="flex items-start gap-6 mb-4">
+          <div className="flex items-start gap-6">
             <div className="flex-shrink-0">
-              <Image 
+              <img 
                 src="/daypeptide.png" 
                 alt="Peptide of the Day" 
-                width={120} 
-                height={120}
-                className="object-contain"
-                priority
+                className="w-28 h-28 object-contain"
               />
             </div>
             <div className="flex-1">
@@ -236,22 +229,17 @@ export default function LibraryPage() {
               </Button>
             </div>
           </div>
-        </div>
-
-        {/* Search Bar - Fixed */}
-        <div className="mb-8">
-          <div className="relative">
-            <svg className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-[#8B6F47]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <Input
-              type="text"
-              placeholder="Search peptides... (e.g., weight loss, muscle growth, healing)"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border-2 border-[#D4C4B0] text-[#3E3028] py-4 pl-14 pr-6 rounded-full text-base placeholder:text-[#A89882] focus:border-[#8B6F47] focus:ring-2 focus:ring-[#D4C4B0] shadow-sm"
-            />
           </div>
+
+        {/* Search Bar - Clean & Simple */}
+        <div className="mb-8">
+          <input
+            type="text"
+            placeholder="Search peptides... (e.g., weight loss, muscle growth, healing)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-white border border-[#D4C4B0] text-[#3E3028] py-4 px-6 rounded-2xl text-base placeholder:text-[#A89882] focus:outline-none focus:border-[#8B6F47] focus:ring-1 focus:ring-[#8B6F47] transition-all"
+          />
         </div>
 
         {/* Categories */}
@@ -300,11 +288,11 @@ export default function LibraryPage() {
 
         {/* Peptide Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {filteredPeptides.map((peptide) => (
+              {filteredPeptides.map((peptide) => (
             <div
-              key={peptide.id}
+                  key={peptide.id}
               className="bg-white border-2 border-[#E8DCC8] rounded-2xl p-6 hover:border-[#8B6F47] hover:shadow-lg transition-all cursor-pointer group"
-              onClick={() => setSelectedPeptide(peptide)}
+                  onClick={() => setSelectedPeptide(peptide)}
             >
               <div className="flex items-start justify-between gap-4 mb-3">
                 <h3 className="text-xl font-bold text-[#3E3028] group-hover:text-[#8B6F47] transition-colors">
@@ -329,9 +317,9 @@ export default function LibraryPage() {
                 {peptide.summary}
               </p>
             </div>
-          ))}
+              ))}
 
-          {filteredPeptides.length === 0 && (
+              {filteredPeptides.length === 0 && (
             <div className="col-span-full text-center py-20">
               <p className="text-[#5C4A3A] text-xl mb-4">
                 No peptides found
@@ -363,8 +351,8 @@ export default function LibraryPage() {
               {/* Header */}
               <div className="sticky top-0 bg-gradient-to-r from-[#8B6F47] to-[#6F5839] px-8 py-6 flex items-center justify-between">
                 <h2 className="text-3xl font-bold text-white">
-                  {selectedPeptide.name}
-                </h2>
+                    {selectedPeptide.name}
+                  </h2>
                 <button
                   onClick={() => setSelectedPeptide(null)}
                   className="w-12 h-12 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-colors"
@@ -385,7 +373,7 @@ export default function LibraryPage() {
                   <p className="text-[#5C4A3A] leading-relaxed text-lg">
                     {selectedPeptide.details}
                   </p>
-                </div>
+                    </div>
 
                 <div className="bg-gradient-to-br from-[#F5EFE7] to-white border-2 border-[#D4C4B0] rounded-2xl p-6">
                   <h3 className="text-2xl font-bold text-[#3E3028] mb-4 flex items-center gap-3">
@@ -401,18 +389,18 @@ export default function LibraryPage() {
                       <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
                     </svg>
                     <span className="text-sm text-orange-900 font-medium">If you're new, always start with the lower dose and increase slowly</span>
-                  </div>
-                </div>
+                    </div>
+                    </div>
 
-                <div>
+                    <div>
                   <h3 className="text-2xl font-bold text-[#3E3028] mb-4 flex items-center gap-3">
                     <span className="text-3xl">⚠️</span>
                     Possible side effects
-                  </h3>
+                      </h3>
                   <p className="text-[#5C4A3A] leading-relaxed text-lg">
                     {selectedPeptide.sideEffects}
-                  </p>
-                </div>
+                      </p>
+                    </div>
 
                 {/* Buttons */}
                 <div className="pt-6 space-y-3">
@@ -433,7 +421,7 @@ export default function LibraryPage() {
                   >
                     Close
                   </Button>
-                </div>
+                    </div>
 
                 {/* Disclaimer */}
                 <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-6">
@@ -441,8 +429,8 @@ export default function LibraryPage() {
                     <strong className="text-orange-900">Important:</strong> This information is for 
                     educational purposes only. Always consult with a qualified doctor before using any peptides.
                   </p>
-                </div>
-              </div>
+                    </div>
+                  </div>
             </div>
           </div>
         </>
