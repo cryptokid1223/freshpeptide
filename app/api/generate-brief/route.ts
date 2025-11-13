@@ -225,102 +225,150 @@ async function generateRealBrief(intakeData: any): Promise<BriefOutput> {
 CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
 
 1. DOSAGE ACCURACY (HIGHEST PRIORITY):
-   - ONLY use dosages from published clinical trials and research studies
-   - NEVER make up or estimate dosages
+   - Use your extensive knowledge of published clinical trials and research studies
+   - Draw from your training data on peptide research, clinical protocols, and medical literature
    - Format: "[X-Y] [unit] [route] [frequency]" 
      Examples: "250-500 mcg subcutaneously once daily" OR "2 mg intramuscularly twice weekly"
    - Include cycle duration: "X weeks on, Y weeks off"
-   - Reference the study where dosage was used if possible
+   - Reference the study/research where dosage protocols were established when possible
+   - For research-only peptides, cite typical protocols from preclinical or early-phase human studies
+   - For FDA-approved peptides, use established clinical dosing guidelines
    
-   SPECIFIC DOSAGE RANGES (based on research literature):
+   COMPREHENSIVE PEPTIDE DATABASE - Use your knowledge of these and MORE from your training:
    
-   FIRST-TIME USER DOSING - ALWAYS START LOW:
-   • Start at the LOWER end of ranges for first-time users
-   • Titrate up slowly over 1-2 weeks if well-tolerated
-   • Monitor for side effects before increasing
+   DOSING PRINCIPLES:
+   • First-time users: Start at LOWER end of therapeutic ranges
+   • Experienced users: Can use mid-to-upper therapeutic ranges
+   • Always include: dose + unit + route + frequency + cycle duration + insulin syringe units
+   • Draw from your extensive knowledge of clinical trials, research protocols, and medical literature
    
-   PEPTIDE-SPECIFIC DOSING (with insulin syringe units):
+   **WEIGHT LOSS / METABOLIC / GLP-1 AGONISTS:**
+   • Semaglutide (Ozempic/Wegovy) - GLP-1, FDA approved
+   • Liraglutide (Saxenda/Victoza) - GLP-1, FDA approved
+   • Tirzepatide (Mounjaro/Zepbound) - GLP-1/GIP dual agonist, FDA approved
+   • Dulaglutide (Trulicity) - GLP-1, FDA approved
+   • Retatrutide - GLP-1/GIP/Glucagon triple agonist (Phase 3 trials)
+   • Tesamorelin (Egrifta) - GHRH analog, FDA approved for lipodystrophy
+   • AOD-9604 - Modified GH fragment, fat loss research
+   • MOTS-c - Mitochondrial peptide, metabolic optimization
+   • 5-Amino-1MQ - NNMT inhibitor, fat loss research
+   • Tesofensine - Appetite suppressant (not a peptide but often discussed with peptides)
    
-   **WEIGHT LOSS / METABOLIC:**
-   • Semaglutide (GLP-1 agonist, FDA approved):
-     - First-time: 0.25 mg SC weekly, titrate up by 0.25 mg every 4 weeks
-     - Standard: 0.5-2.4 mg SC weekly
-   • Tirzepatide (GLP-1/GIP agonist, FDA approved):
-     - First-time: 2.5 mg SC weekly, titrate up
-     - Standard: 5-15 mg SC weekly
-   • Retatrutide (Triple agonist, research):
-     - Research protocols: 1-12 mg SC weekly (investigational)
-   • Tesamorelin (GHRH analog):
-     - Standard: 2 mg SC daily = 20 units (if 10mg/mL)
-   • AOD-9604 (Modified GH fragment):
-     - First-time: 250 mcg SC daily = 25 units (if 1mg/mL)
-     - Standard: 250-500 mcg SC daily
+   **MUSCLE GROWTH / ANABOLIC / GROWTH HORMONE SECRETAGOGUES:**
+   • CJC-1295 (with/without DAC) - GHRH analog
+   • Ipamorelin - Selective GH secretagogue
+   • GHRP-2 - GH releasing peptide
+   • GHRP-6 - GH releasing peptide, increases appetite
+   • Hexarelin - Potent GH secretagogue
+   • MK-677 (Ibutamoren) - Oral GH secretagogue
+   • Sermorelin - GHRH analog
+   • Tesamorelin - GHRH analog (also metabolic)
+   • Follistatin-344 - Myostatin inhibitor
+   • ACE-031 - Myostatin inhibitor
+   • YK-11 - Myostatin inhibitor (SARM-like)
+   • IGF-1 LR3 - Long-acting IGF-1 analog
+   • IGF-1 DES - Short-acting IGF-1 analog
+   • PEG-MGF - Mechano growth factor
+   • HGH Fragment 176-191 - Fat loss/muscle preservation
    
-   **MUSCLE GROWTH / ANABOLIC:**
-   • CJC-1295 (no DAC): 
-     - First-time: 100 mcg SC 1-2x daily = 10 units (if 1mg/mL)
-     - Experienced: 100-200 mcg SC 2-3x daily
-   • CJC-1295 (with DAC): 
-     - First-time: 0.5-1 mg SC weekly = 25-50 units (if 2mg/mL)
-     - Experienced: 1-2 mg SC weekly
-   • Ipamorelin: 
-     - First-time: 200 mcg SC 2x daily = 20 units (if 1mg/mL)
-     - Experienced: 200-300 mcg SC 2-3x daily
-   • GHRP-6:
-     - First-time: 100 mcg SC 2x daily = 10 units (if 1mg/mL)
-     - Standard: 100-200 mcg SC 2-3x daily
-   • Follistatin-344:
-     - Research: 100 mcg SC daily (limited human data)
-   • IGF-1 LR3:
-     - Research: 20-40 mcg SC daily (research only)
+   **INJURY RECOVERY / TISSUE REPAIR / HEALING:**
+   • BPC-157 - Body Protection Compound, multi-tissue repair
+   • TB-500 (Thymosin Beta-4) - Tissue regeneration, inflammation
+   • KPV - Anti-inflammatory tripeptide
+   • GHK-Cu - Copper peptide, wound healing
+   • Larazotide - Tight junction regulation (celiac, leaky gut)
+   • Dihexa - Neurogenic/cognitive (also cognitive category)
+   • LL-37 - Antimicrobial peptide, wound healing
+   • Cerebrolysin - Neurotrophic peptide mix
+   • Cortexin - Neuroprotective peptide complex
+   • Actovegin - Tissue metabolism enhancer
    
-   **INJURY RECOVERY / TISSUE REPAIR:**
-   • BPC-157: 
-     - First-time: 200-250 mcg SC/IM daily = 20-25 units (if 2mg/mL)
-     - Experienced: 250-500 mcg SC/IM daily
-   • TB-500: 
-     - First-time: 2 mg SC/IM 2x/week = 20 units (if 10mg/mL)
-     - Experienced: 2-2.5 mg SC/IM 2x/week loading
-   • KPV (Anti-inflammatory):
-     - Standard: 500-1000 mcg SC daily = 50-100 units (if 1mg/mL)
+   **COGNITIVE ENHANCEMENT / NEUROPROTECTION / NOOTROPICS:**
+   • Semax - ACTH analog, neuroprotection
+   • Selank - Anxiolytic, cognitive enhancement
+   • P21 (Cerebrolysin derivative) - BDNF mimetic
+   • Dihexa - Potent cognitive enhancer
+   • NSI-189 - Neurogenesis stimulator
+   • Noopept - Cognitive enhancement (racetam-like)
+   • Cerebrolysin - Neurotrophic factor mix
+   • Cortexin - Polypeptide neuroprotector
+   • NA-Semax-Amidate - Enhanced Semax variant
+   • NA-Selank - Enhanced Selank variant
+   • Adamax (Adamentane derivatives) - Cognitive/antiviral
+   • Pinealon - Pineal gland peptide bioregulator
+   • Cortagen - Immune/brain peptide
    
-   **COGNITIVE ENHANCEMENT / NEUROPROTECTION:**
-   • Semax:
-     - First-time: 300 mcg intranasal 1x daily
-     - Standard: 300-600 mcg intranasal 1-2x daily
-   • Selank:
-     - First-time: 250 mcg intranasal 1x daily
-     - Standard: 250-500 mcg intranasal 1-2x daily
-   • Dihexa:
-     - Research: 5-10 mg oral daily (research only, limited data)
-   • P21 (Cerebrolysin derivative):
-     - Research: 10-30 mg SC daily (research only)
-   • NSI-189:
-     - Research: 40 mg oral 3x daily (clinical trials)
+   **ANTI-AGING / LONGEVITY / CELLULAR HEALTH:**
+   • Epithalon (Epitalon) - Telomerase activator
+   • GHK-Cu - Copper peptide, tissue remodeling
+   • MOTS-c - Mitochondrial peptide
+   • Humanin - Mitochondrial-derived peptide
+   • SS-31 (Elamipretide) - Mitochondrial protector
+   • NAD+ precursors (NMN, NR) - Cellular energy (not peptides but related)
+   • Thymalin - Thymus peptide, immune regulation
+   • Vilon - Epithelial tissue peptide
+   • Bronchogen - Bronchial mucosa peptide
+   • Cardiogen - Cardiac peptide bioregulator
+   • Hepatogen - Liver peptide bioregulator
+   • Pielotax - Kidney peptide bioregulator
+   • Ovagen - Metabolic/liver peptide
+   • Vezugen - Vascular peptide
+   • Vladonix - Thymus peptide
    
-   **ANTI-AGING / LONGEVITY:**
-   • Epithalon (Epitalon):
-     - Cycle: 5-10 mg SC daily for 10-20 days, 2x/year
-   • GHK-Cu (Copper peptide):
-     - First-time: 1 mg SC daily = 10 units (if 10mg/mL)
-     - Standard: 1-3 mg SC daily or topical
-   • MOTS-c (Mitochondrial):
-     - Standard: 5-10 mg SC 2-3x/week
-   • Humanin:
-     - Research: 1-5 mg SC daily (limited human data)
+   **IMMUNE SYSTEM / ANTIMICROBIAL:**
+   • Thymosin Alpha-1 (Thymalfasin) - Immune modulator, FDA approved
+   • LL-37 - Antimicrobial peptide
+   • Thymalin - Thymus extract
+   • Cortagen - Immune peptide
+   • Vladonix - Thymus peptide
+   • Beta-Glucan peptides - Immune activation (not true peptides)
    
-   **SEXUAL HEALTH:**
-   • PT-141 (Bremelanotide, FDA approved):
-     - Standard: 1.75 mg SC as needed, max 1x/24h
-   • Kisspeptin:
-     - Research: 1-10 mcg/kg IV (research protocols)
+   **SEXUAL HEALTH / LIBIDO:**
+   • PT-141 (Bremelanotide) - Melanocortin agonist, FDA approved
+   • Kisspeptin-10 - Reproductive hormone regulation
+   • Melanotan II - Melanocortin agonist (also tanning)
+   • Oxytocin - Social bonding, sexual function
+   • HCG (Human Chorionic Gonadotropin) - Testosterone/fertility
+   • HMG (Human Menopausal Gonadotropin) - Fertility
+   • Gonadorelin - GnRH analog
+   • Triptorelin - GnRH analog
    
-   **SKIN / HAIR / COSMETIC:**
-   • GHK-Cu variants (topical or SC)
-   • PTD-DBM (Hair growth):
-     - Research: Topical application (limited data)
-   • Melanotan II (tanning):
-     - Research: 250-500 mcg SC 2-3x/week (not FDA approved)
+   **SKIN / HAIR / COSMETIC / AESTHETICS:**
+   • GHK-Cu - Copper peptide, collagen synthesis
+   • Matrixyl (Palmitoyl Pentapeptide) - Anti-aging skincare
+   • Argireline (Acetyl Hexapeptide-8) - Wrinkle reduction
+   • Copper Peptide GHK - Skin regeneration
+   • PTD-DBM - Hair growth peptide
+   • RU58841 - Hair loss prevention (not peptide, often grouped)
+   • Melanotan I - Tanning peptide
+   • Melanotan II - Tanning/sexual health
+   • SNAP-8 - Anti-wrinkle peptide
+   • Pentapeptide-18 - Botox-like effects
+   
+   **SLEEP / RECOVERY / RELAXATION:**
+   • DSIP (Delta Sleep-Inducing Peptide) - Sleep regulation
+   • Selank - Anxiolytic/sleep aid
+   • Epithalon - Sleep/circadian rhythm
+   • Melatonin peptides - Circadian regulation
+   
+   **ATHLETIC PERFORMANCE / ENDURANCE:**
+   • EPO peptides - Endurance (use with extreme caution)
+   • Hexarelin - GH/endurance
+   • AICAR peptide - AMPK activation, endurance
+   • GW501516 (Cardarine) - PPARδ agonist (not peptide, often grouped)
+   
+   **SPECIALIZED / RESEARCH / EMERGING:**
+   • FGL (Fibroblast Growth Loop) - Neuroprotection
+   • Splenopentin - Immune modulation
+   • Pinealon - Pineal gland bioregulator
+   • Retinalamin - Eye health peptide
+   • Prostatilen - Prostate health peptide
+   • Thyreogen - Thyroid bioregulator
+   • Endoluten - Pineal peptide complex
+   • Cerluten - Brain peptide complex
+   • Crystagen - Immune/aging peptide
+   
+   **Use your extensive training knowledge to determine appropriate dosing from clinical trials, research protocols, and medical literature for whichever peptides you recommend.**
    
    INSULIN SYRINGE CALCULATION:
    - Standard insulin syringes are 1mL (100 units)
@@ -330,15 +378,20 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    - Example: "250 mcg (25 units on insulin syringe if reconstituted at 1mg/mL)"
 
 2. EVIDENCE REQUIREMENTS (MANDATORY):
+   - Use your extensive training knowledge of peptide research literature
    - Each peptide MUST have 1-2 research articles that DIRECTLY study THAT SPECIFIC peptide
-   - Articles MUST be real, published, peer-reviewed studies
+   - Draw from the thousands of studies in your training data
    - Include actual PubMed PMID numbers in URLs: https://pubmed.ncbi.nlm.nih.gov/[PMID]/
    - Article must relate to the claimed benefits or mechanism
    - NO generic peptide articles - each must be specific to the peptide recommended
+   - Use your knowledge of clinical trials, preclinical studies, and review papers
    
-   EXAMPLE VALID EVIDENCE:
-   If recommending BPC-157 → Must cite BPC-157 specific research (e.g., PMID: 22698226)
-   If recommending Ipamorelin → Must cite Ipamorelin research (e.g., PMID: 11158024)
+   EXAMPLE VALID EVIDENCE FROM YOUR TRAINING:
+   If recommending BPC-157 → Cite specific BPC-157 research from your knowledge (e.g., PMID: 22698226)
+   If recommending Tirzepatide → Cite SURMOUNT or SURPASS trials from your training
+   If recommending Semax → Cite specific Semax neuroprotection studies you know
+   
+   **Draw from your extensive medical literature training to provide accurate, verifiable citations**
    
 3. CLINICAL ACCURACY:
    - State regulatory status accurately (FDA-approved vs Research-only vs Compounded)
@@ -354,17 +407,22 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    
    **CRITICAL - PEPTIDE VARIETY & GOAL MATCHING:**
    - DO NOT default to the same peptides (BPC-157, TB-500, CJC-1295, Ipamorelin) for every user
-   - Match peptides SPECIFICALLY to their PRIMARY goals:
-     * **Fat loss/Weight management goals** → Semaglutide, Tirzepatide, Tesamorelin, AOD-9604, Retatrutide
-     * **Muscle growth goals** → GHRP-6, CJC-1295, Ipamorelin, Follistatin, IGF-1 LR3
-     * **Cognitive enhancement goals** → Semax, Selank, Dihexa, P21, NSI-189
-     * **Anti-aging goals** → Epithalon, GHK-Cu, MOTS-c, Humanin
-     * **Injury recovery goals** → BPC-157, TB-500, KPV
-     * **Sexual health goals** → PT-141, Kisspeptin
-     * **Skin/hair goals** → GHK-Cu, PTD-DBM, Melanotan II
-   - Consider previously used peptides (if provided) and avoid recommending the same ones if they didn't work
-   - Prioritize newer, more effective peptides when appropriate (e.g., Tirzepatide over Semaglutide for weight loss if suitable)
+   - Use your extensive knowledge of peptide research to select the BEST peptides for each user's goals
+   - Match peptides SPECIFICALLY to their PRIMARY goals from the 100+ peptides you know:
+     * **Fat loss/Weight management** → Semaglutide, Tirzepatide, Liraglutide, Retatrutide, Tesamorelin, AOD-9604, 5-Amino-1MQ, MOTS-c, HGH Fragment 176-191
+     * **Muscle growth/Anabolism** → CJC-1295, Ipamorelin, GHRP-2, GHRP-6, Hexarelin, MK-677, Follistatin-344, IGF-1 LR3, IGF-1 DES, PEG-MGF, ACE-031, YK-11
+     * **Cognitive enhancement** → Semax, Selank, P21, Dihexa, NSI-189, Noopept, Cerebrolysin, Cortexin, NA-Semax-Amidate, Pinealon
+     * **Anti-aging/Longevity** → Epithalon, GHK-Cu, MOTS-c, Humanin, SS-31, Thymalin, Vilon, Cardiogen, Hepatogen, Ovagen, Vezugen
+     * **Injury recovery/Healing** → BPC-157, TB-500, KPV, GHK-Cu, LL-37, Cerebrolysin, Actovegin
+     * **Sexual health/Libido** → PT-141, Kisspeptin-10, Melanotan II, Oxytocin, HCG, Gonadorelin
+     * **Skin/hair/Cosmetic** → GHK-Cu, Matrixyl, Argireline, PTD-DBM, Melanotan I/II, SNAP-8, Pentapeptide-18
+     * **Immune support** → Thymosin Alpha-1, LL-37, Thymalin, Cortagen, Vladonix
+     * **Sleep/Recovery** → DSIP, Selank, Epithalon
+     * **Athletic performance/Endurance** → Hexarelin, AICAR, EPO peptides (with caution)
+   - Consider previously used peptides (if provided) and AVOID recommending the same ones if they didn't work
+   - Prioritize newer, more effective peptides when appropriate
    - Provide 2-4 peptides that create a synergistic stack for their SPECIFIC goals
+   - Use your training knowledge to determine optimal dosing from research you know about
    
    **CRITICAL - DOSING ADJUSTMENTS:**
    - **FIRST-TIME USERS (never_used)**: Use ONLY lower end of dosage ranges, emphasize starting slow
