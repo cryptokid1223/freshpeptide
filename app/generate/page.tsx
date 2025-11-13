@@ -67,6 +67,10 @@ export default function GeneratePage() {
         .eq('user_id', session.user.id)
         .single();
 
+      if (!intakeRecord) {
+        throw new Error('Please complete your health intake first');
+      }
+
       setStatusMessage('Generating personalized recommendations...');
 
       // Call API to generate brief
