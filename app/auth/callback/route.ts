@@ -38,7 +38,8 @@ export async function GET(request: Request) {
           intake.dietary &&
           intake.stress &&
           intake.recovery &&
-          intake.goals;
+          intake.goals &&
+          intake.experience;
 
         if (hasCompletedIntake) {
           // User has completed intake, go to dashboard

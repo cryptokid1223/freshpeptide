@@ -207,6 +207,14 @@ async function generateRealBrief(intakeData: any): Promise<BriefOutput> {
       quick_1_day: 'Quick recovery (1 day or less)',
       average_2_3_days: 'Average recovery (2-3 days)',
       slow_4plus_days: 'Slow recovery (4+ days, persistent soreness/fatigue)',
+      never_used: 'Never used peptides before (FIRST-TIME USER)',
+      beginner_1_3_months: 'Beginner (1-3 months experience)',
+      intermediate_3_12_months: 'Intermediate (3-12 months experience)',
+      experienced_1plus_years: 'Experienced (1+ years)',
+      never_injected: 'Never self-injected before',
+      uncomfortable_need_guidance: 'Uncomfortable with injections, need detailed guidance',
+      somewhat_comfortable: 'Somewhat comfortable with injections',
+      very_comfortable: 'Very comfortable with self-injections',
       other: 'Other',
     };
     return mapping[value] || value;
@@ -225,17 +233,44 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    - Reference the study where dosage was used if possible
    
    SPECIFIC DOSAGE RANGES (based on research literature):
-   • BPC-157: 200-500 mcg SC/IM daily (animal studies extrapolated; human data limited)
-   • TB-500: 2-2.5 mg SC/IM 2x/week loading, then 2 mg weekly maintenance
-   • CJC-1295 (no DAC): 100-200 mcg SC 1-3x daily
-   • CJC-1295 (with DAC): 0.5-2 mg SC once weekly
-   • Ipamorelin: 200-300 mcg SC 2-3x daily on empty stomach
-   • Selank: 250-750 mcg intranasal or SC 1-2x daily
+   
+   FIRST-TIME USER DOSING - ALWAYS START LOW:
+   • Start at the LOWER end of ranges for first-time users
+   • Titrate up slowly over 1-2 weeks if well-tolerated
+   • Monitor for side effects before increasing
+   
+   PEPTIDE-SPECIFIC DOSING (with insulin syringe units):
+   • BPC-157: 
+     - First-time: 200-250 mcg SC/IM daily = 20-25 units on insulin syringe (if reconstituted 2mg/mL)
+     - Experienced: 250-500 mcg SC/IM daily = 25-50 units
+   • TB-500: 
+     - First-time: 2 mg SC/IM 2x/week = 20 units (if reconstituted 10mg/mL)
+     - Experienced: 2-2.5 mg SC/IM 2x/week loading = 20-25 units
+   • CJC-1295 (no DAC): 
+     - First-time: 100 mcg SC 1-2x daily = 10 units (if 1mg/mL)
+     - Experienced: 100-200 mcg SC 2-3x daily = 10-20 units
+   • CJC-1295 (with DAC): 
+     - First-time: 0.5-1 mg SC once weekly = 25-50 units (if 2mg/mL)
+     - Experienced: 1-2 mg SC once weekly = 50-100 units
+   • Ipamorelin: 
+     - First-time: 200 mcg SC 2x daily = 20 units (if 1mg/mL)
+     - Experienced: 200-300 mcg SC 2-3x daily = 20-30 units
+   • Selank: 250-500 mcg intranasal or SC 1-2x daily
    • Semax: 300-600 mcg intranasal 1-2x daily
-   • GHK-Cu: 1-3 mg SC daily or topical application
-   • Melanotan II: 250-500 mcg SC 2-3x/week (research use only, not FDA approved)
-   • Semaglutide: 0.25-2.4 mg SC once weekly (FDA approved for weight management)
-   • PT-141: 1.75 mg SC as needed, max once per 24h (FDA approved)
+   • GHK-Cu: 
+     - First-time: 1 mg SC daily = 10 units (if 10mg/mL)
+     - Experienced: 1-3 mg SC daily = 10-30 units
+   • Semaglutide: 
+     - First-time: 0.25 mg SC once weekly = titrate per FDA protocol
+     - Standard: 0.5-2.4 mg SC weekly (FDA approved)
+   • PT-141: 1.75 mg SC as needed = per FDA approved dosing
+   
+   INSULIN SYRINGE CALCULATION:
+   - Standard insulin syringes are 1mL (100 units)
+   - 1 unit = 0.01 mL
+   - Units depend on reconstitution concentration
+   - ALWAYS include both mcg/mg AND syringe units
+   - Example: "250 mcg (25 units on insulin syringe if reconstituted at 1mg/mL)"
 
 2. EVIDENCE REQUIREMENTS (MANDATORY):
    - Each peptide MUST have 1-2 research articles that DIRECTLY study THAT SPECIFIC peptide
@@ -255,10 +290,18 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    - Use proper medical terminology with patient-friendly explanations
    
 4. PERSONALIZATION:
-   - Analyze demographics, medical history, medications, lifestyle, diet, stress, recovery, and goals
+   - Analyze demographics, medical history, medications, lifestyle, diet, stress, recovery, peptide experience, and goals
    - Write directly to the person using "you" and "your"
    - Tailor peptide selection to their specific profile
    - Address their specific health concerns and goals
+   - **CRITICAL**: Adjust dosing based on peptide experience:
+     * FIRST-TIME USERS (never_used): Use ONLY lower end of dosage ranges, emphasize starting slow
+     * BEGINNERS (1-3 months): Use lower-to-mid ranges, include titration instructions
+     * INTERMEDIATE/EXPERIENCED: Can use mid-to-upper ranges based on goals
+   - **CRITICAL**: Adjust injection guidance based on injection comfort:
+     * Never injected/Uncomfortable: Include detailed injection technique, site rotation, sterile practice
+     * Somewhat comfortable: Brief injection reminders only
+     * Very comfortable: Minimal injection instruction needed
    
 5. SAFETY EMPHASIS:
    - Always note research-only peptides lack FDA approval for human use
@@ -280,7 +323,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
       "why": "Write directly to the person: Why this specific peptide is ideal for YOUR goals and YOUR health profile. Use 'you' and 'your'",
       "mechanism": "Detailed scientific mechanism of action explained in an accessible way",
       "detailedInfo": "Comprehensive information about the peptide, its history, research status, and relevant studies. Written in a conversational tone.",
-      "recommendedDosage": "MUST include: dose amount + unit + route + frequency. Example formats: '250-500 mcg subcutaneously once daily' OR '2-5 mg intramuscularly twice weekly' OR '100-200 mcg via injection 3 times daily (morning, post-workout, bedtime)'. Be specific and cite research ranges.",
+      "recommendedDosage": "MUST include: dose amount + unit + route + frequency + INSULIN SYRINGE UNITS. Example formats: '250 mcg subcutaneously once daily (25 units on insulin syringe if reconstituted at 1mg/mL)' OR '2 mg intramuscularly twice weekly (20 units if reconstituted at 10mg/mL)'. ALWAYS include syringe units for injectables. Start with FIRST-TIME USER dosing (lower end of range).",
       "timing": {
         "frequency": "Specific frequency (e.g., 'Once daily', 'Twice weekly', '3 times daily')",
         "timeOfDay": "Optimal timing (e.g., 'Morning fasted', 'Before bed', 'Post-workout', 'Morning, afternoon, and bedtime')",
@@ -334,6 +377,10 @@ STRESS PROFILE:
 
 RECOVERY PATTERN:
 - Recovery Speed: ${formatCondition(intakeData.recovery?.recovery)}
+
+PEPTIDE EXPERIENCE LEVEL:
+- Experience: ${formatCondition(intakeData.experience?.peptideExperience)}${intakeData.experience?.previousPeptides ? `\n- Previously Used: ${intakeData.experience.previousPeptides}` : ''}
+- Injection Comfort: ${formatCondition(intakeData.experience?.injectionComfort)}
 
 GOALS:
 ${intakeData.goals?.selectedGoals?.map((goal: string) => `- ${goal}`).join('\n')}

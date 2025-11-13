@@ -43,6 +43,13 @@ export const goalsSchema = z.object({
   customGoal: z.string().optional(),
 });
 
+// Peptide Experience schema (Step H)
+export const experienceSchema = z.object({
+  peptideExperience: z.enum(['never_used', 'beginner_1_3_months', 'intermediate_3_12_months', 'experienced_1plus_years']),
+  previousPeptides: z.string().optional(), // Optional text field for which peptides they've used
+  injectionComfort: z.enum(['never_injected', 'uncomfortable_need_guidance', 'somewhat_comfortable', 'very_comfortable']),
+});
+
 // Combined intake schema
 export const intakeSchema = z.object({
   demographics: demographicsSchema,
@@ -52,6 +59,7 @@ export const intakeSchema = z.object({
   stress: stressSchema,
   recovery: recoverySchema,
   goals: goalsSchema,
+  experience: experienceSchema,
 });
 
 export type DemographicsData = z.infer<typeof demographicsSchema>;
@@ -61,5 +69,6 @@ export type DietaryData = z.infer<typeof dietarySchema>;
 export type StressData = z.infer<typeof stressSchema>;
 export type RecoveryData = z.infer<typeof recoverySchema>;
 export type GoalsData = z.infer<typeof goalsSchema>;
+export type ExperienceData = z.infer<typeof experienceSchema>;
 export type IntakeFormData = z.infer<typeof intakeSchema>;
 

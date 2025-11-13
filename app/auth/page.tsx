@@ -59,13 +59,15 @@ export default function AuthPage() {
           intake.stress &&
           intake.recovery &&
           intake.goals &&
+          intake.experience &&
           Object.keys(intake.demographics).length > 0 &&
           Object.keys(intake.medical).length > 0 &&
           Object.keys(intake.lifestyle).length > 0 &&
           Object.keys(intake.dietary).length > 0 &&
           Object.keys(intake.stress).length > 0 &&
           Object.keys(intake.recovery).length > 0 &&
-          Object.keys(intake.goals).length > 0;
+          Object.keys(intake.goals).length > 0 &&
+          Object.keys(intake.experience).length > 0;
 
         if (hasCompletedIntake) {
           localStorage.setItem('consent_given', 'true');
