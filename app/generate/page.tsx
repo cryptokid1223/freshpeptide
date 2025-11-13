@@ -254,7 +254,7 @@ export default function GeneratePage() {
                       <h3 className="text-xl font-bold text-[var(--accent)] tracking-[-0.01em]">
                         {index + 1}. {peptide.name}
                       </h3>
-                      {peptide.status && <StatusPill status={peptide.status} />}
+                      {(peptide as any).status && <StatusPill status={(peptide as any).status} />}
                     </div>
                     
                     <div className="space-y-4">
