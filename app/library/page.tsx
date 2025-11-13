@@ -4908,9 +4908,9 @@ export default function LibraryPage() {
               )}
             </div>
 
-            {/* Detail Panel */}
-          <div id="detail-panel" className="sticky top-4 h-fit">
-              {selectedPeptide ? (
+          {/* Detail Panel */}
+          <div id="detail-panel" className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+            {selectedPeptide ? (
               <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
                 <h2 className="text-2xl font-bold text-[var(--accent)] mb-3 tracking-[-0.01em]">
                     {selectedPeptide.name}
