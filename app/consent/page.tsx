@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -75,94 +74,125 @@ export default function ConsentPage() {
   }
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-16 max-w-[720px]">
-        <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-3 tracking-[-0.01em]">
-            Research Consent & Acknowledgment
+    <div className="min-h-screen bg-white">
+      {/* Top Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+          <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+            FreshPeptide
+          </Link>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 pt-32 pb-20 max-w-3xl">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-3 tracking-tight">
+            Research Consent
           </h1>
-          <p className="text-[var(--text-dim)] mb-8">
+          <p className="text-gray-600">
             Please read and acknowledge the following before proceeding
           </p>
+        </div>
 
-          <div className="space-y-6 mb-8">
-            <div className="p-6 rounded-xl bg-[var(--warn)]/5 border border-[var(--warn)]/30">
-              <h2 className="text-xl font-semibold text-[var(--warn)] mb-3 flex items-center gap-2">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                  <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-                </svg>
-                RESEARCH / DEMO PURPOSES ONLY — NOT MEDICAL ADVICE
+        {/* Warning Box */}
+        <div className="bg-orange-50 border border-orange-200 rounded-xl p-6 mb-8">
+          <div className="flex items-start gap-3">
+            <svg className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 16 16">
+              <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+              <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+            </svg>
+            <div>
+              <h2 className="text-lg font-semibold text-orange-900 mb-2">
+                Research & Educational Purposes Only
               </h2>
-              <p className="text-[var(--text-dim)] text-sm leading-relaxed">
+              <p className="text-sm text-gray-700 leading-relaxed">
                 This platform is designed exclusively for research, educational, and demonstration 
                 purposes. It does not provide medical advice, diagnosis, or treatment recommendations.
               </p>
             </div>
+          </div>
+        </div>
 
-            <div className="space-y-4">
-              <div className="flex items-start gap-3 p-5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <Checkbox
-                  id="consent1"
-                  checked={consent1}
-                  onCheckedChange={(checked) => setConsent1(checked as boolean)}
-                  className="mt-0.5"
-                />
-                <Label htmlFor="consent1" className="text-[var(--text-dim)] cursor-pointer flex-1 text-sm leading-relaxed">
-                  <strong className="text-[var(--accent)]">I understand</strong> that this platform is 
-                  for research and demonstration purposes only, and does not provide medical advice 
-                  or treatment recommendations.
-                </Label>
-              </div>
-
-              <div className="flex items-start gap-3 p-5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <Checkbox
-                  id="consent2"
-                  checked={consent2}
-                  onCheckedChange={(checked) => setConsent2(checked as boolean)}
-                  className="mt-0.5"
-                />
-                <Label htmlFor="consent2" className="text-[var(--text-dim)] cursor-pointer flex-1 text-sm leading-relaxed">
-                  <strong className="text-[var(--accent)]">I acknowledge</strong> that any information 
-                  or suggestions generated by this platform should not be used to make medical 
-                  decisions, and I will consult qualified healthcare professionals for any 
-                  health-related concerns.
-                </Label>
-              </div>
-
-              <div className="flex items-start gap-3 p-5 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <Checkbox
-                  id="consent3"
-                  checked={consent3}
-                  onCheckedChange={(checked) => setConsent3(checked as boolean)}
-                  className="mt-0.5"
-                />
-                <Label htmlFor="consent3" className="text-[var(--text-dim)] cursor-pointer flex-1 text-sm leading-relaxed">
-                  <strong className="text-[var(--accent)]">I agree</strong> to use this platform for 
-                  educational purposes only and understand that the peptides discussed may be 
-                  research-only substances with varying regulatory statuses and potential risks.
-                </Label>
-              </div>
-            </div>
+        {/* Consent Checkboxes */}
+        <div className="space-y-4 mb-10">
+          <div className="flex items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors">
+            <Checkbox
+              id="consent1"
+              checked={consent1}
+              onCheckedChange={(checked) => setConsent1(checked as boolean)}
+              className="mt-1 border-gray-400"
+            />
+            <Label htmlFor="consent1" className="text-gray-700 cursor-pointer flex-1 leading-relaxed">
+              <strong className="text-gray-900">I understand</strong> that this platform is 
+              for research and demonstration purposes only, and does not provide medical advice 
+              or treatment recommendations.
+            </Label>
           </div>
 
-          <div className="flex gap-4">
-            <Button
-              onClick={() => router.push('/auth')}
-              className="bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)]/50 rounded-full px-8 font-semibold"
-            >
-              Go Back
-            </Button>
-            <Button
-              onClick={handleContinue}
-              disabled={!allConsented}
-              className="flex-1 bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              I Understand & Continue
-            </Button>
+          <div className="flex items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors">
+            <Checkbox
+              id="consent2"
+              checked={consent2}
+              onCheckedChange={(checked) => setConsent2(checked as boolean)}
+              className="mt-1 border-gray-400"
+            />
+            <Label htmlFor="consent2" className="text-gray-700 cursor-pointer flex-1 leading-relaxed">
+              <strong className="text-gray-900">I acknowledge</strong> that any information 
+              or suggestions generated by this platform should not be used to make medical 
+              decisions, and I will consult qualified healthcare professionals for any 
+              health-related concerns.
+            </Label>
           </div>
-        </Card>
+
+          <div className="flex items-start gap-4 p-5 bg-gray-50 border border-gray-200 rounded-xl hover:border-blue-300 transition-colors">
+            <Checkbox
+              id="consent3"
+              checked={consent3}
+              onCheckedChange={(checked) => setConsent3(checked as boolean)}
+              className="mt-1 border-gray-400"
+            />
+            <Label htmlFor="consent3" className="text-gray-700 cursor-pointer flex-1 leading-relaxed">
+              <strong className="text-gray-900">I agree</strong> to use this platform for 
+              educational purposes only and understand that the peptides discussed may be 
+              research-only substances with varying regulatory statuses and potential risks.
+            </Label>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-4">
+          <Button
+            onClick={() => router.push('/auth')}
+            variant="outline"
+            className="border-gray-300 text-gray-700 hover:bg-gray-50 font-medium px-8 rounded-lg"
+          >
+            Go Back
+          </Button>
+          <Button
+            onClick={handleContinue}
+            disabled={!allConsented}
+            className="flex-1 bg-blue-600 text-white hover:bg-blue-700 font-semibold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+          >
+            I Understand & Continue →
+          </Button>
+        </div>
+
+        {/* Help Text */}
+        {!allConsented && (
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Please check all boxes to continue
+          </p>
+        )}
+      </main>
+
+      {/* Research Purposes Banner - Bottom Sticky Small */}
+      <div className="fixed bottom-0 left-0 right-0 bg-orange-600 text-white py-1.5 px-4 text-center z-40">
+        <p className="text-xs font-medium tracking-wide">
+          RESEARCH PURPOSES ONLY — NOT MEDICAL ADVICE
+        </p>
       </div>
-    </MainLayout>
+    </div>
   );
 }
