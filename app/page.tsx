@@ -45,13 +45,13 @@ export default function Home() {
     <div className="min-h-screen bg-white">
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
-        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+        <div className="container mx-auto px-6 py-3 max-w-7xl flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="hover:opacity-80 transition-opacity">
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-20 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </Link>
 
@@ -128,14 +128,14 @@ export default function Home() {
       </nav>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 pt-32 pb-20 max-w-5xl">
+      <main className="container mx-auto px-6 pt-24 pb-20 max-w-5xl">
         {/* Hero Section */}
-        <div className="text-center mb-20">
-          <div className="flex justify-center mb-10">
+        <div className="text-center mb-16">
+          <div className="flex justify-center mb-6">
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="w-full max-w-xl h-auto object-contain"
+              className="w-full max-w-md h-auto object-contain"
             />
           </div>
           <div className="text-3xl md:text-4xl font-light text-gray-600 min-h-[48px]">

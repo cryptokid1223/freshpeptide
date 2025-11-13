@@ -80,9 +80,9 @@ export default function JournalPage() {
     <div className="min-h-screen bg-[#FDFCFA]">
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
-        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+        <div className="container mx-auto px-6 py-3 max-w-7xl flex items-center justify-between">
           <Link href="/" className="hover:opacity-80 transition-opacity">
-            <img src="/logo.png" alt="FreshPeptide" className="h-20 w-auto object-contain" />
+            <img src="/logo.png" alt="FreshPeptide" className="h-12 w-auto object-contain" />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/dashboard">

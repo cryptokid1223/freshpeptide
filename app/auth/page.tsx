@@ -125,12 +125,12 @@ export default function AuthPage() {
     <div className="min-h-screen bg-white">
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
-        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+        <div className="container mx-auto px-6 py-3 max-w-7xl flex items-center justify-between">
           <Link href="/" className="hover:opacity-80 transition-opacity">
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-20 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">
