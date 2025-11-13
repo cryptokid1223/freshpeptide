@@ -33,8 +33,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen relative" style={{ background: 'var(--bg)' }}>
-      <TopRibbon />
-      
       {/* Radial gradient vignette */}
       <div 
         className="absolute inset-0 pointer-events-none"
@@ -271,6 +269,8 @@ export default function Home() {
           </ul>
         </div>
       </main>
+      
+      <TopRibbon />
     </div>
   );
 }

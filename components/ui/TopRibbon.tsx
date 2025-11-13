@@ -3,8 +3,8 @@
 export function TopRibbon() {
   return (
     <div 
-      className="sticky top-0 z-50 h-9 flex items-center justify-center bg-[#B45309] text-[#0B0B0F] font-semibold text-xs tracking-wide shadow-[var(--shadow)]"
-      style={{ boxShadow: '0 2px 12px rgba(0,0,0,0.3)' }}
+      className="sticky bottom-0 z-50 h-9 flex items-center justify-center bg-[#B45309] text-[#0B0B0F] font-semibold text-xs tracking-wide shadow-[var(--shadow)]"
+      style={{ boxShadow: '0 -2px 12px rgba(0,0,0,0.3)' }}
     >
       <span className="flex items-center gap-1.5">
         <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16">

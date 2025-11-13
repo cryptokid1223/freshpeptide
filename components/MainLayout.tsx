@@ -40,8 +40,6 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg)' }}>
-      <TopRibbon />
-      
       {pathname !== '/' && (
         <nav className="bg-[var(--surface-1)]/80 backdrop-blur-sm border-b border-[var(--border)]">
           <div className="container mx-auto px-4 py-3.5 max-w-[1180px]">
@@ -124,6 +122,8 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
           </p>
         </div>
       </footer>
+      
+      <TopRibbon />
     </div>
   );
 }
