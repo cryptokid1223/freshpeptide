@@ -123,38 +123,49 @@ export default function LibraryPage() {
       return;
     }
 
-    const { data: existing } = await supabase
-      .from('user_peptide_stack')
-      .select('peptides')
-      .eq('user_id', session.user.id)
-      .maybeSingle();
+    try {
+      const { data: existing } = await supabase
+        .from('user_peptide_stack')
+        .select('peptides')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
 
-    const currentStack = existing?.peptides || [];
-    
-    // Check if already in stack
-    if (currentStack.some((p: any) => p.name === peptide.name)) {
-      alert('This peptide is already in your stack!');
-      return;
+      const currentStack = existing?.peptides || [];
+      
+      // Check if already in stack
+      if (currentStack.some((p: any) => p.name === peptide.name)) {
+        alert('This peptide is already in your stack!');
+        return;
+      }
+
+      const updatedStack = [...currentStack, {
+        name: peptide.name,
+        dosage: peptide.dosage,
+        added_at: new Date().toISOString(),
+      }];
+
+      const { error } = await supabase
+        .from('user_peptide_stack')
+        .upsert({
+          user_id: session.user.id,
+          peptides: updatedStack,
+        }, {
+          onConflict: 'user_id'
+        });
+
+      if (error) {
+        console.error('Add to stack error:', error);
+        alert('Could not add to stack. Please make sure you ran the database schema in Supabase.');
+        return;
+      }
+
+      setAddedToStack([...addedToStack, peptide.id]);
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 2500);
+    } catch (err) {
+      console.error('Error adding to stack:', err);
+      alert('Error adding to stack. Check console for details.');
     }
-
-    const updatedStack = [...currentStack, {
-      name: peptide.name,
-      dosage: peptide.dosage,
-      added_at: new Date().toISOString(),
-    }];
-
-    await supabase
-      .from('user_peptide_stack')
-      .upsert({
-        user_id: session.user.id,
-        peptides: updatedStack,
-      }, {
-        onConflict: 'user_id'
-      });
-
-    setAddedToStack([...addedToStack, peptide.id]);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 2500);
   };
 
   return (

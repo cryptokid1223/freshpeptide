@@ -104,32 +104,37 @@ export default function AccountPage() {
 
         {/* Quick Links */}
         <div className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-8 mb-6">
-          <h2 className="text-2xl font-bold text-[#3E3028] mb-4">Quick Links</h2>
-          <div className="space-y-3">
+          <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Quick Links</h2>
+          <div className="grid grid-cols-2 gap-3">
             <Link href="/dashboard">
-              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
-                → Dashboard
-              </Button>
+              <div className="bg-[#F5EFE7] border border-[#D4C4B0] hover:border-[#8B6F47] hover:bg-white rounded-xl p-4 text-center transition-all cursor-pointer">
+                <div className="text-2xl mb-2">📊</div>
+                <p className="font-semibold text-[#3E3028]">Dashboard</p>
+              </div>
             </Link>
             <Link href="/generate">
-              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
-                → Generate Stack
-              </Button>
+              <div className="bg-[#F5EFE7] border border-[#D4C4B0] hover:border-[#8B6F47] hover:bg-white rounded-xl p-4 text-center transition-all cursor-pointer">
+                <div className="text-2xl mb-2">🧬</div>
+                <p className="font-semibold text-[#3E3028]">Generate Stack</p>
+              </div>
             </Link>
             <Link href="/tracking">
-              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
-                → Track Usage
-              </Button>
+              <div className="bg-[#F5EFE7] border border-[#D4C4B0] hover:border-[#8B6F47] hover:bg-white rounded-xl p-4 text-center transition-all cursor-pointer">
+                <div className="text-2xl mb-2">✅</div>
+                <p className="font-semibold text-[#3E3028]">Track Usage</p>
+              </div>
             </Link>
             <Link href="/journal">
-              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
-                → Daily Journal
-              </Button>
+              <div className="bg-[#F5EFE7] border border-[#D4C4B0] hover:border-[#8B6F47] hover:bg-white rounded-xl p-4 text-center transition-all cursor-pointer">
+                <div className="text-2xl mb-2">📝</div>
+                <p className="font-semibold text-[#3E3028]">Daily Journal</p>
+              </div>
             </Link>
-            <Link href="/library">
-              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
-                → Peptide Library
-              </Button>
+            <Link href="/library" className="col-span-2">
+              <div className="bg-[#F5EFE7] border border-[#D4C4B0] hover:border-[#8B6F47] hover:bg-white rounded-xl p-4 text-center transition-all cursor-pointer">
+                <div className="text-2xl mb-2">📚</div>
+                <p className="font-semibold text-[#3E3028]">Peptide Library</p>
+              </div>
             </Link>
           </div>
         </div>

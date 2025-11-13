@@ -155,7 +155,7 @@ export default function Home() {
         >
           <div className="space-y-6">
             <div className="flex items-start gap-4 group">
-              <div className="w-2 h-2 rounded-full bg-blue-600 mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
+              <div className="w-2 h-2 rounded-full bg-[#8B6F47] mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
                   Comprehensive Intake
@@ -167,7 +167,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-start gap-4 group">
-              <div className="w-2 h-2 rounded-full bg-blue-600 mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
+              <div className="w-2 h-2 rounded-full bg-[#8B6F47] mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
                   Medical Intelligence Analysis
@@ -179,7 +179,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-start gap-4 group">
-              <div className="w-2 h-2 rounded-full bg-blue-600 mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
+              <div className="w-2 h-2 rounded-full bg-[#8B6F47] mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
                   Searchable Library
@@ -201,7 +201,7 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8">How It Works</h2>
           <div className="space-y-4">
             <div className="flex items-center gap-6 group">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 1
               </div>
               <div>
@@ -211,7 +211,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-6 group">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 2
               </div>
               <div>
@@ -221,7 +221,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-6 group">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 3
               </div>
               <div>
@@ -231,7 +231,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-6 group">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 4
               </div>
               <div>
@@ -241,7 +241,7 @@ export default function Home() {
             </div>
 
             <div className="flex items-center gap-6 group">
-              <div className="w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
+              <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 5
               </div>
               <div>

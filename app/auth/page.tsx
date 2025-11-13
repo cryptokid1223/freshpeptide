@@ -15,6 +15,8 @@ export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
@@ -106,13 +108,26 @@ export default function AuthPage() {
 
       if (authError) throw authError;
 
-      // Success! Profile will be created automatically by database trigger
+      // Update profile with first and last name
+      if (data.user) {
+        await supabase
+          .from('profiles')
+          .update({
+            first_name: firstName,
+            last_name: lastName,
+          })
+          .eq('id', data.user.id);
+      }
+
+      // Success!
       setMessage('Account created! You can now sign in.');
       
       // Auto-switch to sign in after 2 seconds
       setTimeout(() => {
         setMode('signin');
         setMessage('');
+        setFirstName('');
+        setLastName('');
       }, 2000);
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
@@ -208,6 +223,39 @@ export default function AuthPage() {
 
           {/* Form */}
           <form onSubmit={mode === 'signin' ? handleSignIn : handleSignUp} className="space-y-4">
+            {mode === 'signup' && (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">
+                    First Name
+                  </Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="John"
+                    required
+                    className="mt-1.5 bg-gray-50 border-gray-300 text-gray-900 focus:border-blue-600 focus:ring-blue-600"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">
+                    Last Name
+                  </Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Doe"
+                    required
+                    className="mt-1.5 bg-gray-50 border-gray-300 text-gray-900 focus:border-blue-600 focus:ring-blue-600"
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
               <Label htmlFor="email" className="text-sm font-medium text-gray-700">
                 Email Address

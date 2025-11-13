@@ -9,7 +9,7 @@ import type { BriefOutput } from '@/lib/supabase';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string>('');
+  const [userName, setUserName] = useState<string>('');
   const [brief, setBrief] = useState<BriefOutput | null>(null);
   const [logs, setLogs] = useState<any[]>([]);
   const [recentJournal, setRecentJournal] = useState<any>(null);
@@ -24,7 +24,18 @@ export default function DashboardPage() {
         return;
       }
       
-      setUserEmail(session.user.email || '');
+      // Get user's name from profiles
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('first_name, last_name')
+        .eq('id', session.user.id)
+        .single();
+
+      if (profile?.first_name && profile?.last_name) {
+        setUserName(`${profile.first_name} ${profile.last_name}`);
+      } else {
+        setUserName(session.user.email?.split('@')[0] || 'there');
+      }
 
       // Load intake
       const { data: intakeRecord } = await supabase
@@ -124,9 +135,8 @@ export default function DashboardPage() {
         {/* Welcome Header */}
         <div className="mb-10">
           <h1 className="text-4xl font-bold text-[#3E3028] mb-2">
-            Welcome back!
+            Welcome back, {userName}!
           </h1>
-          <p className="text-[#5C4A3A]">{userEmail}</p>
         </div>
 
         {/* Quick Actions - Large Buttons */}
