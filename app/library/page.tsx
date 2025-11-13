@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { TypeWriter } from '@/components/ui/TypeWriter';
 import Link from 'next/link';
+import Image from 'next/image';
 import { supabase } from '@/lib/supabase';
 
 // Categories
@@ -180,9 +181,19 @@ export default function LibraryPage() {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 pt-28 pb-24 max-w-5xl">
-        {/* Header with Typing Animation */}
+        {/* Header with Library Logo */}
         <div className="text-center mb-12">
-          <div className="text-3xl md:text-4xl font-light text-[#5C4A3A] mb-2 min-h-[48px]">
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/library.png" 
+              alt="Peptide Library" 
+              width={200} 
+              height={200}
+              className="object-contain"
+              priority
+            />
+          </div>
+          <div className="text-3xl md:text-4xl font-light text-[#5C4A3A] min-h-[48px]">
             <TypeWriter 
               text="Explore and learn about peptides" 
               speed={60}
@@ -193,31 +204,38 @@ export default function LibraryPage() {
 
         {/* Peptide of the Day - Clean & Warm */}
         <div className="bg-gradient-to-br from-[#F5EFE7] to-white border-2 border-[#D4C4B0] rounded-2xl p-8 mb-10 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-16 h-16 bg-[#8B6F47] rounded-2xl flex items-center justify-center text-white text-3xl font-bold">
-              ⭐
+          <div className="flex items-start gap-6 mb-4">
+            <div className="flex-shrink-0">
+              <Image 
+                src="/daypeptide.png" 
+                alt="Peptide of the Day" 
+                width={120} 
+                height={120}
+                className="object-contain"
+                priority
+              />
             </div>
-            <div>
-              <span className="bg-[#8B6F47] text-white text-xs font-semibold px-3 py-1.5 rounded-full">
+            <div className="flex-1">
+              <span className="bg-[#8B6F47] text-white text-xs font-semibold px-3 py-1.5 rounded-full inline-block mb-2">
                 Peptide of the Day
               </span>
-              <p className="text-[#8B6F47] text-sm mt-1 font-medium">
+              <p className="text-[#8B6F47] text-sm font-medium mb-4">
                 {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
               </p>
+              <h3 className="text-3xl font-bold text-[#3E3028] mb-3">
+                {peptideOfTheDay.name}
+              </h3>
+              <p className="text-[#5C4A3A] text-lg leading-relaxed mb-5">
+                {peptideOfTheDay.summary}
+              </p>
+              <Button
+                onClick={() => setSelectedPeptide(peptideOfTheDay)}
+                className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-semibold px-8 py-3 rounded-xl text-base"
+              >
+                Learn More →
+              </Button>
             </div>
           </div>
-          <h3 className="text-3xl font-bold text-[#3E3028] mb-3">
-            {peptideOfTheDay.name}
-          </h3>
-          <p className="text-[#5C4A3A] text-lg leading-relaxed mb-5">
-            {peptideOfTheDay.summary}
-          </p>
-          <Button
-            onClick={() => setSelectedPeptide(peptideOfTheDay)}
-            className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-semibold px-8 py-3 rounded-xl text-base"
-          >
-            Learn More →
-          </Button>
         </div>
 
         {/* Search Bar - Fixed */}
