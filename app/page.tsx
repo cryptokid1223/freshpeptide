@@ -51,7 +51,7 @@ export default function Home() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-10 w-auto object-contain"
+              className="h-14 w-auto object-contain"
             />
           </Link>
 
@@ -135,7 +135,7 @@ export default function Home() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="w-auto h-32 md:h-40 object-contain"
+              className="w-auto h-48 md:h-64 object-contain"
             />
           </div>
           <div className="text-3xl md:text-4xl font-light text-gray-600 min-h-[48px]">
