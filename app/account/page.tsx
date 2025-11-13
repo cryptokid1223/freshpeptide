@@ -134,7 +134,7 @@ export default function AccountPage() {
               <div className="flex items-center justify-between py-2 border-b border-slate-700 gap-3">
                 <div className="flex-1">
                   <p className="text-sm sm:text-base text-slate-200">Educational Brief</p>
-                  <p className="text-xs sm:text-sm text-slate-400">AI-generated peptide recommendations</p>
+                  <p className="text-xs sm:text-sm text-slate-400">Medical Intelligence peptide recommendations</p>
                 </div>
                 <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex-shrink-0 ${
                   briefGenerated 

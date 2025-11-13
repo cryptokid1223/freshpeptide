@@ -109,8 +109,8 @@ export default function GeneratePage() {
         throw new Error('No intake data found. Please complete the questionnaire first.');
       }
 
-      console.log('✅ Intake data loaded, calling AI...');
-      setStatusMessage('🤖 Calling AI to analyze your profile...');
+      console.log('✅ Intake data loaded, calling medical intelligence...');
+      setStatusMessage('🔬 Medical Intelligence analyzing your profile...');
       
       const response = await fetch('/api/generate-brief', {
         method: 'POST',
@@ -177,7 +177,7 @@ export default function GeneratePage() {
                 Generate Your Peptide Educational Brief
               </h1>
               <p className="text-sm sm:text-base text-slate-300 mb-4 sm:mb-6">
-                Based on your intake responses, our AI will generate an educational brief that maps 
+                Based on your intake responses, our Medical Intelligence system will generate an educational brief that maps 
                 your goals to peptide classes found in research literature, explains mechanisms, 
                 highlights risks, and provides evidence citations.
               </p>
@@ -214,7 +214,7 @@ export default function GeneratePage() {
                 disabled={isGenerating}
                 className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-6 text-lg"
               >
-                {isGenerating ? 'Generating Brief...' : 'Generate Peptide Stack'}
+                {isGenerating ? 'Medical Intelligence Analyzing...' : 'Generate Peptide Stack'}
               </Button>
             </Card>
           ) : (

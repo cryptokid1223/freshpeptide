@@ -204,7 +204,7 @@ export default function AuthPage() {
             <p className="text-sm sm:text-base text-slate-400 text-center mb-6 sm:mb-8 px-2">
               {mode === 'signin' 
                 ? 'Sign in to access your dashboard and peptide stack' 
-                : 'Sign up to get personalized AI-powered peptide recommendations'}
+                : 'Sign up to get personalized Medical Intelligence peptide recommendations'}
             </p>
 
             {message && (
@@ -307,7 +307,7 @@ export default function AuthPage() {
               {mode === 'signup' && (
                 <div className="p-4 bg-green-900/20 border border-green-700 rounded-lg">
                   <p className="text-sm text-slate-300">
-                    <strong className="text-green-400">✨ New here?</strong> After creating your account, you'll verify your email and answer a quick questionnaire to get personalized AI recommendations.
+                    <strong className="text-green-400">✨ New here?</strong> After creating your account, you'll verify your email and answer a quick questionnaire to get personalized Medical Intelligence recommendations.
                   </p>
                 </div>
               )}

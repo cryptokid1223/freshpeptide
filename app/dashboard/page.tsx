@@ -104,7 +104,7 @@ export default function DashboardPage() {
             {/* Brief Status Card */}
             <Card className="bg-slate-800/50 border-slate-700 p-6">
               <div className="flex items-center gap-4 mb-4">
-                <div className="text-4xl">🤖</div>
+                <div className="text-4xl">🔬</div>
                 <div>
                   <h2 className="text-xl font-semibold text-cyan-400">Educational Brief</h2>
                   <p className="text-sm text-slate-400">
@@ -127,7 +127,7 @@ export default function DashboardPage() {
               ) : (
                 <>
                   <p className="text-slate-300 mb-4">
-                    Generate an AI-powered educational brief based on your intake data.
+                    Generate a Medical Intelligence-powered educational brief based on your intake data.
                   </p>
                   <Link href="/generate">
                     <Button 

@@ -40,7 +40,7 @@ export default function Home() {
             FreshPeptide
           </h1>
           <p className="text-xl sm:text-2xl text-slate-300 mb-3 sm:mb-4 px-2">
-            AI-Powered Peptide Research Platform
+            Medical Intelligence Peptide Research Platform
           </p>
           <p className="text-base sm:text-lg text-slate-400 max-w-2xl mx-auto mb-6 sm:mb-8 px-4">
             Get personalized peptide recommendations based on your health profile and goals
@@ -158,12 +158,12 @@ export default function Home() {
           </Card>
 
           <Card className="bg-slate-800/50 border-slate-700 p-5 sm:p-6 hover:bg-slate-800/70 transition-all">
-            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🤖</div>
+            <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">🔬</div>
             <h3 className="text-lg sm:text-xl font-semibold text-cyan-400 mb-2">
-              AI-Powered Analysis
+              Medical Intelligence Analysis
             </h3>
             <p className="text-sm sm:text-base text-slate-300">
-              Server-side AI generates educational briefs mapping goals to research-backed 
+              Advanced analytical system generates educational briefs mapping goals to research-backed 
               peptide classes with evidence citations.
             </p>
           </Card>
@@ -222,7 +222,7 @@ export default function Home() {
               </div>
               <div>
                 <h4 className="font-semibold text-slate-200 mb-1 text-sm sm:text-base">Generate Brief</h4>
-                <p className="text-slate-400 text-xs sm:text-sm">AI analyzes your inputs and creates educational content</p>
+                <p className="text-slate-400 text-xs sm:text-sm">Medical Intelligence analyzes your inputs and creates educational content</p>
               </div>
             </div>
             
@@ -254,7 +254,7 @@ export default function Home() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-400 flex-shrink-0">•</span>
-              <span>All AI outputs are educational and should not guide medical decisions</span>
+              <span>All system outputs are educational and should not guide medical decisions</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-amber-400 flex-shrink-0">•</span>
