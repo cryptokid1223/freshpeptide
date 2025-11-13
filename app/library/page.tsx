@@ -4744,6 +4744,7 @@ export default function LibraryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPeptide, setSelectedPeptide] = useState<any>(null);
+  const [isMobileModalOpen, setIsMobileModalOpen] = useState(false);
   const [filteredPeptides, setFilteredPeptides] = useState(PEPTIDES);
   const peptideOfTheDay = getPeptideOfTheDay();
 
@@ -4812,12 +4813,7 @@ export default function LibraryPage() {
               setSearchQuery('');
               setSelectedCategory('all');
               setSelectedPeptide(peptideOfTheDay);
-              setTimeout(() => {
-                const detailPanel = document.getElementById('detail-panel');
-                if (detailPanel) {
-                  detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-              }, 100);
+              setIsMobileModalOpen(true);
             }}
             className="bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full px-6 font-semibold"
           >
@@ -4882,7 +4878,10 @@ export default function LibraryPage() {
                 name={peptide.name}
                 status={peptide.regulatory_status}
                 summary={peptide.summary}
-                  onClick={() => setSelectedPeptide(peptide)}
+                  onClick={() => {
+                    setSelectedPeptide(peptide);
+                    setIsMobileModalOpen(true);
+                  }}
                 isSelected={selectedPeptide?.id === peptide.id}
               />
               ))}
@@ -4908,8 +4907,8 @@ export default function LibraryPage() {
               )}
             </div>
 
-          {/* Detail Panel */}
-          <div id="detail-panel" className="sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+          {/* Detail Panel - Desktop Only (lg+) */}
+          <div className="hidden lg:block sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
             {selectedPeptide ? (
               <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
                 <h2 className="text-2xl font-bold text-[var(--accent)] mb-3 tracking-[-0.01em]">
@@ -5007,6 +5006,122 @@ export default function LibraryPage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Modal Overlay (lg-) */}
+      {isMobileModalOpen && selectedPeptide && (
+        <>
+          {/* Backdrop */}
+          <div 
+            className="lg:hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-40"
+            onClick={() => setIsMobileModalOpen(false)}
+          />
+          
+          {/* Modal Content */}
+          <div className="lg:hidden fixed inset-x-0 bottom-0 top-20 z-50 overflow-hidden">
+            <Card 
+              className="h-full rounded-t-3xl border-t border-x border-[var(--border)] bg-[var(--surface-1)] overflow-y-auto" 
+              style={{ boxShadow: 'var(--shadow)' }}
+            >
+              {/* Close Button */}
+              <div className="sticky top-0 bg-[var(--surface-1)]/95 backdrop-blur-sm border-b border-[var(--border)] px-4 py-3 flex items-center justify-between z-10">
+                <h2 className="text-lg font-bold text-[var(--accent)] tracking-[-0.01em] truncate pr-2">
+                  {selectedPeptide.name}
+                </h2>
+                <button
+                  onClick={() => setIsMobileModalOpen(false)}
+                  className="flex-shrink-0 w-8 h-8 rounded-full bg-[var(--surface-2)] hover:bg-[var(--surface-2)]/80 flex items-center justify-center transition-colors"
+                >
+                  <svg className="w-5 h-5 text-[var(--text)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-4">
+                <div className="mb-4">
+                  <StatusPill status={selectedPeptide.regulatory_status} />
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Summary
+                    </h3>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.summary}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Mechanism
+                    </h3>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.mechanism}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Recommended Dosage (Research)
+                    </h3>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.recommended_dosage}</p>
+                  </div>
+
+                  <div className="pt-4 border-t border-[var(--border)]">
+                    <h3 className="text-base font-semibold text-[var(--danger)] mb-2 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                      </svg>
+                      Common Adverse Effects
+                    </h3>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">
+                      {selectedPeptide.common_adverse_effects}
+                    </p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base font-semibold text-[var(--danger)] mb-2 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                      </svg>
+                      Contraindications
+                    </h3>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.contraindications}</p>
+                  </div>
+
+                  <div className="pt-4 border-t border-[var(--border)]">
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-3 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Evidence
+                    </h3>
+                    <div className="space-y-3">
+                      {selectedPeptide.evidence.map((ev: any, index: number) => (
+                        <div key={index} className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] p-4">
+                          <p className="font-semibold text-sm text-[var(--text)] mb-1">
+                            {ev.title} ({ev.year})
+                          </p>
+                          <p className="text-xs text-[var(--accent)] mb-2">{ev.source}</p>
+                          <p className="text-xs text-[var(--text-dim)] leading-relaxed">{ev.summary}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 p-4 bg-[var(--warn)]/5 border border-[var(--warn)]/30 rounded-xl">
+                  <p className="text-xs text-[var(--text-dim)] leading-relaxed">
+                    <strong className="text-[var(--warn)]">Disclaimer:</strong> This information is for 
+                    educational purposes only. Consult healthcare professionals before using any peptides.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          </div>
+        </>
+      )}
     </MainLayout>
   );
 }
