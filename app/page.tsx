@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { TopRibbon } from '@/components/ui/TopRibbon';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { NumberedStep } from '@/components/ui/NumberedStep';
+import { TypeWriter } from '@/components/ui/TypeWriter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import Link from 'next/link';
