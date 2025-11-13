@@ -1,11 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { SectionTitle } from '@/components/ui/SectionTitle';
-import { StatusPill } from '@/components/ui/StatusPill';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import type { BriefOutput } from '@/lib/supabase';
@@ -18,7 +15,7 @@ export default function GeneratePage() {
   const [statusMessage, setStatusMessage] = useState<string>('');
 
   useEffect(() => {
-    const checkAuthAndIntake = async () => {
+    const loadBrief = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
@@ -26,39 +23,19 @@ export default function GeneratePage() {
         return;
       }
 
+      // Check if intake is completed
       const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
-      const intake = intakeRecord?.intake_data;
-      const hasCompletedIntake = intake && 
-        intake.demographics && 
-        intake.medical && 
-        intake.lifestyle && 
-        intake.dietary &&
-        intake.stress &&
-        intake.recovery &&
-        intake.goals &&
-        Object.keys(intake.demographics).length > 0 &&
-        Object.keys(intake.medical).length > 0 &&
-        Object.keys(intake.lifestyle).length > 0 &&
-        Object.keys(intake.dietary).length > 0 &&
-        Object.keys(intake.stress).length > 0 &&
-        Object.keys(intake.recovery).length > 0 &&
-        Object.keys(intake.goals).length > 0;
-
-      if (!hasCompletedIntake) {
-        setStatusMessage('⚠️ Please complete all intake sections first');
-        setError('Intake questionnaire not completed. Please go to the intake page and complete all sections.');
+      if (!intakeRecord?.intake_data) {
+        router.push('/consent');
         return;
       }
 
-      localStorage.setItem('consent_given', 'true');
-      localStorage.setItem('intake_completed', 'true');
-      setStatusMessage('✅ Ready to generate');
-
+      // Load existing brief
       const { data: briefRecords } = await supabase
         .from('briefs')
         .select('brief_output')
@@ -71,390 +48,274 @@ export default function GeneratePage() {
       }
     };
 
-    checkAuthAndIntake();
+    loadBrief();
   }, [router]);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     setError(null);
-    setStatusMessage('🔄 Starting generation...');
+    setStatusMessage('Analyzing your health profile...');
 
     try {
-      setStatusMessage('🔐 Checking authentication...');
       const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session?.user) {
-        throw new Error('Not authenticated. Please sign in again.');
-      }
+      if (!session) return;
 
-      const user = session.user;
-
-      setStatusMessage('📋 Loading your questionnaire data...');
+      // Get intake data
       const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
-        .eq('user_id', user.id)
-        .maybeSingle();
-      
-      if (!intakeRecord?.intake_data || Object.keys(intakeRecord.intake_data).length === 0) {
-        throw new Error('No intake data found. Please complete the questionnaire first.');
-      }
+        .eq('user_id', session.user.id)
+        .single();
 
-      setStatusMessage('🔬 Medical Intelligence analyzing your profile...');
-      
+      setStatusMessage('Generating personalized recommendations...');
+
+      // Call API to generate brief
       const response = await fetch('/api/generate-brief', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userId: user.id,
+          userId: session.user.id,
           intakeData: intakeRecord.intake_data,
         }),
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        try {
-          const errorData = JSON.parse(errorText);
-          throw new Error(errorData.error || 'Failed to generate brief');
-        } catch {
-          throw new Error('Failed to generate brief: ' + response.status);
-        }
+        throw new Error('Failed to generate brief');
       }
 
-      setStatusMessage('💾 Saving your personalized stack...');
-      const data = await response.json();
-      setBrief(data.brief);
+      const result = await response.json();
       
-      localStorage.setItem('generated_brief', JSON.stringify(data.brief));
-      
+      setStatusMessage('Saving your stack...');
+
+      // Save to database
       await supabase.from('briefs').insert({
-        user_id: user.id,
-        brief_output: data.brief,
-        model_name: data.model,
+        user_id: session.user.id,
+        brief_output: result.brief,
+        model_name: result.model,
       });
 
-      setStatusMessage('✅ Complete! Your stack is ready.');
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'An error occurred';
-      setError(errorMsg);
-      setStatusMessage('❌ Generation failed');
+      setBrief(result.brief);
+      setStatusMessage('Complete!');
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
     } finally {
-      setIsGenerating(false);
+      setTimeout(() => {
+        setIsGenerating(false);
+        setStatusMessage('');
+      }, 1000);
     }
   };
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
-        {!brief ? (
-          <div className="max-w-3xl mx-auto">
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-              <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-4">
-                Generate Your Peptide Educational Brief
-              </h1>
-              <p className="text-[var(--text-dim)] mb-8 leading-relaxed">
-                Based on your intake responses, our Medical Intelligence system will generate an educational brief that maps 
-                your goals to peptide classes found in research literature, explains mechanisms, 
-                highlights risks, and provides evidence citations.
-              </p>
-
-              {statusMessage && (
-                <div className={`mb-6 p-4 rounded-xl ${
-                  statusMessage.includes('✅') ? 'bg-[var(--ok)]/10 border-[var(--ok)]/30' :
-                  statusMessage.includes('⚠️') ? 'bg-[var(--warn)]/10 border-[var(--warn)]/30' :
-                  'bg-[var(--accent)]/10 border-[var(--accent)]/30'
-                } border`}>
-                  <p className={`text-center font-medium ${
-                    statusMessage.includes('✅') ? 'text-[var(--ok)]' :
-                    statusMessage.includes('⚠️') ? 'text-[var(--warn)]' :
-                    'text-[var(--accent)]'
-                  }`}>{statusMessage}</p>
-                </div>
-              )}
-
-              {error && (
-                <div className="mb-6 p-4 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/30">
-                  <p className="text-[var(--danger)] mb-3">{error}</p>
-                  <Button 
-                    onClick={() => router.push('/intake')} 
-                    className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold"
-                  >
-                    Go to Intake Page
-                  </Button>
-                </div>
-              )}
-
-              <div className="bg-[var(--warn)]/5 border border-[var(--warn)]/30 rounded-xl p-4 mb-8">
-                <p className="text-[var(--text-dim)] text-sm leading-relaxed">
-                  <strong className="text-[var(--warn)]">Remember:</strong> This is educational content 
-                  only and not medical advice. Always consult healthcare professionals.
-                </p>
-              </div>
-
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating}
-                className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] py-8 text-lg font-semibold rounded-full"
-              >
-                {isGenerating ? 'Medical Intelligence Analyzing...' : 'Generate Peptide Stack'}
+    <div className="min-h-screen bg-[#FDFCFA]">
+      {/* Top Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
+        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="h-20 w-auto object-contain"
+            />
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#5C4A3A] hover:text-[#3E3028] hover:bg-[#F5EFE7] font-medium">
+                Dashboard
               </Button>
-            </Card>
+            </Link>
+            <Link href="/library">
+              <Button variant="ghost" className="text-[#5C4A3A] hover:text-[#3E3028] hover:bg-[#F5EFE7] font-medium">
+                Library
+              </Button>
+            </Link>
+            <Button onClick={handleSignOut} className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-medium px-6 rounded-lg">
+              Sign Out
+            </Button>
           </div>
-        ) : (
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 pt-28 pb-24 max-w-4xl">
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-[#3E3028] mb-3">
+            Your Personalized Stack
+          </h1>
+          <p className="text-[#5C4A3A] text-lg">
+            AI-generated peptide recommendations based on your health profile
+          </p>
+        </div>
+
+        {/* Generate Button */}
+        {!brief && (
+          <div className="text-center mb-12">
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-bold px-12 py-6 rounded-2xl text-xl shadow-lg disabled:opacity-50"
+            >
+              {isGenerating ? '🧬 Generating...' : '🧬 Generate My Stack'}
+            </Button>
+            {statusMessage && (
+              <p className="text-[#8B6F47] mt-4 font-medium">{statusMessage}</p>
+            )}
+            {error && (
+              <p className="text-red-600 mt-4">{error}</p>
+            )}
+          </div>
+        )}
+
+        {/* Regenerate Button */}
+        {brief && (
+          <div className="text-center mb-8">
+            <Button
+              onClick={handleGenerate}
+              disabled={isGenerating}
+              variant="outline"
+              className="border-2 border-[#8B6F47] text-[#8B6F47] hover:bg-[#F5EFE7] font-semibold px-8 py-3 rounded-xl"
+            >
+              {isGenerating ? 'Regenerating...' : '🔄 Regenerate Stack'}
+            </Button>
+          </div>
+        )}
+
+        {/* Brief Display */}
+        {brief && (
           <div className="space-y-8">
-            {/* Header */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-              <div className="flex items-start justify-between mb-4">
-                <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF]">
-                  Your Educational Brief
-                </h1>
-                <Button
-                  onClick={() => router.push('/dashboard')}
-                  className="bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)]/50 rounded-full px-6 font-semibold"
-                >
-                  Dashboard
-                </Button>
-              </div>
-
-              <div className="bg-[var(--warn)]/5 border border-[var(--warn)]/30 rounded-xl p-4">
-                <p className="text-[var(--warn)] font-semibold text-center text-sm">
-                  ⚠️ EDUCATIONAL CONTENT ONLY — NOT MEDICAL ADVICE
-                </p>
-              </div>
-            </Card>
-
             {/* Goal Alignment */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle>Your Personalized Analysis</SectionTitle>
-              <p className="text-[var(--text-dim)] whitespace-pre-line leading-relaxed">{brief.goalAlignment}</p>
-            </Card>
+            <div className="bg-gradient-to-br from-[#F5EFE7] to-white border-2 border-[#D4C4B0] rounded-2xl p-8">
+              <h2 className="text-2xl font-bold text-[#3E3028] mb-4">Why These Peptides?</h2>
+              <p className="text-[#5C4A3A] leading-relaxed text-lg">{brief.goalAlignment}</p>
+            </div>
 
-            {/* Recommended Stack */}
-            {brief.recommendedStack && (
-              <Card className="rounded-2xl border border-[var(--accent)]/30 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent-2)]/5 p-8" style={{ boxShadow: 'var(--shadow)' }}>
-                <h2 className="text-2xl font-bold text-[var(--accent)] mb-4 tracking-[-0.01em]">
-                  🎯 {brief.recommendedStack.name}
-                </h2>
-                <p className="text-[var(--text-dim)] mb-4 leading-relaxed">
-                  <strong className="text-[var(--text)]">Description:</strong> {brief.recommendedStack.description}
-                </p>
-                <p className="text-[var(--text-dim)] leading-relaxed">
-                  <strong className="text-[var(--text)]">Synergies:</strong> {brief.recommendedStack.synergies}
-                </p>
-              </Card>
-            )}
-
-            {/* Peptides */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle>Your Peptide Stack - Detailed Breakdown</SectionTitle>
+            {/* Recommended Peptides */}
+            <div>
+              <h2 className="text-3xl font-bold text-[#3E3028] mb-6">Your Peptides</h2>
               <div className="space-y-6">
-                {brief.candidatePeptides.map((peptide, index) => (
-                  <div key={index} className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-6">
-                    <div className="flex items-start justify-between mb-4">
-                      <h3 className="text-xl font-bold text-[var(--accent)] tracking-[-0.01em]">
-                        {index + 1}. {peptide.name}
-                      </h3>
-                      {(peptide as any).status && <StatusPill status={(peptide as any).status} />}
-                    </div>
+                {brief.candidatePeptides?.map((peptide: any, index: number) => (
+                  <div key={index} className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-8 hover:border-[#8B6F47] transition-all">
+                    <h3 className="text-3xl font-bold text-[#3E3028] mb-4">{peptide.name}</h3>
                     
-                    <div className="space-y-4">
-                      <p className="text-sm text-[var(--text-dim)] leading-relaxed">
-                        <strong className="text-[var(--text)]">Why Recommended:</strong> {peptide.why}
-                      </p>
+                    <div className="space-y-6">
+                      <div>
+                        <p className="text-sm font-semibold text-[#8B6F47] mb-2">Why this peptide?</p>
+                        <p className="text-[#5C4A3A] leading-relaxed text-lg">{peptide.why}</p>
+                      </div>
 
-                      {peptide.detailedInfo && (
-                        <div className="rounded-xl bg-[var(--surface-1)] p-4 border border-[var(--border)]">
-                          <h4 className="text-sm font-semibold text-[var(--accent)] mb-2">📋 About This Peptide</h4>
-                          <p className="text-[var(--text-dim)] text-sm leading-relaxed">{peptide.detailedInfo}</p>
-                        </div>
-                      )}
-
-                      <p className="text-sm text-[var(--text-dim)] leading-relaxed">
-                        <strong className="text-[var(--text)]">Mechanism of Action:</strong> {peptide.mechanism}
-                      </p>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div className="rounded-xl bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-4">
-                          <h4 className="text-sm font-semibold text-[var(--accent)] mb-2">💊 Dosage</h4>
-                          <p className="text-[var(--text-dim)] text-sm leading-relaxed">{peptide.recommendedDosage}</p>
-                        </div>
+                      <div className="bg-[#F5EFE7] border border-[#D4C4B0] rounded-xl p-6">
+                        <p className="text-sm font-semibold text-[#8B6F47] mb-2">💊 Dosage</p>
+                        <p className="text-[#3E3028] font-bold text-xl mb-2">{peptide.recommendedDosage}</p>
                         {peptide.timing && (
-                          <div className="rounded-xl bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-4">
-                            <h4 className="text-sm font-semibold text-[var(--accent)] mb-2">⏰ Timing</h4>
-                            <div className="text-[var(--text-dim)] text-sm space-y-1">
-                              <p><strong>Frequency:</strong> {peptide.timing.frequency}</p>
-                              <p><strong>Time:</strong> {peptide.timing.timeOfDay}</p>
-                              <p><strong>With Food:</strong> {peptide.timing.withFood}</p>
-                              {peptide.timing.cycleDuration && <p><strong>Cycle:</strong> {peptide.timing.cycleDuration}</p>}
-                            </div>
+                          <div className="text-sm text-[#5C4A3A] space-y-1 mt-3">
+                            <p><strong>How often:</strong> {peptide.timing.frequency}</p>
+                            <p><strong>When:</strong> {peptide.timing.timeOfDay}</p>
+                            {peptide.timing.withFood && <p><strong>With food:</strong> {peptide.timing.withFood}</p>}
                           </div>
                         )}
                       </div>
 
-                      <div className="grid md:grid-cols-2 gap-4">
-                        {peptide.potentialBenefits && peptide.potentialBenefits.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold text-[var(--ok)] mb-2">✅ Potential Benefits</h4>
-                            <ul className="space-y-1">
-                              {peptide.potentialBenefits.map((benefit, i) => (
-                                <li key={i} className="text-[var(--text-dim)] text-sm flex gap-2">
-                                  <span className="text-[var(--ok)]">•</span>
-                                  <span>{benefit}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                        {peptide.sideEffects && peptide.sideEffects.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold text-[var(--warn)] mb-2">⚠️ Possible Side Effects</h4>
-                            <ul className="space-y-1">
-                              {peptide.sideEffects.map((effect, i) => (
-                                <li key={i} className="text-[var(--text-dim)] text-sm flex gap-2">
-                                  <span className="text-[var(--warn)]">•</span>
-                                  <span>{effect}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                      <div>
+                        <p className="text-sm font-semibold text-[#8B6F47] mb-2">✅ Potential Benefits</p>
+                        <ul className="space-y-2">
+                          {peptide.potentialBenefits?.map((benefit: string, i: number) => (
+                            <li key={i} className="flex items-start gap-2 text-[#5C4A3A]">
+                              <span className="text-[#8B6F47]">•</span>
+                              <span>{benefit}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div>
+                        <p className="text-sm font-semibold text-red-700 mb-2">⚠️ Possible Side Effects</p>
+                        <ul className="space-y-2">
+                          {peptide.sideEffects?.map((effect: string, i: number) => (
+                            <li key={i} className="flex items-start gap-2 text-[#5C4A3A]">
+                              <span className="text-red-600">•</span>
+                              <span>{effect}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
 
-            {/* Key Risks */}
-            <Card className="rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/5 p-8" style={{ boxShadow: 'var(--shadow)' }}>
-              <h2 className="text-xl font-semibold text-[var(--danger)] mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                  <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-                </svg>
-                Key Risks & Contraindications
-              </h2>
-              <ul className="space-y-2">
-                {brief.keyRisks.map((risk, index) => (
-                  <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
-                    <span className="text-[var(--danger)]">•</span>
-                    <span>{risk}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-
-            {/* Medical Considerations */}
-            {brief.medicalConsiderations && (
-              <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-                <SectionTitle>Medical Considerations for Your Profile</SectionTitle>
-                <div className="space-y-6">
-                  {brief.medicalConsiderations.drugInteractions && brief.medicalConsiderations.drugInteractions.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-[var(--text)] mb-2">Drug Interactions</h3>
-                      <ul className="space-y-1">
-                        {brief.medicalConsiderations.drugInteractions.map((interaction, index) => (
-                          <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
-                            <span className="text-[var(--warn)]">•</span>
-                            <span>{interaction}</span>
-                          </li>
-                        ))}
-                      </ul>
+            {/* Research Evidence */}
+            {brief.evidenceList && brief.evidenceList.length > 0 && (
+              <div>
+                <h2 className="text-3xl font-bold text-[#3E3028] mb-6">Research Evidence</h2>
+                <div className="space-y-4">
+                  {brief.evidenceList.map((evidence: any, index: number) => (
+                    <div key={index} className="bg-white border border-[#E8DCC8] rounded-xl p-6">
+                      <h4 className="font-bold text-[#3E3028] mb-2">{evidence.title} ({evidence.year})</h4>
+                      <p className="text-sm text-[#8B6F47] mb-2">{evidence.source}</p>
+                      <p className="text-[#5C4A3A] mb-3 leading-relaxed">{evidence.summary}</p>
+                      {evidence.url && (
+                        <a 
+                          href={evidence.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-[#8B6F47] hover:text-[#6F5839] font-semibold text-sm"
+                        >
+                          View on PubMed →
+                        </a>
+                      )}
                     </div>
-                  )}
-                  {brief.medicalConsiderations.contraindications && brief.medicalConsiderations.contraindications.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-[var(--text)] mb-2">Contraindications</h3>
-                      <ul className="space-y-1">
-                        {brief.medicalConsiderations.contraindications.map((contra, index) => (
-                          <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
-                            <span className="text-[var(--warn)]">•</span>
-                            <span>{contra}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {brief.medicalConsiderations.monitoringRecommendations && brief.medicalConsiderations.monitoringRecommendations.length > 0 && (
-                    <div>
-                      <h3 className="font-semibold text-[var(--text)] mb-2">Monitoring Recommendations</h3>
-                      <ul className="space-y-1">
-                        {brief.medicalConsiderations.monitoringRecommendations.map((monitor, index) => (
-                          <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
-                            <span className="text-[var(--accent)]">•</span>
-                            <span>{monitor}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+                  ))}
                 </div>
-              </Card>
+              </div>
             )}
 
-            {/* Evidence */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle subtitle="Peer-reviewed research articles supporting the peptides in your stack">
-                Scientific Evidence & Research
-              </SectionTitle>
-              <div className="space-y-4">
-                {brief.evidenceList.map((evidence, index) => (
-                  <div key={index} className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] p-4">
-                    <h4 className="font-semibold text-[var(--text)] mb-1">
-                      {evidence.title} ({evidence.year})
-                    </h4>
-                    <p className="text-sm text-[var(--accent)] mb-2">{evidence.source}</p>
-                    <p className="text-[var(--text-dim)] text-sm mb-2">{evidence.summary}</p>
-                    {evidence.url && (
-                      <a
-                        href={evidence.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[var(--accent)] hover:text-[var(--accent-2)] text-sm font-medium"
-                      >
-                        View on PubMed →
-                      </a>
-                    )}
-                  </div>
-                ))}
+            {/* Important Warnings */}
+            {brief.keyRisks && brief.keyRisks.length > 0 && (
+              <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-6">
+                <h3 className="text-xl font-bold text-orange-900 mb-4 flex items-center gap-2">
+                  <span className="text-2xl">⚠️</span>
+                  Important Safety Information
+                </h3>
+                <ul className="space-y-2">
+                  {brief.keyRisks.map((risk: string, i: number) => (
+                    <li key={i} className="flex items-start gap-2 text-orange-900">
+                      <span>•</span>
+                      <span>{risk}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </Card>
+            )}
 
-            {/* Disclaimer */}
-            <Card className="rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/5 p-6" style={{ boxShadow: 'var(--shadow)' }}>
-              <h3 className="text-lg font-semibold text-[var(--danger)] mb-3">
-                ⚠️ Important Disclaimer
-              </h3>
-              <p className="text-[var(--text-dim)] text-sm leading-relaxed">
-                This brief is generated for educational and research purposes only. It does not 
-                constitute medical advice, diagnosis, or treatment recommendations. Many peptides 
-                discussed are research-only substances without FDA approval for human use. Always 
-                consult qualified healthcare professionals before making any health-related decisions. 
-                Do not use this information to self-prescribe or obtain controlled substances.
-              </p>
-            </Card>
-
-            {/* Actions */}
-            <div className="flex gap-4">
-              <Button
-                onClick={() => {
-                  setBrief(null);
-                  localStorage.removeItem('generated_brief');
-                }}
-                className="bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)]/50 rounded-full px-8 font-semibold"
-              >
-                Regenerate
-              </Button>
-              <Button
-                onClick={() => router.push('/dashboard')}
-                className="flex-1 bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold"
-              >
-                Go to Dashboard
-              </Button>
+            {/* Action Buttons */}
+            <div className="flex gap-4 justify-center">
+              <Link href="/tracking">
+                <Button className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-semibold px-8 py-4 rounded-xl text-lg">
+                  Start Tracking →
+                </Button>
+              </Link>
+              <Link href="/dashboard">
+                <Button variant="outline" className="border-2 border-[#D4C4B0] text-[#5C4A3A] hover:bg-[#F5EFE7] font-semibold px-8 py-4 rounded-xl text-lg">
+                  Back to Dashboard
+                </Button>
+              </Link>
             </div>
           </div>
         )}
+      </main>
+
+      {/* Research Banner */}
+      <div className="fixed bottom-0 left-0 right-0 bg-orange-600 text-white py-1.5 px-4 text-center z-30">
+        <p className="text-xs font-medium tracking-wide">
+          RESEARCH PURPOSES ONLY — NOT MEDICAL ADVICE
+        </p>
       </div>
-    </MainLayout>
+    </div>
   );
 }

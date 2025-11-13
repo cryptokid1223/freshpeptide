@@ -1,214 +1,175 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { SectionTitle } from '@/components/ui/SectionTitle';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 export default function AccountPage() {
   const router = useRouter();
-  const [userEmail, setUserEmail] = useState<string>('');
-  const [userId, setUserId] = useState<string>('');
-  const [intakeCompleted, setIntakeCompleted] = useState(false);
-  const [briefGenerated, setBriefGenerated] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [hasData, setHasData] = useState(false);
 
   useEffect(() => {
-    const loadAccountData = async () => {
+    const loadAccount = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
         router.push('/auth');
         return;
       }
-
-      setUserEmail(session.user.email || '');
-      setUserId(session.user.id);
-
-      // Check intake status from Supabase
-      const { data: intakeRecord } = await supabase
-        .from('intake')
-        .select('intake_data')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
-
-      const intake = intakeRecord?.intake_data;
-      const hasIntake = intake && 
-        intake.demographics && 
-        intake.medical && 
-        intake.lifestyle && 
-        intake.dietary &&
-        intake.stress &&
-        intake.recovery &&
-        intake.goals;
       
-      setIntakeCompleted(!!hasIntake);
+      setUserEmail(session.user.email || '');
 
-      // Check brief status from Supabase
+      // Check if user has any data
       const { data: briefRecords } = await supabase
         .from('briefs')
         .select('id')
         .eq('user_id', session.user.id)
         .limit(1);
 
-      setBriefGenerated(!!(briefRecords && briefRecords.length > 0));
+      setHasData(!!(briefRecords && briefRecords.length > 0));
     };
 
-    loadAccountData();
+    loadAccount();
   }, [router]);
 
   const handleSignOut = async () => {
-    if (confirm('Are you sure you want to sign out?')) {
-      await supabase.auth.signOut();
-      localStorage.clear();
-      router.push('/');
-    }
+    await supabase.auth.signOut();
+    router.push('/');
   };
 
   const handleClearData = async () => {
-    if (confirm('Are you sure you want to clear all your data? This action cannot be undone.')) {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        await supabase.from('intake').delete().eq('user_id', session.user.id);
-        await supabase.from('briefs').delete().eq('user_id', session.user.id);
-      }
-      
-      localStorage.removeItem('intake_data');
-      setIntakeCompleted(false);
-      setBriefGenerated(false);
-      alert('All data has been cleared successfully.');
-      router.push('/dashboard');
+    if (!confirm('Are you sure? This will delete all your data including intake, briefs, logs, and journal entries.')) {
+      return;
     }
+
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+
+    // Delete all user data
+    await Promise.all([
+      supabase.from('intake').delete().eq('user_id', session.user.id),
+      supabase.from('briefs').delete().eq('user_id', session.user.id),
+      supabase.from('peptide_logs').delete().eq('user_id', session.user.id),
+      supabase.from('daily_journal').delete().eq('user_id', session.user.id),
+      supabase.from('user_peptide_stack').delete().eq('user_id', session.user.id),
+    ]);
+
+    localStorage.clear();
+    alert('All data cleared successfully!');
+    router.push('/consent');
   };
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
-        <div className="max-w-3xl mx-auto">
-          <div className="mb-12">
-            <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
-              Account
-            </h1>
-            <p className="text-[var(--text-dim)]">Manage your profile and account settings</p>
+    <div className="min-h-screen bg-[#FDFCFA]">
+      {/* Top Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
+        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img src="/logo.png" alt="FreshPeptide" className="h-20 w-auto object-contain" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#5C4A3A] hover:text-[#3E3028] hover:bg-[#F5EFE7] font-medium">
+                Dashboard
+              </Button>
+            </Link>
+            <Button onClick={handleSignOut} className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-medium px-6 rounded-lg">
+              Sign Out
+            </Button>
           </div>
-
-          {/* Profile Information */}
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-6" style={{ boxShadow: 'var(--shadow)' }}>
-            <SectionTitle>Profile Information</SectionTitle>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Email Address</label>
-                <p className="text-base text-[var(--text)] font-medium">{userEmail}</p>
-              </div>
-              
-              <div>
-                <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">User ID</label>
-                <p className="text-xs text-[var(--text-dim)] font-mono bg-[var(--surface-2)] px-3 py-2 rounded-lg border border-[var(--border)] break-all">
-                  {userId}
-                </p>
-              </div>
-            </div>
-          </Card>
-
-          {/* Data Status */}
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-6" style={{ boxShadow: 'var(--shadow)' }}>
-            <SectionTitle>Data Status</SectionTitle>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div>
-                  <p className="font-medium text-[var(--text)]">Health Intake</p>
-                  <p className="text-sm text-[var(--text-dim)]">7-step questionnaire data</p>
-                </div>
-                {intakeCompleted ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--ok)]/10 text-[var(--ok)] border border-[var(--ok)]/20">
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Completed
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--text-muted)]/10 text-[var(--text-muted)] border border-[var(--text-muted)]/20">
-                    Not Started
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
-                <div>
-                  <p className="font-medium text-[var(--text)]">Medical Intelligence peptide recommendations</p>
-                  <p className="text-sm text-[var(--text-dim)]">Generated educational brief</p>
-                </div>
-                {briefGenerated ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--ok)]/10 text-[var(--ok)] border border-[var(--ok)]/20">
-                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Generated
-                  </span>
-                ) : (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--text-muted)]/10 text-[var(--text-muted)] border border-[var(--text-muted)]/20">
-                    Not Generated
-                  </span>
-                )}
-              </div>
-            </div>
-          </Card>
-
-          {/* Account Actions */}
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-6" style={{ boxShadow: 'var(--shadow)' }}>
-            <SectionTitle>Account Actions</SectionTitle>
-            
-            <div className="space-y-3">
-              <Button
-                onClick={handleSignOut}
-                className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold"
-              >
-                Sign Out
-              </Button>
-              
-              <Button
-                onClick={handleClearData}
-                className="w-full bg-transparent border border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger)]/10 rounded-full font-semibold"
-              >
-                Clear All Data
-              </Button>
-            </div>
-          </Card>
-
-          {/* Security & Privacy */}
-          <Card className="rounded-2xl border border-[var(--border)]/50 bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
-            <h3 className="text-lg font-semibold text-[var(--text)] mb-3 flex items-center gap-2">
-              <svg className="w-5 h-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Security & Privacy
-            </h3>
-            <ul className="space-y-2 text-sm text-[var(--text-dim)]">
-              <li className="flex items-start gap-2">
-                <span className="text-[var(--accent)] flex-shrink-0">•</span>
-                <span>All data is stored securely in our encrypted database</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[var(--accent)] flex-shrink-0">•</span>
-                <span>Your information is never shared with third parties</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[var(--accent)] flex-shrink-0">•</span>
-                <span>You can delete your data at any time</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="text-[var(--accent)] flex-shrink-0">•</span>
-                <span>This is a research platform - not for medical use</span>
-              </li>
-            </ul>
-          </Card>
         </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 pt-28 pb-24 max-w-3xl">
+        <h1 className="text-4xl font-bold text-[#3E3028] mb-8">Account Settings</h1>
+
+        {/* Account Info */}
+        <div className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-8 mb-6">
+          <h2 className="text-2xl font-bold text-[#3E3028] mb-4">Account Information</h2>
+          <div className="space-y-3">
+            <div>
+              <p className="text-sm font-semibold text-[#8B6F47]">Email</p>
+              <p className="text-lg text-[#3E3028]">{userEmail}</p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#8B6F47]">Status</p>
+              <p className="text-lg text-[#3E3028]">{hasData ? 'Active (Data saved)' : 'New Account'}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Links */}
+        <div className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-8 mb-6">
+          <h2 className="text-2xl font-bold text-[#3E3028] mb-4">Quick Links</h2>
+          <div className="space-y-3">
+            <Link href="/dashboard">
+              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
+                → Dashboard
+              </Button>
+            </Link>
+            <Link href="/generate">
+              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
+                → Generate Stack
+              </Button>
+            </Link>
+            <Link href="/tracking">
+              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
+                → Track Usage
+              </Button>
+            </Link>
+            <Link href="/journal">
+              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
+                → Daily Journal
+              </Button>
+            </Link>
+            <Link href="/library">
+              <Button variant="outline" className="w-full justify-start border-2 border-[#E8DCC8] text-[#5C4A3A] hover:bg-[#F5EFE7] py-3 rounded-xl text-left">
+                → Peptide Library
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-8">
+          <h2 className="text-2xl font-bold text-red-900 mb-4 flex items-center gap-2">
+            <span className="text-3xl">⚠️</span>
+            Danger Zone
+          </h2>
+          <p className="text-red-800 mb-4 leading-relaxed">
+            This will permanently delete all your data including your health intake, peptide stack, logs, and journal entries. 
+            This action cannot be undone.
+          </p>
+          <Button
+            onClick={handleClearData}
+            className="bg-red-600 text-white hover:bg-red-700 font-semibold px-6 py-3 rounded-xl"
+          >
+            Clear All Data
+          </Button>
+        </div>
+
+        {/* Info Box */}
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mt-6">
+          <h3 className="font-semibold text-blue-900 mb-2">Privacy & Security</h3>
+          <ul className="space-y-2 text-sm text-blue-800">
+            <li>• Your data is encrypted and stored securely in Supabase</li>
+            <li>• We never share your personal health information</li>
+            <li>• You can delete all your data at any time</li>
+            <li>• This platform is for research and educational purposes only</li>
+          </ul>
+        </div>
+      </main>
+
+      {/* Research Banner */}
+      <div className="fixed bottom-0 left-0 right-0 bg-orange-600 text-white py-1.5 px-4 text-center z-30">
+        <p className="text-xs font-medium tracking-wide">
+          RESEARCH PURPOSES ONLY — NOT MEDICAL ADVICE
+        </p>
       </div>
-    </MainLayout>
+    </div>
   );
 }

@@ -1,14 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { SectionTitle } from '@/components/ui/SectionTitle';
-import { StackSummary } from '@/components/ui/StackSummary';
-import { StackOverviewCard } from '@/components/ui/StackOverviewCard';
-import { UsageTimeline } from '@/components/ui/UsageTimeline';
-import { UsageStats } from '@/components/ui/UsageStats';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -17,21 +10,13 @@ import type { BriefOutput } from '@/lib/supabase';
 export default function DashboardPage() {
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string>('');
-  const [intakeData, setIntakeData] = useState<any>(null);
   const [brief, setBrief] = useState<BriefOutput | null>(null);
   const [logs, setLogs] = useState<any[]>([]);
-  const [stats, setStats] = useState({
-    totalLogs: 0,
-    activePeptides: 0,
-    logsThisWeek: 0,
-    logsLastWeek: 0,
-    mostLoggedPeptide: undefined as string | undefined,
-    streakDays: 0
-  });
+  const [recentJournal, setRecentJournal] = useState<any>(null);
+  const [hasIntake, setHasIntake] = useState(false);
 
   useEffect(() => {
-    // Check authentication with Supabase and load data from database
-    const loadDashboardData = async () => {
+    const loadDashboard = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
@@ -41,18 +26,16 @@ export default function DashboardPage() {
       
       setUserEmail(session.user.email || '');
 
-      // Load intake data from Supabase database
+      // Load intake
       const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
         .eq('user_id', session.user.id)
         .maybeSingle();
 
-      if (intakeRecord?.intake_data) {
-        setIntakeData(intakeRecord.intake_data);
-      }
+      setHasIntake(!!intakeRecord?.intake_data);
 
-      // Load most recent brief from Supabase database
+      // Load brief
       const { data: briefRecords } = await supabase
         .from('briefs')
         .select('brief_output')
@@ -64,330 +47,292 @@ export default function DashboardPage() {
         setBrief(briefRecords[0].brief_output as BriefOutput);
       }
 
-      // Load tracking logs
+      // Load recent logs (last 5)
       const { data: logsData } = await supabase
         .from('peptide_logs')
         .select('*')
         .eq('user_id', session.user.id)
-        .order('logged_at', { ascending: false });
+        .order('logged_at', { ascending: false })
+        .limit(5);
 
       if (logsData) {
         setLogs(logsData);
-        
-        // Calculate stats
-        const now = new Date();
-        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-        
-        const logsThisWeek = logsData.filter(log => new Date(log.logged_at) >= weekAgo).length;
-        const logsLastWeek = logsData.filter(log => {
-          const logDate = new Date(log.logged_at);
-          return logDate >= twoWeeksAgo && logDate < weekAgo;
-        }).length;
+      }
 
-        // Find most logged peptide
-        const peptideCount: { [key: string]: number } = {};
-        logsData.forEach(log => {
-          peptideCount[log.peptide_name] = (peptideCount[log.peptide_name] || 0) + 1;
-        });
-        const mostLogged = Object.entries(peptideCount).sort((a, b) => b[1] - a[1])[0];
+      // Load most recent journal
+      const { data: journalData } = await supabase
+        .from('daily_journal')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('journal_date', { ascending: false })
+        .limit(1);
 
-        // Count unique active peptides (logged in last 30 days)
-        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        const activePeptides = new Set(
-          logsData.filter(log => new Date(log.logged_at) >= thirtyDaysAgo).map(log => log.peptide_name)
-        ).size;
-
-        setStats({
-          totalLogs: logsData.length,
-          activePeptides,
-          logsThisWeek,
-          logsLastWeek,
-          mostLoggedPeptide: mostLogged?.[0],
-          streakDays: 0 // TODO: Calculate streak
-        });
+      if (journalData && journalData.length > 0) {
+        setRecentJournal(journalData[0]);
       }
     };
 
-    loadDashboardData();
+    loadDashboard();
   }, [router]);
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
+  };
+
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8 sm:py-16 max-w-[1180px]">
-        {/* Header */}
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
-            Dashboard
+    <div className="min-h-screen bg-[#FDFCFA]">
+      {/* Top Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
+        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="h-20 w-auto object-contain"
+            />
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/library">
+              <Button 
+                variant="ghost"
+                className="text-[#5C4A3A] hover:text-[#3E3028] hover:bg-[#F5EFE7] font-medium"
+              >
+                Library
+              </Button>
+            </Link>
+            <Link href="/account">
+              <Button 
+                variant="ghost"
+                className="text-[#5C4A3A] hover:text-[#3E3028] hover:bg-[#F5EFE7] font-medium"
+              >
+                Account
+              </Button>
+            </Link>
+            <Button 
+              onClick={handleSignOut}
+              className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-medium px-6 rounded-lg"
+            >
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 pt-28 pb-24 max-w-6xl">
+        {/* Welcome Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-bold text-[#3E3028] mb-2">
+            Welcome back!
           </h1>
-          <p className="text-sm sm:text-base text-[var(--text-dim)] truncate">Welcome back, {userEmail}</p>
+          <p className="text-[#5C4A3A]">{userEmail}</p>
         </div>
 
-        {/* Usage Statistics */}
-        {logs.length > 0 && (
-          <div className="mb-8 sm:mb-12">
-            <SectionTitle subtitle="Your tracking activity at a glance">Usage Overview</SectionTitle>
-            <UsageStats stats={stats} />
+        {/* Quick Actions - Large Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+          <Link href="/generate">
+            <div className="bg-gradient-to-br from-[#8B6F47] to-[#6F5839] text-white rounded-2xl p-8 hover:shadow-lg transition-all cursor-pointer">
+              <div className="text-4xl mb-3">🧬</div>
+              <h3 className="text-2xl font-bold mb-2">Generate Stack</h3>
+              <p className="text-white/80">Get personalized peptide recommendations</p>
+            </div>
+          </Link>
+
+          <Link href="/tracking">
+            <div className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-8 hover:border-[#8B6F47] hover:shadow-lg transition-all cursor-pointer">
+              <div className="text-4xl mb-3">📊</div>
+              <h3 className="text-2xl font-bold text-[#3E3028] mb-2">Track Usage</h3>
+              <p className="text-[#5C4A3A]">Log your peptide doses</p>
+            </div>
+          </Link>
+
+          <Link href="/journal">
+            <div className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-8 hover:border-[#8B6F47] hover:shadow-lg transition-all cursor-pointer">
+              <div className="text-4xl mb-3">📝</div>
+              <h3 className="text-2xl font-bold text-[#3E3028] mb-2">Daily Journal</h3>
+              <p className="text-[#5C4A3A]">Record your progress</p>
+            </div>
+          </Link>
+        </div>
+
+        {/* Status Cards */}
+        {!hasIntake && (
+          <div className="bg-orange-50 border-2 border-orange-200 rounded-2xl p-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="text-3xl">⚠️</div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-orange-900 mb-2">
+                  Complete Your Health Intake
+                </h3>
+                <p className="text-orange-800 mb-4">
+                  Answer a few questions to get personalized peptide recommendations
+                </p>
+                <Link href="/consent">
+                  <Button className="bg-orange-600 text-white hover:bg-orange-700 font-semibold px-6 rounded-lg">
+                    Start Questionnaire →
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 
-        {/* Hero Cards - Intake & Brief Status */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
-          {/* Intake Status Card */}
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-[#001018]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-              </div>
+        {!brief && hasIntake && (
+          <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 mb-8">
+            <div className="flex items-start gap-4">
+              <div className="text-3xl">💡</div>
               <div className="flex-1">
-                <h2 className="text-xl font-bold text-[var(--accent)]">Health Intake</h2>
-                <div className="flex items-center gap-2 mt-1">
-                  {intakeData ? (
-                    <>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[var(--ok)]/10 text-[var(--ok)] border border-[var(--ok)]/20">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        Completed
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-sm text-[var(--text-dim)]">Not started</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            {intakeData ? (
-              <>
-                <p className="text-sm text-[var(--text-dim)] mb-4">
-                  Your comprehensive health intake is complete. You can view or update your 
-                  information at any time.
-                </p>
-                <Link href="/intake">
-                  <Button 
-                    className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold"
-                  >
-                    View/Edit Intake
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <p className="text-sm text-[var(--text-dim)] mb-4">
-                  Complete your health intake to get personalized peptide recommendations.
-                </p>
-                <Link href="/intake">
-                  <Button className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold">
-                    Start Intake
-                  </Button>
-                </Link>
-              </>
-            )}
-          </Card>
-
-          {/* Brief Status Card */}
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
-            <div className="flex items-center gap-4 mb-4">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] flex items-center justify-center flex-shrink-0">
-                <svg className="w-6 h-6 text-[#001018]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <h2 className="text-xl font-bold text-[var(--accent)]">Educational Brief</h2>
-                <div className="flex items-center gap-2 mt-1">
-                  {brief ? (
-                    <>
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-[var(--ok)]/10 text-[var(--ok)] border border-[var(--ok)]/20">
-                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                        Generated
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-sm text-[var(--text-dim)]">Not generated</span>
-                  )}
-                </div>
-              </div>
-            </div>
-            {brief ? (
-              <>
-                <p className="text-sm text-[var(--text-dim)] mb-4">
-                  Your personalized educational brief is ready. Review peptide recommendations 
-                  and research citations.
+                <h3 className="text-xl font-bold text-blue-900 mb-2">
+                  Ready to Generate Your Stack
+                </h3>
+                <p className="text-blue-800 mb-4">
+                  You've completed your intake. Generate your personalized peptide recommendations now!
                 </p>
                 <Link href="/generate">
-                  <Button 
-                    className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold"
-                  >
-                    View Brief
+                  <Button className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-semibold px-6 rounded-lg">
+                    Generate My Stack →
                   </Button>
                 </Link>
-              </>
-            ) : (
-              <>
-                <p className="text-sm text-[var(--text-dim)] mb-4">
-                  Generate a Medical Intelligence-powered educational brief based on your intake data.
-                </p>
-                <Link href="/generate">
-                  <Button 
-                    className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold"
-                    disabled={!intakeData}
-                  >
-                    {intakeData ? 'Generate Brief' : 'Complete Intake First'}
-                  </Button>
-                </Link>
-              </>
-            )}
-          </Card>
-        </div>
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Intake Summary */}
-        {intakeData && (
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 mb-8 sm:mb-12" style={{ boxShadow: 'var(--shadow)' }}>
-            <SectionTitle>Intake Summary</SectionTitle>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              {intakeData.demographics && (
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--text)] mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
-                    Demographics
-                  </h3>
-                  <div className="space-y-2 text-[var(--text-dim)] text-sm">
-                    <p><span className="text-[var(--text)]">Age:</span> {intakeData.demographics.age}</p>
-                    <p><span className="text-[var(--text)]">Sex:</span> {intakeData.demographics.sex}</p>
-                    <p><span className="text-[var(--text)]">Height:</span> {intakeData.demographics.height}</p>
-                    <p><span className="text-[var(--text)]">Weight:</span> {intakeData.demographics.weight}</p>
+        {/* Your Current Stack */}
+        {brief && (
+          <div className="mb-12">
+            <h2 className="text-3xl font-bold text-[#3E3028] mb-6">Your Peptide Stack</h2>
+            <div className="space-y-4">
+              {brief.candidatePeptides?.map((peptide: any, index: number) => (
+                <div
+                  key={index}
+                  className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-6 hover:border-[#8B6F47] hover:shadow-md transition-all"
+                >
+                  <div className="flex items-start justify-between gap-4 mb-3">
+                    <h3 className="text-2xl font-bold text-[#3E3028]">
+                      {peptide.name}
+                    </h3>
+                    <Link href="/tracking">
+                      <Button className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-medium px-4 py-2 rounded-lg text-sm whitespace-nowrap">
+                        Log Dose
+                      </Button>
+                    </Link>
+                  </div>
+                  <p className="text-[#5C4A3A] mb-3 leading-relaxed">{peptide.why}</p>
+                  <div className="bg-[#F5EFE7] border border-[#D4C4B0] rounded-xl p-4">
+                    <p className="text-sm font-semibold text-[#3E3028] mb-1">Dosage:</p>
+                    <p className="text-[#5C4A3A]">{peptide.recommendedDosage}</p>
                   </div>
                 </div>
-              )}
-
-              {intakeData.goals && (
-                <div>
-                  <h3 className="text-lg font-semibold text-[var(--text)] mb-3 flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
-                    Goals
-                  </h3>
-                  <ul className="space-y-2 text-[var(--text-dim)] text-sm">
-                    {intakeData.goals.selectedGoals?.map((goal: string, index: number) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <span className="text-[var(--accent)]">•</span>
-                        <span>{goal}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              ))}
             </div>
-          </Card>
-        )}
-
-        {/* Your Peptide Recommendations */}
-        {brief && (
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 mb-8 sm:mb-12" style={{ boxShadow: 'var(--shadow)' }}>
-            <SectionTitle subtitle="Your personalized educational stack based on your health profile">
-              Your Peptide Recommendations
-            </SectionTitle>
-            
-            <StackSummary 
-              items={brief.candidatePeptides.map(p => ({
-                ...p,
-                status: (p as any).status || 'Research Only',
-                family: (p as any).family || 'Peptide',
-                tags: (p as any).tags || []
-              }))}
-              onViewFull={() => router.push('/generate')}
-            />
-
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
-              <Link href="/generate" className="flex-1">
-                <Button className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold text-sm sm:text-base">
-                  View Full Brief
-                </Button>
-              </Link>
-              <Link href="/tracking" className="flex-1">
-                <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold text-sm sm:text-base">
-                  Track Usage
-                </Button>
-              </Link>
-              <Link href="/library" className="flex-1">
-                <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold text-sm sm:text-base">
-                  Browse Library
+            <div className="mt-6 text-center">
+              <Link href="/generate">
+                <Button variant="outline" className="border-2 border-[#D4C4B0] text-[#5C4A3A] hover:bg-[#F5EFE7] font-medium px-8 rounded-lg">
+                  View Full Details →
                 </Button>
               </Link>
             </div>
-          </Card>
+          </div>
         )}
 
-        {/* Tracking Analytics */}
-        {brief && logs.length > 0 && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
-            {/* Stack Status Overview */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle>Current Stack Status</SectionTitle>
-              <StackOverviewCard 
-                peptides={brief.candidatePeptides.map(p => {
-                  const peptideLogs = logs.filter(log => log.peptide_name === p.name);
-                  const lastLog = peptideLogs[0];
-                  return {
-                    name: p.name,
-                    status: peptideLogs.length > 0 ? 'active' : 'paused',
-                    lastLogged: lastLog?.logged_at,
-                    totalLogs: peptideLogs.length,
-                    goal: p.why
-                  };
-                })}
-              />
-            </Card>
-
-            {/* Recent Activity Timeline */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
-              <div className="flex items-center justify-between mb-4">
-                <SectionTitle>Recent Activity</SectionTitle>
-                <Link href="/tracking" className="text-sm text-[var(--accent)] hover:text-[var(--accent-2)] font-medium">
+        {/* Recent Activity */}
+        {logs.length > 0 && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-[#3E3028]">Recent Activity</h2>
+              <Link href="/tracking">
+                <Button variant="ghost" className="text-[#8B6F47] hover:text-[#6F5839] font-semibold">
                   View All →
-                </Link>
-              </div>
-              <div className="max-h-[300px] sm:max-h-[400px] overflow-y-auto">
-                <UsageTimeline logs={logs} limit={7} />
-              </div>
-            </Card>
+                </Button>
+              </Link>
+            </div>
+            <div className="space-y-3">
+              {logs.slice(0, 5).map((log) => {
+                const logDate = new Date(log.logged_at);
+                return (
+                  <div
+                    key={log.id}
+                    className="bg-white border border-[#E8DCC8] rounded-xl p-4 flex items-center justify-between"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-2 h-2 rounded-full bg-[#8B6F47]"></div>
+                      <div>
+                        <p className="font-semibold text-[#3E3028]">{log.peptide_name}</p>
+                        <p className="text-sm text-[#5C4A3A]">{log.amount || 'Logged'}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-[#8B6F47]">
+                      {logDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
-        {/* Quick Actions - Only show if no brief yet */}
-        {!brief && (
-          <div className="grid md:grid-cols-2 gap-6">
-            <Link href="/library">
-              <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 hover:border-[var(--accent)]/50 transition-all cursor-pointer" style={{ boxShadow: 'var(--shadow)' }}>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] flex items-center justify-center mb-4">
-                  <svg className="w-6 h-6 text-[#001018]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                  </svg>
+        {/* Today's Journal Preview */}
+        {recentJournal && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-3xl font-bold text-[#3E3028]">Today's Journal</h2>
+              <Link href="/journal">
+                <Button variant="ghost" className="text-[#8B6F47] hover:text-[#6F5839] font-semibold">
+                  View All →
+                </Button>
+              </Link>
+            </div>
+            <div className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-6">
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div>
+                  <p className="text-sm text-[#5C4A3A] mb-1">Mood</p>
+                  <p className="text-2xl font-bold text-[#3E3028]">{recentJournal.mood_rating || '-'}/10</p>
                 </div>
-                <h3 className="text-lg font-semibold text-[var(--accent)] mb-1">Browse Library</h3>
-                <p className="text-sm text-[var(--text-dim)]">Explore peptide database</p>
-              </Card>
-            </Link>
+                <div>
+                  <p className="text-sm text-[#5C4A3A] mb-1">Energy</p>
+                  <p className="text-2xl font-bold text-[#3E3028]">{recentJournal.energy_rating || '-'}/10</p>
+                </div>
+                <div>
+                  <p className="text-sm text-[#5C4A3A] mb-1">Sleep</p>
+                  <p className="text-2xl font-bold text-[#3E3028]">{recentJournal.sleep_rating || '-'}/10</p>
+                </div>
+              </div>
+              {recentJournal.journal_text && (
+                <div className="bg-[#F5EFE7] rounded-xl p-4">
+                  <p className="text-[#5C4A3A] line-clamp-3">{recentJournal.journal_text}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
-            <Link href="/account">
-              <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 hover:border-[var(--accent)]/50 transition-all cursor-pointer" style={{ boxShadow: 'var(--shadow)' }}>
-                <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] flex items-center justify-center mb-4">
-                  <svg className="w-6 h-6 text-[#001018]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold text-[var(--accent)] mb-1">Account</h3>
-                <p className="text-sm text-[var(--text-dim)]">Manage your profile</p>
-              </Card>
+        {/* Empty State - No Brief */}
+        {!brief && hasIntake && (
+          <div className="text-center py-16">
+            <div className="text-6xl mb-4">🧬</div>
+            <h3 className="text-2xl font-bold text-[#3E3028] mb-3">
+              Ready to Get Started?
+            </h3>
+            <p className="text-[#5C4A3A] mb-6 max-w-md mx-auto">
+              Generate your personalized peptide stack based on your health profile
+            </p>
+            <Link href="/generate">
+              <Button className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-semibold px-8 py-4 rounded-xl text-lg">
+                Generate My Stack →
+              </Button>
             </Link>
           </div>
         )}
+      </main>
+
+      {/* Research Banner */}
+      <div className="fixed bottom-0 left-0 right-0 bg-orange-600 text-white py-1.5 px-4 text-center z-30">
+        <p className="text-xs font-medium tracking-wide">
+          RESEARCH PURPOSES ONLY — NOT MEDICAL ADVICE
+        </p>
       </div>
-    </MainLayout>
+    </div>
   );
 }

@@ -1,259 +1,250 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
-import { Card } from '@/components/ui/card';
-import { SectionTitle } from '@/components/ui/SectionTitle';
-import { DailyJournal } from '@/components/ui/DailyJournal';
-import { PeptideNotes } from '@/components/ui/PeptideNotes';
-import { WeeklySummary } from '@/components/ui/WeeklySummary';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import type { BriefOutput } from '@/lib/supabase';
 
 export default function JournalPage() {
   const router = useRouter();
-  const [brief, setBrief] = useState<BriefOutput | null>(null);
-  const [todayJournal, setTodayJournal] = useState<any>(null);
-  const [selectedPeptide, setSelectedPeptide] = useState('');
-  const [peptideNotes, setPeptideNotes] = useState<any[]>([]);
-  const [weeklySummary, setWeeklySummary] = useState<any>(null);
-  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [userId, setUserId] = useState('');
+  const [entries, setEntries] = useState<any[]>([]);
+  const [showForm, setShowForm] = useState(false);
+  
+  // Form state
+  const [mood, setMood] = useState(5);
+  const [energy, setEnergy] = useState(5);
+  const [sleep, setSleep] = useState(5);
+  const [journalText, setJournalText] = useState('');
+  const [journalDate, setJournalDate] = useState(new Date().toISOString().slice(0, 10));
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadJournals = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      
       if (!session) {
         router.push('/auth');
         return;
       }
 
-      setUserId(session.user.id);
-
-      // Load user's peptide stack
-      const { data: briefRecords } = await supabase
-        .from('briefs')
-        .select('brief_output')
-        .eq('user_id', session.user.id)
-        .order('created_at', { ascending: false })
-        .limit(1);
-
-      if (briefRecords && briefRecords.length > 0) {
-        setBrief(briefRecords[0].brief_output as BriefOutput);
-        // Auto-select first peptide
-        if (briefRecords[0].brief_output.candidatePeptides.length > 0) {
-          const firstPeptide = briefRecords[0].brief_output.candidatePeptides[0].name;
-          setSelectedPeptide(firstPeptide);
-        }
-      }
-
-      // Load today's journal entry
-      const today = new Date().toISOString().split('T')[0];
-      const { data: journalData } = await supabase
+      const { data } = await supabase
         .from('daily_journal')
         .select('*')
         .eq('user_id', session.user.id)
-        .eq('journal_date', today)
-        .maybeSingle();
+        .order('journal_date', { ascending: false });
 
-      setTodayJournal(journalData);
-
-      // Load this week's summary
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      const weekAgoStr = weekAgo.toISOString().split('T')[0];
-
-      const { data: summaryData } = await supabase
-        .from('weekly_summaries')
-        .select('*')
-        .eq('user_id', session.user.id)
-        .gte('week_start_date', weekAgoStr)
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      setWeeklySummary(summaryData);
-      setIsLoading(false);
+      if (data) {
+        setEntries(data);
+      }
     };
 
-    loadData();
+    loadJournals();
   }, [router]);
 
-  useEffect(() => {
-    if (selectedPeptide && userId) {
-      loadPeptideNotes();
-    }
-  }, [selectedPeptide, userId]);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
 
-  const loadPeptideNotes = async () => {
+    await supabase.from('daily_journal').upsert({
+      user_id: session.user.id,
+      journal_date: journalDate,
+      mood_rating: mood,
+      energy_rating: energy,
+      sleep_rating: sleep,
+      journal_text: journalText,
+    }, {
+      onConflict: 'user_id,journal_date'
+    });
+
+    // Reload
     const { data } = await supabase
-      .from('peptide_notes')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('peptide_name', selectedPeptide)
-      .order('created_at', { ascending: false });
-
-    setPeptideNotes(data || []);
-  };
-
-  const handleSaveJournal = async (journalData: any) => {
-    const today = new Date().toISOString().split('T')[0];
-    
-    const { error } = await supabase
       .from('daily_journal')
-      .upsert({
-        user_id: userId,
-        journal_date: today,
-        ...journalData
-      });
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('journal_date', { ascending: false });
 
-    if (error) throw error;
-  };
-
-  const handleAddNote = async (noteData: any) => {
-    const { error } = await supabase
-      .from('peptide_notes')
-      .insert({
-        user_id: userId,
-        peptide_name: selectedPeptide,
-        ...noteData
-      });
-
-    if (error) throw error;
-    await loadPeptideNotes();
-  };
-
-  const handleDeleteNote = async (noteId: string) => {
-    if (!confirm('Delete this note?')) return;
-    
-    const { error } = await supabase
-      .from('peptide_notes')
-      .delete()
-      .eq('id', noteId);
-
-    if (error) {
-      alert('Failed to delete note');
-    } else {
-      await loadPeptideNotes();
+    if (data) {
+      setEntries(data);
     }
+
+    setShowForm(false);
   };
 
-  const handleGenerateSummary = async () => {
-    setIsGeneratingSummary(true);
-    try {
-      const response = await fetch('/api/generate-summary', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId })
-      });
-
-      if (!response.ok) throw new Error('Failed to generate summary');
-
-      const data = await response.json();
-      setWeeklySummary(data.summary);
-    } catch (error) {
-      alert('Failed to generate weekly summary');
-    } finally {
-      setIsGeneratingSummary(false);
-    }
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    router.push('/');
   };
-
-  if (isLoading) {
-    return (
-      <MainLayout>
-        <div className="container mx-auto px-4 py-16">
-          <p className="text-[var(--text-dim)] text-center">Loading...</p>
-        </div>
-      </MainLayout>
-    );
-  }
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-8 sm:py-16 max-w-[1180px]">
-        <div className="mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
-            Journal & Notes
-          </h1>
-          <p className="text-sm sm:text-base text-[var(--text-dim)]">
-            Track your daily well-being and observations about your peptide stack
-          </p>
+    <div className="min-h-screen bg-[#FDFCFA]">
+      {/* Top Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
+        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img src="/logo.png" alt="FreshPeptide" className="h-20 w-auto object-contain" />
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/dashboard">
+              <Button variant="ghost" className="text-[#5C4A3A] hover:text-[#3E3028] hover:bg-[#F5EFE7] font-medium">
+                Dashboard
+              </Button>
+            </Link>
+            <Button onClick={handleSignOut} className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-medium px-6 rounded-lg">
+              Sign Out
+            </Button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 pt-28 pb-24 max-w-4xl">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-4xl font-bold text-[#3E3028]">Daily Journal</h1>
+          <Button
+            onClick={() => setShowForm(!showForm)}
+            className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-semibold px-6 py-3 rounded-xl"
+          >
+            {showForm ? 'Cancel' : '+ New Entry'}
+          </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
-          {/* Daily Journal */}
-          <div>
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 mb-4 sm:mb-6" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle subtitle={new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}>
-                Daily Check-In
-              </SectionTitle>
-              <DailyJournal
-                initialMood={todayJournal?.mood_rating}
-                initialEnergy={todayJournal?.energy_rating}
-                initialSleep={todayJournal?.sleep_quality}
-                initialText={todayJournal?.journal_text}
-                onSave={handleSaveJournal}
-              />
-            </Card>
+        {/* Journal Form */}
+        {showForm && (
+          <div className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-8 mb-8">
+            <h3 className="text-2xl font-bold text-[#3E3028] mb-6">How are you feeling today?</h3>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-[#3E3028] mb-2">Date</label>
+                <input
+                  type="date"
+                  value={journalDate}
+                  onChange={(e) => setJournalDate(e.target.value)}
+                  required
+                  className="w-full bg-[#F5EFE7] border border-[#D4C4B0] text-[#3E3028] py-3 px-4 rounded-xl focus:outline-none focus:border-[#8B6F47]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#3E3028] mb-2">
+                  Mood: {mood}/10
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={mood}
+                  onChange={(e) => setMood(Number(e.target.value))}
+                  className="w-full h-3 bg-[#E8DCC8] rounded-full appearance-none cursor-pointer accent-[#8B6F47]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#3E3028] mb-2">
+                  Energy: {energy}/10
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={energy}
+                  onChange={(e) => setEnergy(Number(e.target.value))}
+                  className="w-full h-3 bg-[#E8DCC8] rounded-full appearance-none cursor-pointer accent-[#8B6F47]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#3E3028] mb-2">
+                  Sleep Quality: {sleep}/10
+                </label>
+                <input
+                  type="range"
+                  min="1"
+                  max="10"
+                  value={sleep}
+                  onChange={(e) => setSleep(Number(e.target.value))}
+                  className="w-full h-3 bg-[#E8DCC8] rounded-full appearance-none cursor-pointer accent-[#8B6F47]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#3E3028] mb-2">
+                  Notes
+                </label>
+                <textarea
+                  value={journalText}
+                  onChange={(e) => setJournalText(e.target.value)}
+                  placeholder="How are you feeling? Any changes or observations?"
+                  rows={5}
+                  className="w-full bg-[#F5EFE7] border border-[#D4C4B0] text-[#3E3028] py-3 px-4 rounded-xl focus:outline-none focus:border-[#8B6F47] focus:ring-1 focus:ring-[#8B6F47]"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-[#8B6F47] text-white hover:bg-[#6F5839] font-bold py-4 rounded-xl text-lg"
+              >
+                Save Entry
+              </Button>
+            </form>
           </div>
+        )}
 
-          {/* Peptide-Specific Notes */}
-          <div>
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle>Peptide-Specific Notes</SectionTitle>
-              
-              {brief && brief.candidatePeptides.length > 0 ? (
-                <>
-                  <div className="mb-6">
-                    <Select onValueChange={setSelectedPeptide} value={selectedPeptide}>
-                      <SelectTrigger className="bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]">
-                        <SelectValue placeholder="Select peptide" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {brief.candidatePeptides.map((peptide, idx) => (
-                          <SelectItem key={idx} value={peptide.name}>
-                            {peptide.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+        {/* Entries List */}
+        <div>
+          <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Past Entries</h2>
+          {entries.length === 0 ? (
+            <div className="text-center py-16 bg-white border-2 border-[#E8DCC8] rounded-2xl">
+              <div className="text-6xl mb-4">📝</div>
+              <p className="text-[#5C4A3A] text-xl mb-4">No journal entries yet</p>
+              <Button
+                onClick={() => setShowForm(true)}
+                className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-semibold px-8 py-3 rounded-xl"
+              >
+                Create Your First Entry
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {entries.map((entry) => (
+                <div key={entry.id} className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h4 className="text-xl font-bold text-[#3E3028]">
+                      {new Date(entry.journal_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}
+                    </h4>
                   </div>
-
-                  {selectedPeptide && (
-                    <div className="max-h-[400px] sm:max-h-[500px] overflow-y-auto">
-                      <PeptideNotes
-                        peptideName={selectedPeptide}
-                        notes={peptideNotes}
-                        onAddNote={handleAddNote}
-                        onDeleteNote={handleDeleteNote}
-                      />
+                  <div className="grid grid-cols-3 gap-4 mb-4">
+                    <div className="bg-[#F5EFE7] rounded-xl p-3 text-center">
+                      <p className="text-sm text-[#5C4A3A] mb-1">Mood</p>
+                      <p className="text-2xl font-bold text-[#3E3028]">{entry.mood_rating || '-'}/10</p>
+                    </div>
+                    <div className="bg-[#F5EFE7] rounded-xl p-3 text-center">
+                      <p className="text-sm text-[#5C4A3A] mb-1">Energy</p>
+                      <p className="text-2xl font-bold text-[#3E3028]">{entry.energy_rating || '-'}/10</p>
+                    </div>
+                    <div className="bg-[#F5EFE7] rounded-xl p-3 text-center">
+                      <p className="text-sm text-[#5C4A3A] mb-1">Sleep</p>
+                      <p className="text-2xl font-bold text-[#3E3028]">{entry.sleep_rating || '-'}/10</p>
+                    </div>
+                  </div>
+                  {entry.journal_text && (
+                    <div className="bg-[#F5EFE7] border border-[#D4C4B0] rounded-xl p-4">
+                      <p className="text-[#5C4A3A] leading-relaxed">{entry.journal_text}</p>
                     </div>
                   )}
-                </>
-              ) : (
-                <div className="text-center py-8 sm:py-12">
-                  <p className="text-sm sm:text-base text-[var(--text-dim)] mb-3">No peptide stack generated yet</p>
-                  <p className="text-xs sm:text-sm text-[var(--text-muted)]">Generate your stack to start taking notes</p>
                 </div>
-              )}
-            </Card>
-          </div>
+              ))}
+            </div>
+          )}
         </div>
+      </main>
 
-        {/* Weekly AI Summary */}
-        <div className="mt-6 sm:mt-8">
-          <WeeklySummary
-            summary={weeklySummary}
-            isGenerating={isGeneratingSummary}
-            onGenerate={handleGenerateSummary}
-          />
-        </div>
+      {/* Research Banner */}
+      <div className="fixed bottom-0 left-0 right-0 bg-orange-600 text-white py-1.5 px-4 text-center z-30">
+        <p className="text-xs font-medium tracking-wide">
+          RESEARCH PURPOSES ONLY — NOT MEDICAL ADVICE
+        </p>
       </div>
-    </MainLayout>
+    </div>
   );
 }
-
