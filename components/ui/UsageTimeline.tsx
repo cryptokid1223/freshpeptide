@@ -67,7 +67,7 @@ export function UsageTimeline({ logs, limit = 10 }: UsageTimelineProps) {
                   <div className="flex items-start justify-between mb-1">
                     <h5 className="font-medium text-[var(--accent)] text-sm">{log.peptide_name}</h5>
                     <span className="text-xs text-[var(--text-muted)]">
-                      {new Date(log.logged_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(log.logged_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                     </span>
                   </div>
                   

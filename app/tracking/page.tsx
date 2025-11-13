@@ -102,12 +102,15 @@ export default function TrackingPage() {
         return;
       }
 
+      // Convert datetime-local value to ISO string preserving the local time
+      const loggedAtISO = new Date(loggedAt).toISOString();
+
       const { error } = await supabase.from('peptide_logs').insert({
         user_id: session.user.id,
         peptide_name: selectedPeptide,
         amount: amount || null,
         route: route || null,
-        logged_at: loggedAt,
+        logged_at: loggedAtISO,
         notes: notes || null,
         effects: effects || null,
         side_effects: sideEffects || null,
@@ -319,7 +322,7 @@ export default function TrackingPage() {
                       <div className="flex items-start justify-between mb-2">
                         <h3 className="font-semibold text-[var(--accent)]">{log.peptide_name}</h3>
                         <span className="text-xs text-[var(--text-muted)]">
-                          {new Date(log.logged_at).toLocaleDateString()} {new Date(log.logged_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(log.logged_at).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })} {new Date(log.logged_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                         </span>
                       </div>
                       
