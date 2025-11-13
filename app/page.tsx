@@ -47,8 +47,12 @@ export default function Home() {
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
         <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-            FreshPeptide
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="h-10 w-auto object-contain"
+            />
           </Link>
 
           {/* Right Side Buttons */}
@@ -127,9 +131,13 @@ export default function Home() {
       <main className="container mx-auto px-6 pt-32 pb-20 max-w-5xl">
         {/* Hero Section */}
         <div className="text-center mb-24">
-          <h1 className="text-6xl md:text-7xl font-bold text-gray-900 mb-8 tracking-tight">
-            FreshPeptide
-          </h1>
+          <div className="flex justify-center mb-8">
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="w-auto h-32 md:h-40 object-contain"
+            />
+          </div>
           <div className="text-3xl md:text-4xl font-light text-gray-600 min-h-[48px]">
             <TypeWriter 
               text="look better, feel better, be better" 

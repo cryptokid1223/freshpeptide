@@ -162,8 +162,12 @@ export default function LibraryPage() {
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
         <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-[#3E3028] hover:text-[#8B6F47] transition-colors">
-            FreshPeptide
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="h-10 w-auto object-contain"
+            />
           </Link>
           <div className="flex items-center gap-3">
             <Link href="/dashboard">
@@ -186,7 +190,7 @@ export default function LibraryPage() {
             <img 
               src="/library.png" 
               alt="Peptide Library" 
-              className="w-48 h-48 object-contain"
+              className="w-64 h-64 object-contain"
             />
           </div>
           <div className="text-3xl md:text-4xl font-light text-[#5C4A3A] min-h-[48px]">
@@ -234,13 +238,13 @@ export default function LibraryPage() {
         {/* Search Bar - Clean & Simple */}
         <div className="mb-8">
           <input
-            type="text"
+              type="text"
             placeholder="Search peptides... (e.g., weight loss, muscle growth, healing)"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full bg-white border border-[#D4C4B0] text-[#3E3028] py-4 px-6 rounded-2xl text-base placeholder:text-[#A89882] focus:outline-none focus:border-[#8B6F47] focus:ring-1 focus:ring-[#8B6F47] transition-all"
-          />
-        </div>
+            />
+          </div>
 
         {/* Categories */}
         <div className="mb-10">

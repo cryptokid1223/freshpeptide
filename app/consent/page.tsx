@@ -78,8 +78,12 @@ export default function ConsentPage() {
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
         <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
-          <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
-            FreshPeptide
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="h-10 w-auto object-contain"
+            />
           </Link>
         </div>
       </nav>
