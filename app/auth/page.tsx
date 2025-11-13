@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -123,183 +122,158 @@ export default function AuthPage() {
   };
 
   return (
-    <MainLayout>
-      <div className="container mx-auto px-4 py-16 max-w-[520px]">
-        <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
-          {/* Tab Buttons */}
-          <div className="flex gap-3 mb-8">
-            <Button
-              type="button"
+    <div className="min-h-screen bg-white">
+      {/* Top Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
+        <div className="container mx-auto px-6 py-4 max-w-7xl flex items-center justify-between">
+          <Link href="/" className="text-2xl font-bold text-gray-900 hover:text-blue-600 transition-colors">
+            FreshPeptide
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/library">
+              <Button 
+                variant="ghost"
+                className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 font-medium"
+              >
+                Library
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-6 pt-32 pb-20 max-w-md">
+        {/* Auth Card */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+          {/* Tabs */}
+          <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-xl">
+            <button
               onClick={() => {
                 setMode('signin');
                 setError('');
                 setMessage('');
-                setEmail('');
-                setPassword('');
               }}
-              className={`flex-1 py-6 text-base font-semibold rounded-full transition-all ${
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
                 mode === 'signin'
-                  ? 'bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] text-[#001018]'
-                  : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-dim)] hover:text-[var(--text)] hover:border-[var(--accent)]/50'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Sign In
-            </Button>
-            <Button
-              type="button"
+            </button>
+            <button
               onClick={() => {
                 setMode('signup');
                 setError('');
                 setMessage('');
-                setEmail('');
-                setPassword('');
               }}
-              className={`flex-1 py-6 text-base font-semibold rounded-full transition-all ${
+              className={`flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all ${
                 mode === 'signup'
-                  ? 'bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] text-[#001018]'
-                  : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-dim)] hover:text-[var(--text)] hover:border-[var(--accent)]/50'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Sign Up
-            </Button>
+            </button>
           </div>
 
-          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-3 text-center tracking-[-0.01em]">
-            {mode === 'signin' ? 'Welcome Back!' : 'Create Your Account'}
-          </h1>
-          <p className="text-sm text-[var(--text-dim)] text-center mb-8">
-            {mode === 'signin' 
-              ? 'Sign in to access your dashboard and peptide stack' 
-              : 'Sign up to get personalized Medical Intelligence peptide recommendations'}
-          </p>
+          {/* Title */}
+          <div className="mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              {mode === 'signin' ? 'Welcome Back' : 'Create Your Account'}
+            </h1>
+            <p className="text-sm text-gray-600">
+              {mode === 'signin' 
+                ? 'Sign in to access your personalized peptide stack' 
+                : 'Sign up to get personalized peptide recommendations'}
+            </p>
+          </div>
 
+          {/* Messages */}
           {message && (
-            <div className="mb-6 p-4 rounded-xl bg-[var(--ok)]/10 border border-[var(--ok)]/30">
-              <p className="text-[var(--ok)] text-center text-sm font-medium">{message}</p>
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+              {message}
             </div>
           )}
-
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/30">
-              <p className="text-[var(--danger)] text-center text-sm font-medium">{error}</p>
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+              {error}
             </div>
           )}
 
-          {mode === 'signin' ? (
-            <form onSubmit={handleSignIn} className="space-y-5">
-              <div>
-                <Label htmlFor="email" className="text-[var(--text)] font-medium">
-                  Email Address
-                </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="password" className="text-[var(--text)] font-medium">
-                  Password
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
-                />
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] py-6 text-base font-semibold rounded-full mt-6"
-              >
-                {isLoading ? 'Signing in...' : 'Sign In'}
-              </Button>
-            </form>
-          ) : (
-            <form onSubmit={handleSignUp} className="space-y-5">
-              <div>
-                <Label htmlFor="signup-email" className="text-[var(--text)] font-medium">
-                  Email Address
-                </Label>
-                <Input
-                  id="signup-email"
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="signup-password" className="text-[var(--text)] font-medium">
-                  Password
-                </Label>
-                <Input
-                  id="signup-password"
-                  type="password"
-                  placeholder="Create a password (min 6 characters)"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={6}
-                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
-                />
-                <p className="text-xs text-[var(--text-muted)] mt-2">Must be at least 6 characters</p>
-              </div>
-
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] py-6 text-base font-semibold rounded-full mt-6"
-              >
-                {isLoading ? 'Creating account...' : 'Create Account'}
-              </Button>
-            </form>
-          )}
-
-          <div className="mt-8 space-y-4">
-            {mode === 'signup' && (
-              <div className="p-4 rounded-xl bg-[var(--accent)]/5 border border-[var(--accent)]/20">
-                <p className="text-sm text-[var(--text-dim)] leading-relaxed">
-                  <strong className="text-[var(--accent)]">✨ New here?</strong> After creating your account, you'll verify your email and answer a quick questionnaire to get personalized Medical Intelligence recommendations.
-                </p>
-              </div>
-            )}
-            
-            {mode === 'signin' && (
-              <div className="p-4 rounded-xl bg-[var(--accent-2)]/5 border border-[var(--accent-2)]/20">
-                <p className="text-sm text-[var(--text-dim)] leading-relaxed">
-                  <strong className="text-[var(--accent-2)]">👋 Welcome back!</strong> Sign in to access your dashboard and view your personalized peptide stack.
-                </p>
-              </div>
-            )}
-
-            <div className="text-center pt-2">
-              <button
-                type="button"
-                onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-                className="text-[var(--accent)] hover:text-[var(--accent-2)] text-sm font-medium transition-colors"
-              >
-                {mode === 'signin' 
-                  ? "Don't have an account? Sign Up →" 
-                  : 'Already have an account? Sign In →'}
-              </button>
+          {/* Form */}
+          <form onSubmit={mode === 'signin' ? handleSignIn : handleSignUp} className="space-y-4">
+            <div>
+              <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                Email Address
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="your.email@example.com"
+                required
+                className="mt-1.5 bg-gray-50 border-gray-300 text-gray-900 focus:border-blue-600 focus:ring-blue-600"
+              />
             </div>
-          </div>
-        </Card>
+
+            <div>
+              <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder={mode === 'signin' ? 'Enter your password' : 'Create a password (min 6 characters)'}
+                required
+                className="mt-1.5 bg-gray-50 border-gray-300 text-gray-900 focus:border-blue-600 focus:ring-blue-600"
+              />
+              {mode === 'signup' && (
+                <p className="text-xs text-gray-500 mt-1.5">Must be at least 6 characters</p>
+              )}
+            </div>
+
+            <Button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-blue-600 text-white hover:bg-blue-700 font-semibold py-2.5 rounded-lg mt-6"
+            >
+              {isLoading 
+                ? (mode === 'signin' ? 'Signing in...' : 'Creating account...') 
+                : (mode === 'signin' ? 'Sign In' : 'Create Account')
+              }
+            </Button>
+          </form>
+
+          {/* Footer Text */}
+          {mode === 'signup' && (
+            <div className="mt-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-xs text-gray-700 leading-relaxed">
+                <strong className="text-blue-700">Next steps:</strong> After creating your account, 
+                you'll complete a quick questionnaire to get personalized peptide recommendations tailored to your goals.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom Link */}
+        <div className="text-center mt-6">
+          <Link href="/" className="text-sm text-gray-600 hover:text-gray-900">
+            ← Back to home
+          </Link>
+        </div>
+      </main>
+
+      {/* Research Purposes Banner - Bottom Sticky Small */}
+      <div className="fixed bottom-0 left-0 right-0 bg-orange-600 text-white py-1.5 px-4 text-center z-40">
+        <p className="text-xs font-medium tracking-wide">
+          RESEARCH PURPOSES ONLY — NOT MEDICAL ADVICE
+        </p>
       </div>
-    </MainLayout>
+    </div>
   );
 }
