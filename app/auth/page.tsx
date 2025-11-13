@@ -321,7 +321,7 @@ export default function AuthPage() {
       </main>
 
       {/* Research Disclaimer - Small Bottom Right */}
-      <div className="fixed bottom-4 right-4 z-40">
+      <div className="absolute bottom-4 right-4">
         <p className="text-xs text-gray-400">
           Research purposes only
         </p>
