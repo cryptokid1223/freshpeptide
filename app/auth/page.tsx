@@ -106,23 +106,22 @@ export default function AuthPage() {
       if (authError) throw authError;
 
       if (data.user) {
-        // Try to create or update profile (upsert handles both new and existing users)
-        const { error: profileError } = await supabase
+        // Profile is automatically created by database trigger
+        // Wait a moment for the trigger to complete
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Verify profile was created
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
-          .upsert({
-            id: data.user.id,
-            email: data.user.email,
-            updated_at: new Date().toISOString(),
-          }, {
-            onConflict: 'id'
-          });
+          .select('id')
+          .eq('id', data.user.id)
+          .single();
 
-        if (profileError) {
-          console.error('Profile creation error:', profileError);
-          // Don't throw - the auth account was created successfully
-          setMessage('Account created! Profile setup had an issue but you can still sign in.');
+        if (profileError || !profileData) {
+          console.error('Profile verification error:', profileError);
+          setError('Account created but profile setup failed. Please try signing in or contact support.');
         } else {
-          setMessage('Account created! Check your email to verify your account (or sign in if email confirmation is disabled).');
+          setMessage('Account created successfully! ' + (data.user.identities && data.user.identities.length > 0 ? 'Check your email to verify your account.' : 'You can now sign in!'));
         }
       }
     } catch (error: any) {
