@@ -71,13 +71,13 @@ export default function ConsentPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-3xl mx-auto">
-          <Card className="bg-slate-800/50 border-slate-700 p-8">
-            <h1 className="text-3xl font-bold text-cyan-400 mb-2">
+          <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
+            <h1 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-2">
               Research Consent & Acknowledgment
             </h1>
-            <p className="text-slate-400 mb-8">
+            <p className="text-sm sm:text-base text-slate-400 mb-6 sm:mb-8">
               Please read and acknowledge the following before proceeding
             </p>
 

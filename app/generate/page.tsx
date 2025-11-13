@@ -169,14 +169,14 @@ export default function GeneratePage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16">
+      <div className="container mx-auto px-4 py-8 sm:py-16">
         <div className="max-w-4xl mx-auto">
           {!brief ? (
-            <Card className="bg-slate-800/50 border-slate-700 p-8">
-              <h1 className="text-3xl font-bold text-cyan-400 mb-4">
+            <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
+              <h1 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-3 sm:mb-4">
                 Generate Your Peptide Educational Brief
               </h1>
-              <p className="text-slate-300 mb-6">
+              <p className="text-sm sm:text-base text-slate-300 mb-4 sm:mb-6">
                 Based on your intake responses, our AI will generate an educational brief that maps 
                 your goals to peptide classes found in research literature, explains mechanisms, 
                 highlights risks, and provides evidence citations.
@@ -219,21 +219,21 @@ export default function GeneratePage() {
             </Card>
           ) : (
             <div className="space-y-6">
-              <Card className="bg-slate-800/50 border-slate-700 p-8">
-                <div className="flex items-center justify-between mb-6">
-                  <h1 className="text-3xl font-bold text-cyan-400">
+              <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
+                <div className="mb-6">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-3 sm:mb-4">
                     Your Educational Brief
                   </h1>
                   <Button
                     onClick={() => router.push('/dashboard')}
-                    className="bg-cyan-600 hover:bg-cyan-700"
+                    className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700"
                   >
                     View Dashboard
                   </Button>
                 </div>
 
-                <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-4 mb-6">
-                  <p className="text-amber-400 font-semibold text-center">
+                <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+                  <p className="text-amber-400 font-semibold text-center text-xs sm:text-sm">
                     ⚠️ EDUCATIONAL CONTENT ONLY — NOT MEDICAL ADVICE
                   </p>
                 </div>

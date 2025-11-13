@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error && data.user) {
-      // Create profile if it doesn't exist
+      // Create profile if it doesn't exist (for email verification flow)
       await supabase
         .from('profiles')
         .upsert(
@@ -25,20 +25,27 @@ export async function GET(request: Request) {
         );
 
       // Check if user has completed intake
-      const { data: intakeData } = await supabase
+      const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
         .eq('user_id', data.user.id)
-        .single();
+        .maybeSingle();
 
-      if (intakeData?.intake_data && Object.keys(intakeData.intake_data).length > 0) {
+      const intake = intakeRecord?.intake_data;
+      const hasCompletedIntake = intake && 
+        intake.demographics && 
+        intake.medical && 
+        intake.lifestyle && 
+        intake.goals;
+
+      if (hasCompletedIntake) {
         // User has completed intake, go to dashboard
         return NextResponse.redirect(new URL('/dashboard', request.url));
       }
     }
   }
 
-  // New user or hasn't completed intake, go to consent
+  // New user or hasn't completed intake, go to consent first
   return NextResponse.redirect(new URL('/consent', request.url));
 }
 
