@@ -232,9 +232,9 @@ export default function DashboardPage() {
             <StackSummary 
               items={brief.candidatePeptides.map(p => ({
                 ...p,
-                status: p.status || 'Research Only',
-                family: p.family || 'Peptide',
-                tags: p.tags || []
+                status: (p as any).status || 'Research Only',
+                family: (p as any).family || 'Peptide',
+                tags: (p as any).tags || []
               }))}
               onViewFull={() => router.push('/generate')}
             />
