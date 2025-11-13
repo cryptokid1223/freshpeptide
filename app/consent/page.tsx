@@ -191,10 +191,10 @@ export default function ConsentPage() {
         )}
       </main>
 
-      {/* Research Purposes Banner - Bottom Sticky Small */}
-      <div className="fixed bottom-0 left-0 right-0 bg-orange-600 text-white py-1.5 px-4 text-center z-40">
-        <p className="text-xs font-medium tracking-wide">
-          RESEARCH PURPOSES ONLY — NOT MEDICAL ADVICE
+      {/* Research Disclaimer - Small Bottom Right */}
+      <div className="fixed bottom-4 right-4 z-40">
+        <p className="text-xs text-gray-400">
+          Research purposes only
         </p>
       </div>
     </div>
