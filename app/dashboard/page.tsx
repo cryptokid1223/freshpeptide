@@ -114,27 +114,27 @@ export default function DashboardPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
+      <div className="container mx-auto px-4 py-8 sm:py-16 max-w-[1180px]">
         {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
             Dashboard
           </h1>
-          <p className="text-[var(--text-dim)] truncate">Welcome back, {userEmail}</p>
+          <p className="text-sm sm:text-base text-[var(--text-dim)] truncate">Welcome back, {userEmail}</p>
         </div>
 
         {/* Usage Statistics */}
         {logs.length > 0 && (
-          <div className="mb-12">
+          <div className="mb-8 sm:mb-12">
             <SectionTitle subtitle="Your tracking activity at a glance">Usage Overview</SectionTitle>
             <UsageStats stats={stats} />
           </div>
         )}
 
         {/* Hero Cards - Intake & Brief Status */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-8 sm:mb-12">
           {/* Intake Status Card */}
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-[#001018]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
           </Card>
 
           {/* Brief Status Card */}
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
             <div className="flex items-center gap-4 mb-4">
               <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] flex items-center justify-center flex-shrink-0">
                 <svg className="w-6 h-6 text-[#001018]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -247,7 +247,7 @@ export default function DashboardPage() {
 
         {/* Intake Summary */}
         {intakeData && (
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-12" style={{ boxShadow: 'var(--shadow)' }}>
+          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 mb-8 sm:mb-12" style={{ boxShadow: 'var(--shadow)' }}>
             <SectionTitle>Intake Summary</SectionTitle>
             
             <div className="grid md:grid-cols-2 gap-8">
@@ -288,7 +288,7 @@ export default function DashboardPage() {
 
         {/* Your Peptide Recommendations */}
         {brief && (
-          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-12" style={{ boxShadow: 'var(--shadow)' }}>
+          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 mb-8 sm:mb-12" style={{ boxShadow: 'var(--shadow)' }}>
             <SectionTitle subtitle="Your personalized educational stack based on your health profile">
               Your Peptide Recommendations
             </SectionTitle>
@@ -303,19 +303,19 @@ export default function DashboardPage() {
               onViewFull={() => router.push('/generate')}
             />
 
-            <div className="flex gap-4 mt-6">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-6">
               <Link href="/generate" className="flex-1">
-                <Button className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold">
+                <Button className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold text-sm sm:text-base">
                   View Full Brief
                 </Button>
               </Link>
               <Link href="/tracking" className="flex-1">
-                <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold">
+                <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold text-sm sm:text-base">
                   Track Usage
                 </Button>
               </Link>
               <Link href="/library" className="flex-1">
-                <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold">
+                <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold text-sm sm:text-base">
                   Browse Library
                 </Button>
               </Link>
@@ -325,9 +325,9 @@ export default function DashboardPage() {
 
         {/* Tracking Analytics */}
         {brief && logs.length > 0 && (
-          <div className="grid lg:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
             {/* Stack Status Overview */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
               <SectionTitle>Current Stack Status</SectionTitle>
               <StackOverviewCard 
                 peptides={brief.candidatePeptides.map(p => {
@@ -345,14 +345,14 @@ export default function DashboardPage() {
             </Card>
 
             {/* Recent Activity Timeline */}
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
               <div className="flex items-center justify-between mb-4">
                 <SectionTitle>Recent Activity</SectionTitle>
                 <Link href="/tracking" className="text-sm text-[var(--accent)] hover:text-[var(--accent-2)] font-medium">
                   View All →
                 </Link>
               </div>
-              <div className="max-h-[400px] overflow-y-auto">
+              <div className="max-h-[300px] sm:max-h-[400px] overflow-y-auto">
                 <UsageTimeline logs={logs} limit={7} />
               </div>
             </Card>

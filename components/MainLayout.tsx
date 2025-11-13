@@ -11,6 +11,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
   useEffect(() => {
@@ -46,12 +47,13 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
             <div className="flex items-center justify-between">
               <Link 
                 href="/" 
-                className="text-xl font-bold bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+                className="text-lg sm:text-xl font-bold bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] bg-clip-text text-transparent hover:opacity-80 transition-opacity"
               >
                 FreshPeptide
               </Link>
               
-              <div className="flex items-center gap-6">
+              {/* Desktop Navigation */}
+              <div className="hidden lg:flex items-center gap-6">
                 {isAuthenticated && (
                   <>
                     <Link 
@@ -113,7 +115,7 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                     <Button
                       onClick={handleSignOut}
                       size="sm"
-                      className="ml-2 bg-transparent border border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger)]/10 rounded-full px-4 text-xs font-semibold transition-all"
+                      className="bg-transparent border border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger)]/10 rounded-full px-4 text-xs font-semibold transition-all"
                     >
                       Sign Out
                     </Button>
@@ -126,7 +128,83 @@ export function MainLayout({ children }: { children: React.ReactNode }) {
                   </Link>
                 )}
               </div>
+
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className="lg:hidden p-2 text-[var(--text)] hover:text-[var(--accent)] transition-colors"
+              >
+                {isMobileMenuOpen ? (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
             </div>
+
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && isAuthenticated && (
+              <div className="lg:hidden mt-4 pb-4 space-y-2">
+                <Link 
+                  href="/dashboard"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    pathname === '/dashboard' ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[var(--text-dim)] hover:bg-[var(--surface-2)]'
+                  }`}
+                >
+                  Dashboard
+                </Link>
+                <Link 
+                  href="/library"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    pathname === '/library' ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[var(--text-dim)] hover:bg-[var(--surface-2)]'
+                  }`}
+                >
+                  Library
+                </Link>
+                <Link 
+                  href="/tracking"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    pathname === '/tracking' ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[var(--text-dim)] hover:bg-[var(--surface-2)]'
+                  }`}
+                >
+                  Tracking
+                </Link>
+                <Link 
+                  href="/journal"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    pathname === '/journal' ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[var(--text-dim)] hover:bg-[var(--surface-2)]'
+                  }`}
+                >
+                  Journal
+                </Link>
+                <Link 
+                  href="/account"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`block px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                    pathname === '/account' ? 'bg-[var(--accent)]/10 text-[var(--accent)]' : 'text-[var(--text-dim)] hover:bg-[var(--surface-2)]'
+                  }`}
+                >
+                  Account
+                </Link>
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    handleSignOut();
+                  }}
+                  className="block w-full text-left px-4 py-2 rounded-lg text-sm font-medium text-[var(--danger)] hover:bg-[var(--danger)]/10 transition-all"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
           </div>
         </nav>
       )}

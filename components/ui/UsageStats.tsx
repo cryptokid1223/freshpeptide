@@ -51,24 +51,24 @@ export function UsageStats({ stats }: UsageStatsProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
       {statCards.map((stat, index) => (
         <Card 
           key={index}
-          className="rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-4" 
+          className="rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-3 sm:p-4" 
           style={{ boxShadow: 'var(--shadow)' }}
         >
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <p className="text-xs text-[var(--text-muted)] mb-1">{stat.label}</p>
-              <p className="text-3xl font-bold text-[var(--text)] mb-1">{stat.value}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-[var(--text)] mb-1">{stat.value}</p>
               {stat.subtext && (
                 <p className={`text-xs ${weeklyChange > 0 ? 'text-[var(--ok)]' : weeklyChange < 0 ? 'text-[var(--danger)]' : 'text-[var(--text-muted)]'}`}>
                   {stat.subtext}
                 </p>
               )}
             </div>
-            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${stat.color} flex items-center justify-center text-[#001018]`}>
+            <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br ${stat.color} flex items-center justify-center text-[#001018] flex-shrink-0`}>
               {stat.icon}
             </div>
           </div>
@@ -77,18 +77,18 @@ export function UsageStats({ stats }: UsageStatsProps) {
       
       {stats.mostLoggedPeptide && (
         <Card 
-          className="rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-4 md:col-span-3" 
+          className="rounded-xl border border-[var(--border)] bg-[var(--surface-1)] p-3 sm:p-4 sm:col-span-2 md:col-span-3" 
           style={{ boxShadow: 'var(--shadow)' }}
         >
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-2)] flex items-center justify-center">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[var(--accent)] to-[var(--accent-2)] flex items-center justify-center flex-shrink-0">
               <svg className="w-5 h-5 text-[#001018]" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs text-[var(--text-muted)]">Most Tracked</p>
-              <p className="font-semibold text-[var(--accent)]">{stats.mostLoggedPeptide}</p>
+              <p className="font-semibold text-sm sm:text-base text-[var(--accent)] truncate">{stats.mostLoggedPeptide}</p>
             </div>
           </div>
         </Card>
