@@ -6,6 +6,9 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SectionTitle } from '@/components/ui/SectionTitle';
 import { StackSummary } from '@/components/ui/StackSummary';
+import { StackOverviewCard } from '@/components/ui/StackOverviewCard';
+import { UsageTimeline } from '@/components/ui/UsageTimeline';
+import { UsageStats } from '@/components/ui/UsageStats';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
@@ -16,6 +19,15 @@ export default function DashboardPage() {
   const [userEmail, setUserEmail] = useState<string>('');
   const [intakeData, setIntakeData] = useState<any>(null);
   const [brief, setBrief] = useState<BriefOutput | null>(null);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [stats, setStats] = useState({
+    totalLogs: 0,
+    activePeptides: 0,
+    logsThisWeek: 0,
+    logsLastWeek: 0,
+    mostLoggedPeptide: undefined as string | undefined,
+    streakDays: 0
+  });
 
   useEffect(() => {
     // Check authentication with Supabase and load data from database
@@ -51,6 +63,50 @@ export default function DashboardPage() {
       if (briefRecords && briefRecords.length > 0) {
         setBrief(briefRecords[0].brief_output as BriefOutput);
       }
+
+      // Load tracking logs
+      const { data: logsData } = await supabase
+        .from('peptide_logs')
+        .select('*')
+        .eq('user_id', session.user.id)
+        .order('logged_at', { ascending: false });
+
+      if (logsData) {
+        setLogs(logsData);
+        
+        // Calculate stats
+        const now = new Date();
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const twoWeeksAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+        
+        const logsThisWeek = logsData.filter(log => new Date(log.logged_at) >= weekAgo).length;
+        const logsLastWeek = logsData.filter(log => {
+          const logDate = new Date(log.logged_at);
+          return logDate >= twoWeeksAgo && logDate < weekAgo;
+        }).length;
+
+        // Find most logged peptide
+        const peptideCount: { [key: string]: number } = {};
+        logsData.forEach(log => {
+          peptideCount[log.peptide_name] = (peptideCount[log.peptide_name] || 0) + 1;
+        });
+        const mostLogged = Object.entries(peptideCount).sort((a, b) => b[1] - a[1])[0];
+
+        // Count unique active peptides (logged in last 30 days)
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const activePeptides = new Set(
+          logsData.filter(log => new Date(log.logged_at) >= thirtyDaysAgo).map(log => log.peptide_name)
+        ).size;
+
+        setStats({
+          totalLogs: logsData.length,
+          activePeptides,
+          logsThisWeek,
+          logsLastWeek,
+          mostLoggedPeptide: mostLogged?.[0],
+          streakDays: 0 // TODO: Calculate streak
+        });
+      }
     };
 
     loadDashboardData();
@@ -66,6 +122,14 @@ export default function DashboardPage() {
           </h1>
           <p className="text-[var(--text-dim)] truncate">Welcome back, {userEmail}</p>
         </div>
+
+        {/* Usage Statistics */}
+        {logs.length > 0 && (
+          <div className="mb-12">
+            <SectionTitle subtitle="Your tracking activity at a glance">Usage Overview</SectionTitle>
+            <UsageStats stats={stats} />
+          </div>
+        )}
 
         {/* Hero Cards - Intake & Brief Status */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
@@ -245,6 +309,11 @@ export default function DashboardPage() {
                   View Full Brief
                 </Button>
               </Link>
+              <Link href="/tracking" className="flex-1">
+                <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold">
+                  Track Usage
+                </Button>
+              </Link>
               <Link href="/library" className="flex-1">
                 <Button className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold">
                   Browse Library
@@ -252,6 +321,42 @@ export default function DashboardPage() {
               </Link>
             </div>
           </Card>
+        )}
+
+        {/* Tracking Analytics */}
+        {brief && logs.length > 0 && (
+          <div className="grid lg:grid-cols-2 gap-8 mb-12">
+            {/* Stack Status Overview */}
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+              <SectionTitle>Current Stack Status</SectionTitle>
+              <StackOverviewCard 
+                peptides={brief.candidatePeptides.map(p => {
+                  const peptideLogs = logs.filter(log => log.peptide_name === p.name);
+                  const lastLog = peptideLogs[0];
+                  return {
+                    name: p.name,
+                    status: peptideLogs.length > 0 ? 'active' : 'paused',
+                    lastLogged: lastLog?.logged_at,
+                    totalLogs: peptideLogs.length,
+                    goal: p.why
+                  };
+                })}
+              />
+            </Card>
+
+            {/* Recent Activity Timeline */}
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+              <div className="flex items-center justify-between mb-4">
+                <SectionTitle>Recent Activity</SectionTitle>
+                <Link href="/tracking" className="text-sm text-[var(--accent)] hover:text-[var(--accent-2)] font-medium">
+                  View All →
+                </Link>
+              </div>
+              <div className="max-h-[400px] overflow-y-auto">
+                <UsageTimeline logs={logs} limit={7} />
+              </div>
+            </Card>
+          </div>
         )}
 
         {/* Quick Actions - Only show if no brief yet */}
