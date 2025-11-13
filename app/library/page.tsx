@@ -5,6 +5,10 @@ import { MainLayout } from '@/components/MainLayout';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { StatusPill } from '@/components/ui/StatusPill';
+import { PeptideMiniCard } from '@/components/ui/PeptideMiniCard';
+import { CategoryChips } from '@/components/ui/CategoryChips';
 
 // Mock peptide data (in production, this would come from Supabase)
 const PEPTIDES = [
@@ -4774,212 +4778,232 @@ export default function LibraryPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8 sm:py-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-2">Peptide Library</h1>
-            <p className="text-sm sm:text-base text-slate-400">
-              Explore our curated database of 234 research peptides with detailed information
+      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
+        {/* Header */}
+        <div className="mb-12">
+          <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
+            Peptide Library
+          </h1>
+          <p className="text-[var(--text-dim)]">
+            Explore our curated database of 234 research peptides with detailed information
             </p>
           </div>
 
-          {/* Peptide of the Day */}
-          <Card className="bg-gradient-to-br from-cyan-900/30 to-blue-900/30 border-cyan-500/50 p-4 sm:p-6 mb-6 sm:mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-3">
-              <div className="bg-cyan-500 text-slate-900 px-3 py-1 rounded-full text-xs sm:text-sm font-bold inline-block w-fit">
-                ✨ Peptide of the Day
-              </div>
-              <p className="text-slate-400 text-xs sm:text-sm">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-              </p>
-            </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-cyan-300 mb-2">{peptideOfTheDay.name}</h2>
-            <p className="text-amber-400 text-xs sm:text-sm mb-2 sm:mb-3">{peptideOfTheDay.regulatory_status}</p>
-            <p className="text-slate-200 text-xs sm:text-sm mb-3 sm:mb-4">{peptideOfTheDay.summary}</p>
-            <button
-              onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
-                setSelectedPeptide(peptideOfTheDay);
-                // Small delay to ensure state updates, then scroll to detail panel
-                setTimeout(() => {
-                  const detailPanel = document.getElementById('detail-panel');
-                  if (detailPanel) {
-                    detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }
-                }, 100);
-              }}
-              className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-            >
-              Learn More →
-            </button>
-          </Card>
-
-          {/* Category Filters */}
-          <div className="mb-4 sm:mb-6">
-            <h3 className="text-xs sm:text-sm font-semibold text-slate-300 mb-2 sm:mb-3">Browse by Category:</h3>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
-              {CATEGORIES.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => {
-                    setSelectedCategory(category.id);
-                    setSearchQuery('');
-                    setSelectedPeptide(null); // Reset selected peptide when changing category
-                  }}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition-all ${
-                    selectedCategory === category.id
-                      ? 'bg-cyan-600 text-white shadow-lg shadow-cyan-600/50'
-                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-600'
-                  }`}
-                >
-                  {category.label}
-                  {category.id === 'all' && ` (${PEPTIDES.length})`}
-                </button>
-              ))}
-            </div>
+        {/* Peptide of the Day */}
+        <Card className="rounded-2xl border border-[var(--accent)]/30 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent-2)]/5 p-6 mb-8" style={{ boxShadow: 'var(--shadow)' }}>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold bg-gradient-to-b from-[var(--accent-2)] to-[var(--accent)] text-[#001018]">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              Peptide of the Day
+            </span>
+            <p className="text-[var(--text-muted)] text-xs">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+            </p>
           </div>
+          <h2 className="text-2xl font-bold text-[var(--accent)] mb-2 tracking-[-0.01em]">{peptideOfTheDay.name}</h2>
+          <div className="mb-3">
+            <StatusPill status={peptideOfTheDay.regulatory_status} />
+          </div>
+          <p className="text-sm text-[var(--text-dim)] mb-4 leading-relaxed">{peptideOfTheDay.summary}</p>
+          <Button
+            onClick={() => {
+              setSearchQuery('');
+              setSelectedCategory('all');
+              setSelectedPeptide(peptideOfTheDay);
+              setTimeout(() => {
+                const detailPanel = document.getElementById('detail-panel');
+                if (detailPanel) {
+                  detailPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              }, 100);
+            }}
+            className="bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full px-6 font-semibold"
+          >
+            Learn More →
+          </Button>
+        </Card>
 
-          {/* Search */}
-          <div className="mb-4 sm:mb-6">
+        {/* Category Filters */}
+          <div className="mb-6">
+          <h3 className="text-sm font-semibold text-[var(--text)] mb-3">Browse by Category:</h3>
+          <CategoryChips
+            categories={CATEGORIES}
+            selected={selectedCategory}
+            onSelect={(id) => {
+              setSelectedCategory(id);
+              setSearchQuery('');
+              setSelectedPeptide(null);
+            }}
+          />
+        </div>
+
+        {/* Search */}
+        <div className="mb-8">
+          <div className="relative">
             <Input
               type="text"
-              placeholder="Search peptides..."
+              placeholder="Search peptides... (press /)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="bg-slate-800 border-slate-600 text-slate-100 text-sm sm:text-lg py-4 sm:py-6"
+              className="bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 px-4 rounded-full focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
             />
-            {(selectedCategory !== 'all' || searchQuery) && (
-              <div className="mt-2 flex items-center gap-2 text-sm text-slate-400">
-                <span>
-                  Showing {filteredPeptides.length} peptide{filteredPeptides.length !== 1 ? 's' : ''}
-                </span>
-                {(selectedCategory !== 'all' || searchQuery) && (
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('all');
-                      setSearchQuery('');
-                      setSelectedPeptide(null);
-                    }}
-                    className="text-cyan-400 hover:text-cyan-300 underline"
-                  >
-                    Clear filters
-                  </button>
-                )}
-              </div>
-            )}
+            <kbd className="absolute right-4 top-1/2 -translate-y-1/2 px-2 py-1 text-xs text-[var(--text-muted)] bg-[var(--surface-1)] border border-[var(--border)] rounded">/</kbd>
+          </div>
+          {(selectedCategory !== 'all' || searchQuery) && (
+            <div className="mt-3 flex items-center gap-3 text-sm text-[var(--text-dim)]">
+              <span>
+                Showing {filteredPeptides.length} peptide{filteredPeptides.length !== 1 ? 's' : ''}
+              </span>
+              {(selectedCategory !== 'all' || searchQuery) && (
+                <button
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setSearchQuery('');
+                    setSelectedPeptide(null);
+                  }}
+                  className="text-[var(--accent)] hover:text-[var(--accent-2)] font-medium"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+          )}
           </div>
 
           {/* Results */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* List */}
-            <div className="space-y-3 sm:space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-4">
               {filteredPeptides.map((peptide) => (
-                <Card
+              <PeptideMiniCard
                   key={peptide.id}
-                  className={`bg-slate-800/50 border-slate-700 p-4 sm:p-6 cursor-pointer transition-all hover:bg-slate-800/70 
-                    ${selectedPeptide?.id === peptide.id ? 'border-cyan-500 bg-slate-800/70' : ''}`}
+                name={peptide.name}
+                status={peptide.regulatory_status}
+                summary={peptide.summary}
                   onClick={() => setSelectedPeptide(peptide)}
-                >
-                  <h3 className="text-base sm:text-xl font-semibold text-cyan-400 mb-2">{peptide.name}</h3>
-                  <p className="text-xs sm:text-sm text-amber-400 mb-2">{peptide.regulatory_status}</p>
-                  <p className="text-slate-300 text-xs sm:text-sm line-clamp-3">{peptide.summary}</p>
-                </Card>
+                isSelected={selectedPeptide?.id === peptide.id}
+              />
               ))}
 
               {filteredPeptides.length === 0 && (
-                <Card className="bg-slate-800/50 border-slate-700 p-6 text-center">
-                  <p className="text-slate-400 mb-2">
-                    {searchQuery
-                      ? `No peptides found matching "${searchQuery}"`
-                      : `No peptides found in this category`}
-                  </p>
-                  <button
-                    onClick={() => {
-                      setSelectedCategory('all');
-                      setSearchQuery('');
-                      setSelectedPeptide(null);
-                    }}
-                    className="text-cyan-400 hover:text-cyan-300 text-sm underline"
-                  >
-                    View all peptides
-                  </button>
+              <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 text-center" style={{ boxShadow: 'var(--shadow)' }}>
+                <p className="text-[var(--text-dim)] mb-3">
+                  {searchQuery
+                    ? `No peptides found matching "${searchQuery}"`
+                    : `No peptides found in this category`}
+                </p>
+                <button
+                  onClick={() => {
+                    setSelectedCategory('all');
+                    setSearchQuery('');
+                    setSelectedPeptide(null);
+                  }}
+                  className="text-[var(--accent)] hover:text-[var(--accent-2)] text-sm font-medium"
+                >
+                  View all peptides
+                </button>
                 </Card>
               )}
             </div>
 
             {/* Detail Panel */}
-            <div id="detail-panel" className="sticky top-4">
+          <div id="detail-panel" className="sticky top-4 h-fit">
               {selectedPeptide ? (
-                <Card className="bg-slate-800/50 border-slate-700 p-6">
-                  <h2 className="text-2xl font-bold text-cyan-400 mb-2">
+              <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+                <h2 className="text-2xl font-bold text-[var(--accent)] mb-3 tracking-[-0.01em]">
                     {selectedPeptide.name}
                   </h2>
-                  <p className="text-amber-400 text-sm mb-4">
-                    {selectedPeptide.regulatory_status}
-                  </p>
+                <div className="mb-4">
+                  <StatusPill status={selectedPeptide.regulatory_status} />
+                </div>
 
-                  <div className="space-y-4">
+                <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-200 mb-2">Summary</h3>
-                      <p className="text-slate-300 text-sm">{selectedPeptide.summary}</p>
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Summary
+                    </h3>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.summary}</p>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-200 mb-2">Mechanism</h3>
-                      <p className="text-slate-300 text-sm">{selectedPeptide.mechanism}</p>
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Mechanism
+                    </h3>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.mechanism}</p>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-slate-200 mb-2">
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-2 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
                         Recommended Dosage (Research)
                       </h3>
-                      <p className="text-slate-300 text-sm">{selectedPeptide.recommended_dosage}</p>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.recommended_dosage}</p>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold text-red-400 mb-2">
+                  <div className="pt-4 border-t border-[var(--border)]">
+                    <h3 className="text-base font-semibold text-[var(--danger)] mb-2 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                      </svg>
                         Common Adverse Effects
                       </h3>
-                      <p className="text-slate-300 text-sm">
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">
                         {selectedPeptide.common_adverse_effects}
                       </p>
                     </div>
 
                     <div>
-                      <h3 className="text-lg font-semibold text-red-400 mb-2">
+                    <h3 className="text-base font-semibold text-[var(--danger)] mb-2 flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                        <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                      </svg>
                         Contraindications
                       </h3>
-                      <p className="text-slate-300 text-sm">{selectedPeptide.contraindications}</p>
+                    <p className="text-sm text-[var(--text-dim)] leading-relaxed">{selectedPeptide.contraindications}</p>
                     </div>
 
-                    <div>
-                      <h3 className="text-lg font-semibold text-slate-200 mb-2">Evidence</h3>
+                  <div className="pt-4 border-t border-[var(--border)]">
+                    <h3 className="text-base font-semibold text-[var(--text)] mb-3 flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                      Evidence
+                    </h3>
+                    <div className="space-y-3">
                       {selectedPeptide.evidence.map((ev: any, index: number) => (
-                        <div key={index} className="bg-slate-900/50 rounded-lg p-3 mb-2">
-                          <p className="font-semibold text-slate-200 text-sm">
+                        <div key={index} className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] p-4">
+                          <p className="font-semibold text-sm text-[var(--text)] mb-1">
                             {ev.title} ({ev.year})
                           </p>
-                          <p className="text-cyan-400 text-xs mb-1">{ev.source}</p>
-                          <p className="text-slate-300 text-xs">{ev.summary}</p>
+                          <p className="text-xs text-[var(--accent)] mb-2">{ev.source}</p>
+                          <p className="text-xs text-[var(--text-dim)] leading-relaxed">{ev.summary}</p>
                         </div>
                       ))}
                     </div>
+                    </div>
                   </div>
 
-                  <div className="mt-6 p-4 bg-amber-900/20 border border-amber-700 rounded-lg">
-                    <p className="text-xs text-slate-300">
-                      <strong className="text-amber-400">Disclaimer:</strong> This information is for 
+                <div className="mt-6 p-4 bg-[var(--warn)]/5 border border-[var(--warn)]/30 rounded-xl">
+                  <p className="text-xs text-[var(--text-dim)] leading-relaxed">
+                    <strong className="text-[var(--warn)]">Disclaimer:</strong> This information is for 
                       educational purposes only. Consult healthcare professionals before using any peptides.
                     </p>
                   </div>
                 </Card>
               ) : (
-                <Card className="bg-slate-800/50 border-slate-700 p-6 text-center">
-                  <p className="text-slate-400">Select a peptide to view details</p>
+              <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-12 text-center" style={{ boxShadow: 'var(--shadow)' }}>
+                <div className="w-16 h-16 rounded-full bg-[var(--surface-2)] mx-auto mb-4 flex items-center justify-center">
+                  <svg className="w-8 h-8 text-[var(--text-muted)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <p className="text-[var(--text-dim)]">Select a peptide to view details</p>
                 </Card>
               )}
-            </div>
           </div>
         </div>
       </div>

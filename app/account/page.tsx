@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/MainLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SectionTitle } from '@/components/ui/SectionTitle';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
@@ -38,6 +39,9 @@ export default function AccountPage() {
         intake.demographics && 
         intake.medical && 
         intake.lifestyle && 
+        intake.dietary &&
+        intake.stress &&
+        intake.recovery &&
         intake.goals;
       
       setIntakeCompleted(!!hasIntake);
@@ -68,134 +72,138 @@ export default function AccountPage() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (session) {
-        // Delete from Supabase
         await supabase.from('intake').delete().eq('user_id', session.user.id);
         await supabase.from('briefs').delete().eq('user_id', session.user.id);
       }
       
-      // Clear localStorage
       localStorage.removeItem('intake_data');
-      localStorage.removeItem('intake_completed');
-      localStorage.removeItem('generated_brief');
-      
       setIntakeCompleted(false);
       setBriefGenerated(false);
-      alert('All data cleared successfully!');
+      alert('All data has been cleared successfully.');
+      router.push('/dashboard');
     }
   };
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8 sm:py-16">
+      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-6 sm:mb-8">Account Settings</h1>
+          <div className="mb-12">
+            <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
+              Account
+            </h1>
+            <p className="text-[var(--text-dim)]">Manage your profile and account settings</p>
+          </div>
 
-          {/* Profile Card */}
-          <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-6 mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-semibold text-cyan-400 mb-3 sm:mb-4">Profile Information</h2>
+          {/* Profile Information */}
+          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <SectionTitle>Profile Information</SectionTitle>
             
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div>
-                <label className="text-xs sm:text-sm text-slate-400">Email Address</label>
-                <p className="text-sm sm:text-base text-slate-200 break-words">{userEmail}</p>
+                <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">Email Address</label>
+                <p className="text-base text-[var(--text)] font-medium">{userEmail}</p>
               </div>
               
               <div>
-                <label className="text-xs sm:text-sm text-slate-400">User ID</label>
-                <p className="text-xs sm:text-sm text-slate-200 font-mono break-all">{userId}</p>
-              </div>
-              
-              <div>
-                <label className="text-xs sm:text-sm text-slate-400">Account Status</label>
-                <p className="text-sm sm:text-base text-green-400">Active</p>
+                <label className="text-sm font-medium text-[var(--text-muted)] block mb-1">User ID</label>
+                <p className="text-xs text-[var(--text-dim)] font-mono bg-[var(--surface-2)] px-3 py-2 rounded-lg border border-[var(--border)] break-all">
+                  {userId}
+                </p>
               </div>
             </div>
           </Card>
 
-          {/* Data Status Card */}
-          <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-6 mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-semibold text-cyan-400 mb-3 sm:mb-4">Data Status</h2>
+          {/* Data Status */}
+          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <SectionTitle>Data Status</SectionTitle>
             
-            <div className="space-y-3">
-              <div className="flex items-center justify-between py-2 border-b border-slate-700 gap-3">
-                <div className="flex-1">
-                  <p className="text-sm sm:text-base text-slate-200">Health Intake</p>
-                  <p className="text-xs sm:text-sm text-slate-400">Demographic and medical information</p>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div>
+                  <p className="font-medium text-[var(--text)]">Health Intake</p>
+                  <p className="text-sm text-[var(--text-dim)]">7-step questionnaire data</p>
                 </div>
-                <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex-shrink-0 ${
-                  intakeCompleted 
-                    ? 'bg-green-900/30 text-green-400 border border-green-700' 
-                    : 'bg-slate-700 text-slate-400'
-                }`}>
-                  {intakeCompleted ? 'Complete' : 'Incomplete'}
-                </span>
+                {intakeCompleted ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--ok)]/10 text-[var(--ok)] border border-[var(--ok)]/20">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Completed
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--text-muted)]/10 text-[var(--text-muted)] border border-[var(--text-muted)]/20">
+                    Not Started
+                  </span>
+                )}
               </div>
-              
-              <div className="flex items-center justify-between py-2 border-b border-slate-700 gap-3">
-                <div className="flex-1">
-                  <p className="text-sm sm:text-base text-slate-200">Educational Brief</p>
-                  <p className="text-xs sm:text-sm text-slate-400">Medical Intelligence peptide recommendations</p>
+
+              <div className="flex items-center justify-between p-4 rounded-xl bg-[var(--surface-2)] border border-[var(--border)]">
+                <div>
+                  <p className="font-medium text-[var(--text)]">Medical Intelligence peptide recommendations</p>
+                  <p className="text-sm text-[var(--text-dim)]">Generated educational brief</p>
                 </div>
-                <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm flex-shrink-0 ${
-                  briefGenerated 
-                    ? 'bg-green-900/30 text-green-400 border border-green-700' 
-                    : 'bg-slate-700 text-slate-400'
-                }`}>
-                  {briefGenerated ? 'Generated' : 'Not Generated'}
-                </span>
+                {briefGenerated ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--ok)]/10 text-[var(--ok)] border border-[var(--ok)]/20">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Generated
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-[var(--text-muted)]/10 text-[var(--text-muted)] border border-[var(--text-muted)]/20">
+                    Not Generated
+                  </span>
+                )}
               </div>
             </div>
           </Card>
 
-          {/* Actions Card */}
-          <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-6 mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-semibold text-cyan-400 mb-3 sm:mb-4">Account Actions</h2>
+          {/* Account Actions */}
+          <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <SectionTitle>Account Actions</SectionTitle>
             
             <div className="space-y-3">
               <Button
-                onClick={() => router.push('/dashboard')}
-                className="w-full bg-cyan-600 hover:bg-cyan-700"
+                onClick={handleSignOut}
+                className="w-full bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:bg-[var(--surface-2)]/80 hover:border-[var(--accent)]/50 rounded-full font-semibold"
               >
-                Go to Dashboard
+                Sign Out
               </Button>
               
               <Button
                 onClick={handleClearData}
-                variant="outline"
-                className="w-full border-slate-600 text-slate-300 hover:bg-slate-700"
+                className="w-full bg-transparent border border-[var(--danger)] text-[var(--danger)] hover:bg-[var(--danger)]/10 rounded-full font-semibold"
               >
                 Clear All Data
-              </Button>
-              
-              <Button
-                onClick={handleSignOut}
-                variant="outline"
-                className="w-full border-red-600 text-red-400 hover:bg-red-900/20"
-              >
-                Sign Out
               </Button>
             </div>
           </Card>
 
-          {/* Security Information */}
-          <Card className="bg-blue-900/20 border-blue-700 p-4 sm:p-6">
-            <h3 className="text-base sm:text-lg font-semibold text-blue-400 mb-2">Security & Privacy</h3>
-            <ul className="space-y-2 text-xs sm:text-sm text-slate-300">
+          {/* Security & Privacy */}
+          <Card className="rounded-2xl border border-[var(--border)]/50 bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <h3 className="text-lg font-semibold text-[var(--text)] mb-3 flex items-center gap-2">
+              <svg className="w-5 h-5 text-[var(--accent)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Security & Privacy
+            </h3>
+            <ul className="space-y-2 text-sm text-[var(--text-dim)]">
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 flex-shrink-0">•</span>
-                <span>Your data is securely stored in Supabase with encryption</span>
+                <span className="text-[var(--accent)] flex-shrink-0">•</span>
+                <span>All data is stored securely in our encrypted database</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 flex-shrink-0">•</span>
-                <span>Row-level security policies protect your information</span>
+                <span className="text-[var(--accent)] flex-shrink-0">•</span>
+                <span>Your information is never shared with third parties</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 flex-shrink-0">•</span>
-                <span>Only you can access your intake data and briefs</span>
+                <span className="text-[var(--accent)] flex-shrink-0">•</span>
+                <span>You can delete your data at any time</span>
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-400 flex-shrink-0">•</span>
-                <span>Use "Clear All Data" to permanently delete your information</span>
+                <span className="text-[var(--accent)] flex-shrink-0">•</span>
+                <span>This is a research platform - not for medical use</span>
               </li>
             </ul>
           </Card>
@@ -204,4 +212,3 @@ export default function AccountPage() {
     </MainLayout>
   );
 }
-

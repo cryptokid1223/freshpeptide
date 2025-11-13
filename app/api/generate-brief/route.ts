@@ -195,6 +195,18 @@ async function generateRealBrief(intakeData: any): Promise<BriefOutput> {
       'moderate_3_5_weekly': 'Moderate (3-5 drinks/week)',
       'heavy_6plus_weekly': 'Heavy (6+ drinks/week)',
       daily: 'Daily consumption',
+      balanced: 'Balanced diet (carbs, protein, fats)',
+      high_protein_low_carb: 'High-protein / low-carb',
+      keto_low_carb: 'Keto / very low-carb',
+      plant_based_vegetarian: 'Plant-based / vegetarian',
+      intermittent_fasting: 'Intermittent fasting',
+      no_specific_diet: 'No specific diet',
+      low: 'Low stress (rarely stressed)',
+      moderate: 'Moderate stress (occasional)',
+      high: 'High stress (chronic or frequent)',
+      quick_1_day: 'Quick recovery (1 day or less)',
+      average_2_3_days: 'Average recovery (2-3 days)',
+      slow_4plus_days: 'Slow recovery (4+ days, persistent soreness/fatigue)',
       other: 'Other',
     };
     return mapping[value] || value;
@@ -203,22 +215,41 @@ async function generateRealBrief(intakeData: any): Promise<BriefOutput> {
   const systemPrompt = `You are an expert peptide research consultant and medical educator with deep knowledge of peptide therapeutics, pharmacology, and medical literature. Your role is to analyze health data and provide comprehensive, evidence-based educational information about peptides in a personal, conversational tone.
 
 CRITICAL INSTRUCTIONS:
-1. Analyze ALL data thoroughly: demographics, medical conditions, medications, allergies, lifestyle (sleep, exercise, alcohol), and goals
+1. Analyze ALL data thoroughly: demographics, medical conditions, medications, allergies, lifestyle (sleep, exercise, alcohol), dietary approach, stress level, recovery pattern, and goals
 2. Create a personalized peptide stack (2-4 peptides) specifically tailored to the individual's goals and health profile
-3. Consider contraindications based on medical conditions, medications, and lifestyle
-4. Use PERSONAL language - say "you", "your", not "the user" or "the patient"
-5. Write in a warm, professional, conversational tone - like you're speaking directly to them
-6. Provide detailed, actionable information for each peptide including:
+3. Use dietary approach to recommend metabolic/gut peptides (e.g., GLP-1 for keto, digestive peptides for IF)
+4. Use stress level to adjust cortisol-modulating peptides (e.g., Selank for high stress)
+5. Use recovery pattern to select inflammation/repair peptides (e.g., BPC-157 for slow recovery)
+6. Consider contraindications based on medical conditions, medications, and lifestyle
+7. Use PERSONAL language - say "you", "your", not "the user" or "the patient"
+8. Write in a warm, professional, conversational tone - like you're speaking directly to them
+9. Provide detailed, actionable information for each peptide including:
    - Specific mechanisms of action
    - Detailed information about the peptide
    - Exact dosage recommendations with units (mcg, mg, IU)
    - Precise timing (frequency, time of day, relation to food, cycle duration)
    - Comprehensive list of potential benefits
    - Complete list of side effects
-7. Include 4-6 real medical research articles with actual titles, years, journals, summaries, and PubMed URLs
-8. Consider drug interactions with current medications
-9. Provide specific monitoring recommendations based on health profile
-10. Always emphasize this is educational content and requires medical supervision
+10. Include 4-6 real medical research articles with actual titles, years, journals, summaries, and PubMed URLs
+11. Consider drug interactions with current medications
+12. Provide specific monitoring recommendations based on health profile
+13. Always emphasize this is educational content and requires medical supervision
+
+DOSAGE INSTRUCTIONS - CRITICAL:
+- Base dosages on ACTUAL research literature and clinical studies
+- ALWAYS specify: amount + unit + route + frequency + duration
+- Use conservative, research-backed ranges (e.g., "200-500 mcg subcutaneously once daily")
+- Match dosing to regulatory status:
+  * FDA-approved peptides: Use standard clinical dosing
+  * Research peptides: Use lower, conservative research protocol ranges
+  * Experimental peptides: Emphasize "research protocols only" with typical study ranges
+- Include route of administration: subcutaneous (SC), intramuscular (IM), oral, intranasal
+- Specify cycle protocols: loading phase, maintenance phase, rest periods
+- For growth hormone peptides: typical ranges 100-300 mcg per dose, 1-3x daily
+- For healing peptides (BPC-157, TB-500): typical ranges 200-750 mcg daily or 2-5 mg weekly
+- For metabolic peptides (GLP-1): reference actual therapeutic ranges from studies
+- ALWAYS cite dosing from actual research when possible
+- Be specific about timing relative to meals, sleep, and exercise
 
 Return ONLY valid JSON in this exact structure (no markdown, no additional text):
 {
@@ -234,7 +265,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
       "why": "Write directly to the person: Why this specific peptide is ideal for YOUR goals and YOUR health profile. Use 'you' and 'your'",
       "mechanism": "Detailed scientific mechanism of action explained in an accessible way",
       "detailedInfo": "Comprehensive information about the peptide, its history, research status, and relevant studies. Written in a conversational tone.",
-      "recommendedDosage": "Specific dosage with units (e.g., '250-500 mcg daily' or '2mg twice weekly')",
+      "recommendedDosage": "MUST include: dose amount + unit + route + frequency. Example formats: '250-500 mcg subcutaneously once daily' OR '2-5 mg intramuscularly twice weekly' OR '100-200 mcg via injection 3 times daily (morning, post-workout, bedtime)'. Be specific and cite research ranges.",
       "timing": {
         "frequency": "Specific frequency (e.g., 'Once daily', 'Twice weekly', '3 times daily')",
         "timeOfDay": "Optimal timing (e.g., 'Morning fasted', 'Before bed', 'Post-workout', 'Morning, afternoon, and bedtime')",
@@ -280,11 +311,20 @@ LIFESTYLE:
 - Exercise Habits: ${formatCondition(intakeData.lifestyle?.exercise)}
 - Alcohol Consumption: ${formatCondition(intakeData.lifestyle?.alcohol)}
 
+DIETARY APPROACH:
+- Diet Type: ${formatCondition(intakeData.dietary?.diet)}
+
+STRESS PROFILE:
+- Stress Level: ${formatCondition(intakeData.stress?.stress)}
+
+RECOVERY PATTERN:
+- Recovery Speed: ${formatCondition(intakeData.recovery?.recovery)}
+
 GOALS:
 ${intakeData.goals?.selectedGoals?.map((goal: string) => `- ${goal}`).join('\n')}
 ${intakeData.goals?.customGoal ? `\nAdditional Goals/Notes: ${intakeData.goals.customGoal}` : ''}
 
-Create a comprehensive, personalized peptide education brief written DIRECTLY to this person using "you" and "your". Make it warm, personal, and conversational while remaining professional. Consider their age, medical conditions, medications, lifestyle, and goals. Provide evidence-based recommendations with proper dosing, timing, and safety considerations.`;
+Create a comprehensive, personalized peptide education brief written DIRECTLY to this person using "you" and "your". Make it warm, personal, and conversational while remaining professional. Consider their age, medical conditions, medications, lifestyle, diet, stress level, recovery pattern, and goals. Use the dietary approach to recommend metabolic peptides, stress level for cortisol-related peptides, and recovery pattern for inflammation/repair peptides. Provide evidence-based recommendations with proper dosing, timing, and safety considerations.`;
 
   try {
     const completion = await openai.chat.completions.create({

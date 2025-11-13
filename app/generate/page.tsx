@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { MainLayout } from '@/components/MainLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { SectionTitle } from '@/components/ui/SectionTitle';
+import { StatusPill } from '@/components/ui/StatusPill';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import type { BriefOutput } from '@/lib/supabase';
@@ -16,7 +18,6 @@ export default function GeneratePage() {
   const [statusMessage, setStatusMessage] = useState<string>('');
 
   useEffect(() => {
-    // Check authentication and intake completion from Supabase
     const checkAuthAndIntake = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
@@ -25,7 +26,6 @@ export default function GeneratePage() {
         return;
       }
 
-      // Check if user has completed intake from Supabase - check all 4 sections
       const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
@@ -37,28 +37,28 @@ export default function GeneratePage() {
         intake.demographics && 
         intake.medical && 
         intake.lifestyle && 
+        intake.dietary &&
+        intake.stress &&
+        intake.recovery &&
         intake.goals &&
         Object.keys(intake.demographics).length > 0 &&
         Object.keys(intake.medical).length > 0 &&
         Object.keys(intake.lifestyle).length > 0 &&
+        Object.keys(intake.dietary).length > 0 &&
+        Object.keys(intake.stress).length > 0 &&
+        Object.keys(intake.recovery).length > 0 &&
         Object.keys(intake.goals).length > 0;
 
-      console.log('Generate page intake check:', { hasCompletedIntake, intake });
-
       if (!hasCompletedIntake) {
-        console.log('Incomplete intake');
         setStatusMessage('⚠️ Please complete all intake sections first');
-        setError('Intake questionnaire not completed. Please go to the intake page and complete all 4 sections.');
-        // Don't redirect - let them see the error
+        setError('Intake questionnaire not completed. Please go to the intake page and complete all sections.');
         return;
       }
 
-      // Set consent flag for consistency
       localStorage.setItem('consent_given', 'true');
       localStorage.setItem('intake_completed', 'true');
       setStatusMessage('✅ Ready to generate');
 
-      // Load most recent brief from Supabase database if it exists
       const { data: briefRecords } = await supabase
         .from('briefs')
         .select('brief_output')
@@ -80,26 +80,17 @@ export default function GeneratePage() {
     setStatusMessage('🔄 Starting generation...');
 
     try {
-      // Get the current session
       setStatusMessage('🔐 Checking authentication...');
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       
-      if (sessionError) {
-        console.error('Session error:', sessionError);
-        throw new Error('Authentication error. Please sign in again.');
-      }
-
       if (!session?.user) {
-        console.error('No session found');
         throw new Error('Not authenticated. Please sign in again.');
       }
 
       const user = session.user;
-      console.log('Generating brief for user:', user.id);
 
-      // Load intake data from Supabase database
       setStatusMessage('📋 Loading your questionnaire data...');
-      const { data: intakeRecord, error: intakeError } = await supabase
+      const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
         .eq('user_id', user.id)
@@ -109,14 +100,11 @@ export default function GeneratePage() {
         throw new Error('No intake data found. Please complete the questionnaire first.');
       }
 
-      console.log('✅ Intake data loaded, calling medical intelligence...');
       setStatusMessage('🔬 Medical Intelligence analyzing your profile...');
       
       const response = await fetch('/api/generate-brief', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: user.id,
           intakeData: intakeRecord.intake_data,
@@ -125,7 +113,6 @@ export default function GeneratePage() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API error response:', errorText);
         try {
           const errorData = JSON.parse(errorText);
           throw new Error(errorData.error || 'Failed to generate brief');
@@ -136,29 +123,18 @@ export default function GeneratePage() {
 
       setStatusMessage('💾 Saving your personalized stack...');
       const data = await response.json();
-      console.log('✅ Brief generated successfully:', data.model);
       setBrief(data.brief);
       
-      // Save to localStorage for quick access
       localStorage.setItem('generated_brief', JSON.stringify(data.brief));
       
-      // Save to Supabase
-      const { error: saveError } = await supabase
-        .from('briefs')
-        .insert({
-          user_id: user.id,
-          brief_output: data.brief,
-          model_name: data.model,
-        });
-
-      if (saveError) {
-        console.error('Error saving brief to Supabase:', saveError);
-        // Don't fail - brief is still shown to user
-      }
+      await supabase.from('briefs').insert({
+        user_id: user.id,
+        brief_output: data.brief,
+        model_name: data.model,
+      });
 
       setStatusMessage('✅ Complete! Your stack is ready.');
     } catch (err) {
-      console.error('Generate error:', err);
       const errorMsg = err instanceof Error ? err.message : 'An error occurred';
       setError(errorMsg);
       setStatusMessage('❌ Generation failed');
@@ -169,42 +145,48 @@ export default function GeneratePage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8 sm:py-16">
-        <div className="max-w-4xl mx-auto">
-          {!brief ? (
-            <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
-              <h1 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-3 sm:mb-4">
+      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
+        {!brief ? (
+          <div className="max-w-3xl mx-auto">
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
+              <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-4">
                 Generate Your Peptide Educational Brief
               </h1>
-              <p className="text-sm sm:text-base text-slate-300 mb-4 sm:mb-6">
+              <p className="text-[var(--text-dim)] mb-8 leading-relaxed">
                 Based on your intake responses, our Medical Intelligence system will generate an educational brief that maps 
                 your goals to peptide classes found in research literature, explains mechanisms, 
                 highlights risks, and provides evidence citations.
               </p>
 
-              {/* Status Message */}
               {statusMessage && (
-                <div className="mb-4 p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
-                  <p className="text-blue-300 text-center text-sm sm:text-base">{statusMessage}</p>
+                <div className={`mb-6 p-4 rounded-xl ${
+                  statusMessage.includes('✅') ? 'bg-[var(--ok)]/10 border-[var(--ok)]/30' :
+                  statusMessage.includes('⚠️') ? 'bg-[var(--warn)]/10 border-[var(--warn)]/30' :
+                  'bg-[var(--accent)]/10 border-[var(--accent)]/30'
+                } border`}>
+                  <p className={`text-center font-medium ${
+                    statusMessage.includes('✅') ? 'text-[var(--ok)]' :
+                    statusMessage.includes('⚠️') ? 'text-[var(--warn)]' :
+                    'text-[var(--accent)]'
+                  }`}>{statusMessage}</p>
                 </div>
               )}
 
-              {/* Error Message */}
               {error && (
-                <div className="mb-4 p-4 bg-red-900/20 border border-red-700 rounded-lg">
-                  <p className="text-red-400 text-sm sm:text-base">{error}</p>
+                <div className="mb-6 p-4 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/30">
+                  <p className="text-[var(--danger)] mb-3">{error}</p>
                   <Button 
                     onClick={() => router.push('/intake')} 
-                    className="mt-3 w-full bg-cyan-600 hover:bg-cyan-700"
+                    className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold"
                   >
                     Go to Intake Page
                   </Button>
                 </div>
               )}
 
-              <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-4 mb-6">
-                <p className="text-slate-300 text-sm">
-                  <strong className="text-amber-400">Remember:</strong> This is educational content 
+              <div className="bg-[var(--warn)]/5 border border-[var(--warn)]/30 rounded-xl p-4 mb-8">
+                <p className="text-[var(--text-dim)] text-sm leading-relaxed">
+                  <strong className="text-[var(--warn)]">Remember:</strong> This is educational content 
                   only and not medical advice. Always consult healthcare professionals.
                 </p>
               </div>
@@ -212,120 +194,111 @@ export default function GeneratePage() {
               <Button
                 onClick={handleGenerate}
                 disabled={isGenerating}
-                className="w-full bg-cyan-600 hover:bg-cyan-700 text-white py-6 text-lg"
+                className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] py-8 text-lg font-semibold rounded-full"
               >
                 {isGenerating ? 'Medical Intelligence Analyzing...' : 'Generate Peptide Stack'}
               </Button>
             </Card>
-          ) : (
-            <div className="space-y-6">
-              <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
-                <div className="mb-6">
-                  <h1 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-3 sm:mb-4">
-                    Your Educational Brief
-                  </h1>
-                  <Button
-                    onClick={() => router.push('/dashboard')}
-                    className="w-full sm:w-auto bg-cyan-600 hover:bg-cyan-700"
-                  >
-                    View Dashboard
-                  </Button>
-                </div>
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {/* Header */}
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
+              <div className="flex items-start justify-between mb-4">
+                <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF]">
+                  Your Educational Brief
+                </h1>
+                <Button
+                  onClick={() => router.push('/dashboard')}
+                  className="bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)]/50 rounded-full px-6 font-semibold"
+                >
+                  Dashboard
+                </Button>
+              </div>
 
-                <div className="bg-amber-900/20 border border-amber-700 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
-                  <p className="text-amber-400 font-semibold text-center text-xs sm:text-sm">
-                    ⚠️ EDUCATIONAL CONTENT ONLY — NOT MEDICAL ADVICE
-                  </p>
-                </div>
-              </Card>
+              <div className="bg-[var(--warn)]/5 border border-[var(--warn)]/30 rounded-xl p-4">
+                <p className="text-[var(--warn)] font-semibold text-center text-sm">
+                  ⚠️ EDUCATIONAL CONTENT ONLY — NOT MEDICAL ADVICE
+                </p>
+              </div>
+            </Card>
 
-              {/* Goal Alignment */}
-              <Card className="bg-slate-800/50 border-slate-700 p-6">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-3">
-                  Your Personalized Analysis
+            {/* Goal Alignment */}
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
+              <SectionTitle>Your Personalized Analysis</SectionTitle>
+              <p className="text-[var(--text-dim)] whitespace-pre-line leading-relaxed">{brief.goalAlignment}</p>
+            </Card>
+
+            {/* Recommended Stack */}
+            {brief.recommendedStack && (
+              <Card className="rounded-2xl border border-[var(--accent)]/30 bg-gradient-to-br from-[var(--accent)]/10 to-[var(--accent-2)]/5 p-8" style={{ boxShadow: 'var(--shadow)' }}>
+                <h2 className="text-2xl font-bold text-[var(--accent)] mb-4 tracking-[-0.01em]">
+                  🎯 {brief.recommendedStack.name}
                 </h2>
-                <p className="text-slate-300 whitespace-pre-line">{brief.goalAlignment}</p>
+                <p className="text-[var(--text-dim)] mb-4 leading-relaxed">
+                  <strong className="text-[var(--text)]">Description:</strong> {brief.recommendedStack.description}
+                </p>
+                <p className="text-[var(--text-dim)] leading-relaxed">
+                  <strong className="text-[var(--text)]">Synergies:</strong> {brief.recommendedStack.synergies}
+                </p>
               </Card>
+            )}
 
-              {/* Recommended Stack */}
-              {brief.recommendedStack && (
-                <Card className="bg-gradient-to-br from-cyan-900/30 to-slate-800/50 border-cyan-700 p-6">
-                  <h2 className="text-2xl font-bold text-cyan-400 mb-3">
-                    🎯 {brief.recommendedStack.name}
-                  </h2>
-                  <p className="text-slate-300 mb-3">
-                    <strong className="text-cyan-400">Description:</strong> {brief.recommendedStack.description}
-                  </p>
-                  <p className="text-slate-300">
-                    <strong className="text-cyan-400">Synergies:</strong> {brief.recommendedStack.synergies}
-                  </p>
-                </Card>
-              )}
-
-              {/* Candidate Peptides */}
-              <Card className="bg-slate-800/50 border-slate-700 p-6">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">
-                  Your Peptide Stack - Detailed Breakdown
-                </h2>
-                <div className="space-y-6">
-                  {brief.candidatePeptides.map((peptide, index) => (
-                    <div key={index} className="bg-slate-900/50 rounded-lg p-6 border border-slate-700">
-                      <h3 className="text-xl font-bold text-cyan-400 mb-4">
+            {/* Peptides */}
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
+              <SectionTitle>Your Peptide Stack - Detailed Breakdown</SectionTitle>
+              <div className="space-y-6">
+                {brief.candidatePeptides.map((peptide, index) => (
+                  <div key={index} className="rounded-2xl border border-[var(--border)] bg-[var(--surface-2)] p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <h3 className="text-xl font-bold text-[var(--accent)] tracking-[-0.01em]">
                         {index + 1}. {peptide.name}
                       </h3>
-                      
-                      {/* Why this peptide */}
-                      <div className="mb-4">
-                        <p className="text-slate-300">
-                          <strong className="text-cyan-400">Why Recommended:</strong> {peptide.why}
-                        </p>
-                      </div>
+                      {peptide.status && <StatusPill status={peptide.status} />}
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <p className="text-sm text-[var(--text-dim)] leading-relaxed">
+                        <strong className="text-[var(--text)]">Why Recommended:</strong> {peptide.why}
+                      </p>
 
-                      {/* Detailed Info */}
                       {peptide.detailedInfo && (
-                        <div className="mb-4 bg-slate-800/50 p-4 rounded-lg">
-                          <h4 className="text-sm font-semibold text-cyan-400 mb-2">📋 About This Peptide</h4>
-                          <p className="text-slate-300 text-sm">{peptide.detailedInfo}</p>
+                        <div className="rounded-xl bg-[var(--surface-1)] p-4 border border-[var(--border)]">
+                          <h4 className="text-sm font-semibold text-[var(--accent)] mb-2">📋 About This Peptide</h4>
+                          <p className="text-[var(--text-dim)] text-sm leading-relaxed">{peptide.detailedInfo}</p>
                         </div>
                       )}
 
-                      {/* Mechanism */}
-                      <div className="mb-4">
-                        <p className="text-slate-300">
-                          <strong className="text-cyan-400">Mechanism of Action:</strong> {peptide.mechanism}
-                        </p>
-                      </div>
+                      <p className="text-sm text-[var(--text-dim)] leading-relaxed">
+                        <strong className="text-[var(--text)]">Mechanism of Action:</strong> {peptide.mechanism}
+                      </p>
 
-                      {/* Dosage & Timing */}
-                      <div className="grid md:grid-cols-2 gap-4 mb-4">
-                        <div className="bg-cyan-900/20 p-4 rounded-lg">
-                          <h4 className="text-sm font-semibold text-cyan-400 mb-2">💊 Dosage</h4>
-                          <p className="text-slate-300 text-sm">{peptide.recommendedDosage}</p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div className="rounded-xl bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-4">
+                          <h4 className="text-sm font-semibold text-[var(--accent)] mb-2">💊 Dosage</h4>
+                          <p className="text-[var(--text-dim)] text-sm leading-relaxed">{peptide.recommendedDosage}</p>
                         </div>
                         {peptide.timing && (
-                          <div className="bg-cyan-900/20 p-4 rounded-lg">
-                            <h4 className="text-sm font-semibold text-cyan-400 mb-2">⏰ Timing</h4>
-                            <ul className="text-slate-300 text-sm space-y-1">
-                              <li><strong>Frequency:</strong> {peptide.timing.frequency}</li>
-                              <li><strong>Time of Day:</strong> {peptide.timing.timeOfDay}</li>
-                              <li><strong>With Food:</strong> {peptide.timing.withFood}</li>
-                              {peptide.timing.cycleDuration && (
-                                <li><strong>Cycle:</strong> {peptide.timing.cycleDuration}</li>
-                              )}
-                            </ul>
+                          <div className="rounded-xl bg-[var(--accent)]/5 border border-[var(--accent)]/20 p-4">
+                            <h4 className="text-sm font-semibold text-[var(--accent)] mb-2">⏰ Timing</h4>
+                            <div className="text-[var(--text-dim)] text-sm space-y-1">
+                              <p><strong>Frequency:</strong> {peptide.timing.frequency}</p>
+                              <p><strong>Time:</strong> {peptide.timing.timeOfDay}</p>
+                              <p><strong>With Food:</strong> {peptide.timing.withFood}</p>
+                              {peptide.timing.cycleDuration && <p><strong>Cycle:</strong> {peptide.timing.cycleDuration}</p>}
+                            </div>
                           </div>
                         )}
                       </div>
 
-                      {/* Benefits & Side Effects */}
                       <div className="grid md:grid-cols-2 gap-4">
                         {peptide.potentialBenefits && peptide.potentialBenefits.length > 0 && (
                           <div>
-                            <h4 className="text-sm font-semibold text-green-400 mb-2">✅ Potential Benefits</h4>
+                            <h4 className="text-sm font-semibold text-[var(--ok)] mb-2">✅ Potential Benefits</h4>
                             <ul className="space-y-1">
                               {peptide.potentialBenefits.map((benefit, i) => (
-                                <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
-                                  <span className="text-green-400">•</span>
+                                <li key={i} className="text-[var(--text-dim)] text-sm flex gap-2">
+                                  <span className="text-[var(--ok)]">•</span>
                                   <span>{benefit}</span>
                                 </li>
                               ))}
@@ -334,11 +307,11 @@ export default function GeneratePage() {
                         )}
                         {peptide.sideEffects && peptide.sideEffects.length > 0 && (
                           <div>
-                            <h4 className="text-sm font-semibold text-amber-400 mb-2">⚠️ Possible Side Effects</h4>
+                            <h4 className="text-sm font-semibold text-[var(--warn)] mb-2">⚠️ Possible Side Effects</h4>
                             <ul className="space-y-1">
                               {peptide.sideEffects.map((effect, i) => (
-                                <li key={i} className="text-slate-300 text-sm flex items-start gap-2">
-                                  <span className="text-amber-400">•</span>
+                                <li key={i} className="text-[var(--text-dim)] text-sm flex gap-2">
+                                  <span className="text-[var(--warn)]">•</span>
                                   <span>{effect}</span>
                                 </li>
                               ))}
@@ -347,143 +320,141 @@ export default function GeneratePage() {
                         )}
                       </div>
                     </div>
-                  ))}
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            {/* Key Risks */}
+            <Card className="rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/5 p-8" style={{ boxShadow: 'var(--shadow)' }}>
+              <h2 className="text-xl font-semibold text-[var(--danger)] mb-4 flex items-center gap-2">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                </svg>
+                Key Risks & Contraindications
+              </h2>
+              <ul className="space-y-2">
+                {brief.keyRisks.map((risk, index) => (
+                  <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
+                    <span className="text-[var(--danger)]">•</span>
+                    <span>{risk}</span>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+
+            {/* Medical Considerations */}
+            {brief.medicalConsiderations && (
+              <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
+                <SectionTitle>Medical Considerations for Your Profile</SectionTitle>
+                <div className="space-y-6">
+                  {brief.medicalConsiderations.drugInteractions && brief.medicalConsiderations.drugInteractions.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-[var(--text)] mb-2">Drug Interactions</h3>
+                      <ul className="space-y-1">
+                        {brief.medicalConsiderations.drugInteractions.map((interaction, index) => (
+                          <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
+                            <span className="text-[var(--warn)]">•</span>
+                            <span>{interaction}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {brief.medicalConsiderations.contraindications && brief.medicalConsiderations.contraindications.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-[var(--text)] mb-2">Contraindications</h3>
+                      <ul className="space-y-1">
+                        {brief.medicalConsiderations.contraindications.map((contra, index) => (
+                          <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
+                            <span className="text-[var(--warn)]">•</span>
+                            <span>{contra}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  {brief.medicalConsiderations.monitoringRecommendations && brief.medicalConsiderations.monitoringRecommendations.length > 0 && (
+                    <div>
+                      <h3 className="font-semibold text-[var(--text)] mb-2">Monitoring Recommendations</h3>
+                      <ul className="space-y-1">
+                        {brief.medicalConsiderations.monitoringRecommendations.map((monitor, index) => (
+                          <li key={index} className="flex gap-2 text-[var(--text-dim)] text-sm">
+                            <span className="text-[var(--accent)]">•</span>
+                            <span>{monitor}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </Card>
+            )}
 
-              {/* Key Risks */}
-              <Card className="bg-slate-800/50 border-slate-700 p-6">
-                <h2 className="text-xl font-semibold text-red-400 mb-3">
-                  Key Risks & Contraindications
-                </h2>
-                <ul className="space-y-2">
-                  {brief.keyRisks.map((risk, index) => (
-                    <li key={index} className="flex items-start gap-2 text-slate-300">
-                      <span className="text-red-400">•</span>
-                      <span>{risk}</span>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-
-              {/* Medical Considerations */}
-              {brief.medicalConsiderations && (
-                <Card className="bg-slate-800/50 border-slate-700 p-6">
-                  <h2 className="text-xl font-semibold text-amber-400 mb-4">
-                    🏥 Medical Considerations for Your Profile
-                  </h2>
-                  <div className="space-y-4">
-                    {brief.medicalConsiderations.drugInteractions && brief.medicalConsiderations.drugInteractions.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold text-slate-200 mb-2">Drug Interactions</h3>
-                        <ul className="space-y-1">
-                          {brief.medicalConsiderations.drugInteractions.map((interaction, index) => (
-                            <li key={index} className="flex items-start gap-2 text-slate-300 text-sm">
-                              <span className="text-amber-400">•</span>
-                              <span>{interaction}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {brief.medicalConsiderations.contraindications && brief.medicalConsiderations.contraindications.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold text-slate-200 mb-2">Contraindications</h3>
-                        <ul className="space-y-1">
-                          {brief.medicalConsiderations.contraindications.map((contra, index) => (
-                            <li key={index} className="flex items-start gap-2 text-slate-300 text-sm">
-                              <span className="text-amber-400">•</span>
-                              <span>{contra}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    {brief.medicalConsiderations.monitoringRecommendations && brief.medicalConsiderations.monitoringRecommendations.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold text-slate-200 mb-2">Monitoring Recommendations</h3>
-                        <ul className="space-y-1">
-                          {brief.medicalConsiderations.monitoringRecommendations.map((monitor, index) => (
-                            <li key={index} className="flex items-start gap-2 text-slate-300 text-sm">
-                              <span className="text-cyan-400">•</span>
-                              <span>{monitor}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
+            {/* Evidence */}
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
+              <SectionTitle subtitle="Peer-reviewed research articles supporting the peptides in your stack">
+                Scientific Evidence & Research
+              </SectionTitle>
+              <div className="space-y-4">
+                {brief.evidenceList.map((evidence, index) => (
+                  <div key={index} className="rounded-xl bg-[var(--surface-2)] border border-[var(--border)] p-4">
+                    <h4 className="font-semibold text-[var(--text)] mb-1">
+                      {evidence.title} ({evidence.year})
+                    </h4>
+                    <p className="text-sm text-[var(--accent)] mb-2">{evidence.source}</p>
+                    <p className="text-[var(--text-dim)] text-sm mb-2">{evidence.summary}</p>
+                    {evidence.url && (
+                      <a
+                        href={evidence.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[var(--accent)] hover:text-[var(--accent-2)] text-sm font-medium"
+                      >
+                        View on PubMed →
+                      </a>
                     )}
                   </div>
-                </Card>
-              )}
-
-              {/* Evidence */}
-              <Card className="bg-slate-800/50 border-slate-700 p-6">
-                <h2 className="text-xl font-semibold text-cyan-400 mb-4">
-                  📚 Scientific Evidence & Research
-                </h2>
-                <p className="text-slate-400 text-sm mb-4">
-                  Below are peer-reviewed research articles supporting the peptides in your stack:
-                </p>
-                <div className="space-y-3">
-                  {brief.evidenceList.map((evidence, index) => (
-                    <div key={index} className="bg-slate-900/50 rounded-lg p-4 border border-slate-700">
-                      <h4 className="font-semibold text-slate-200 mb-1">
-                        {evidence.title} ({evidence.year})
-                      </h4>
-                      <p className="text-sm text-cyan-400 mb-2">{evidence.source}</p>
-                      <p className="text-slate-300 text-sm mb-2">{evidence.summary}</p>
-                      {evidence.url && (
-                        <a
-                          href={evidence.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-cyan-400 hover:text-cyan-300 text-sm underline"
-                        >
-                          View on PubMed →
-                        </a>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </Card>
-
-              {/* Global Disclaimer */}
-              <Card className="bg-red-900/20 border-red-700 p-6">
-                <h3 className="text-lg font-semibold text-red-400 mb-3">
-                  ⚠️ Important Disclaimer
-                </h3>
-                <p className="text-slate-300 text-sm">
-                  This brief is generated for educational and research purposes only. It does not 
-                  constitute medical advice, diagnosis, or treatment recommendations. Many peptides 
-                  discussed are research-only substances without FDA approval for human use. Always 
-                  consult qualified healthcare professionals before making any health-related decisions. 
-                  Do not use this information to self-prescribe or obtain controlled substances.
-                </p>
-              </Card>
-
-              <div className="flex gap-4">
-                <Button
-                  onClick={() => {
-                    setBrief(null);
-                    localStorage.removeItem('generated_brief');
-                  }}
-                  variant="outline"
-                  className="border-slate-600"
-                >
-                  Regenerate
-                </Button>
-                <Button
-                  onClick={() => router.push('/dashboard')}
-                  className="flex-1 bg-cyan-600 hover:bg-cyan-700"
-                >
-                  Go to Dashboard
-                </Button>
+                ))}
               </div>
+            </Card>
+
+            {/* Disclaimer */}
+            <Card className="rounded-2xl border border-[var(--danger)]/30 bg-[var(--danger)]/5 p-6" style={{ boxShadow: 'var(--shadow)' }}>
+              <h3 className="text-lg font-semibold text-[var(--danger)] mb-3">
+                ⚠️ Important Disclaimer
+              </h3>
+              <p className="text-[var(--text-dim)] text-sm leading-relaxed">
+                This brief is generated for educational and research purposes only. It does not 
+                constitute medical advice, diagnosis, or treatment recommendations. Many peptides 
+                discussed are research-only substances without FDA approval for human use. Always 
+                consult qualified healthcare professionals before making any health-related decisions. 
+                Do not use this information to self-prescribe or obtain controlled substances.
+              </p>
+            </Card>
+
+            {/* Actions */}
+            <div className="flex gap-4">
+              <Button
+                onClick={() => {
+                  setBrief(null);
+                  localStorage.removeItem('generated_brief');
+                }}
+                className="bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text)] hover:border-[var(--accent)]/50 rounded-full px-8 font-semibold"
+              >
+                Regenerate
+              </Button>
+              <Button
+                onClick={() => router.push('/dashboard')}
+                className="flex-1 bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold"
+              >
+                Go to Dashboard
+              </Button>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </MainLayout>
   );
 }
-

@@ -13,7 +13,6 @@ type AuthMode = 'signin' | 'signup';
 
 export default function AuthPage() {
   const router = useRouter();
-  // Default to signin mode (better for returning users)
   const [mode, setMode] = useState<AuthMode>('signin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,7 +25,7 @@ export default function AuthPage() {
     const storedMode = localStorage.getItem('authMode') as AuthMode | null;
     if (storedMode === 'signup' || storedMode === 'signin') {
       setMode(storedMode);
-      localStorage.removeItem('authMode'); // Clear after reading
+      localStorage.removeItem('authMode');
     }
   }, []);
 
@@ -45,61 +44,40 @@ export default function AuthPage() {
       if (authError) throw authError;
 
       if (data.user) {
-        // Check if user has completed intake by checking all required sections
-        const { data: intakeData, error: intakeError } = await supabase
+        const { data: intakeData } = await supabase
           .from('intake')
           .select('intake_data')
           .eq('user_id', data.user.id)
           .maybeSingle();
 
-        console.log('==========================================');
-        console.log('SIGN-IN INTAKE CHECK FOR USER:', data.user.email);
-        console.log('Has intake record:', !!intakeData);
-        console.log('Intake data:', intakeData?.intake_data);
-        if (intakeData?.intake_data) {
-          console.log('Top-level keys:', Object.keys(intakeData.intake_data));
-          console.log('Demographics:', intakeData.intake_data.demographics);
-          console.log('Medical:', intakeData.intake_data.medical);
-          console.log('Lifestyle:', intakeData.intake_data.lifestyle);
-          console.log('Goals:', intakeData.intake_data.goals);
-        }
-        console.log('==========================================');
-
-        // Check if user has ALL required intake sections completed
         const intake = intakeData?.intake_data;
         const hasCompletedIntake = intake && 
           intake.demographics && 
           intake.medical && 
           intake.lifestyle && 
+          intake.dietary &&
+          intake.stress &&
+          intake.recovery &&
           intake.goals &&
           Object.keys(intake.demographics).length > 0 &&
           Object.keys(intake.medical).length > 0 &&
           Object.keys(intake.lifestyle).length > 0 &&
+          Object.keys(intake.dietary).length > 0 &&
+          Object.keys(intake.stress).length > 0 &&
+          Object.keys(intake.recovery).length > 0 &&
           Object.keys(intake.goals).length > 0;
 
-        console.log('Has completed intake?', hasCompletedIntake);
-
         if (hasCompletedIntake) {
-          // User has completed full intake, go to dashboard
-          console.log('✅ ROUTING TO DASHBOARD');
-          // Set localStorage flags for consistency
           localStorage.setItem('consent_given', 'true');
           localStorage.setItem('intake_completed', 'true');
           setMessage('Welcome back! Loading your dashboard...');
-          setTimeout(() => {
-            router.push('/dashboard');
-          }, 500);
+          setTimeout(() => router.push('/dashboard'), 500);
         } else {
-          // User hasn't completed intake, go to consent
-          console.log('❌ ROUTING TO CONSENT - User needs to complete intake');
           setMessage('Please complete the intake questionnaire to continue.');
-          setTimeout(() => {
-            router.push('/consent');
-          }, 1000);
+          setTimeout(() => router.push('/consent'), 1000);
         }
       }
     } catch (error: any) {
-      console.error('Sign in error:', error);
       setError(error.message || 'Failed to sign in. Check your email and password.');
     } finally {
       setIsLoading(false);
@@ -128,9 +106,6 @@ export default function AuthPage() {
       if (authError) throw authError;
 
       if (data.user) {
-        console.log('✅ User created:', data.user.id, data.user.email);
-        
-        // CRITICAL: Create profile in profiles table
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
@@ -140,15 +115,11 @@ export default function AuthPage() {
 
         if (profileError) {
           console.error('Profile creation error:', profileError);
-          // Don't throw - profile might already exist
-        } else {
-          console.log('✅ Profile created successfully');
         }
         
         setMessage('Account created! Check your email to verify your account.');
       }
     } catch (error: any) {
-      console.error('Sign up error:', error);
       setError(error.message || 'Failed to create account');
     } finally {
       setIsLoading(false);
@@ -157,185 +128,182 @@ export default function AuthPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8 sm:py-16">
-        <div className="max-w-md mx-auto">
-          <Card className="bg-slate-800/50 border-slate-700 p-4 sm:p-8">
-            {/* Tab Buttons */}
-            <div className="flex gap-2 mb-6 sm:mb-8">
-              <Button
-                type="button"
-                onClick={() => {
-                  setMode('signin');
-                  setError('');
-                  setMessage('');
-                  setEmail('');
-                  setPassword('');
-                }}
-                className={`flex-1 py-4 sm:py-6 text-base sm:text-lg ${
-                  mode === 'signin'
-                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
-                    : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
-                }`}
-              >
-                ✅ Sign In
-              </Button>
-              <Button
-                type="button"
-                onClick={() => {
-                  setMode('signup');
-                  setError('');
-                  setMessage('');
-                  setEmail('');
-                  setPassword('');
-                }}
-                className={`flex-1 py-4 sm:py-6 text-base sm:text-lg ${
-                  mode === 'signup'
-                    ? 'bg-cyan-600 hover:bg-cyan-700 text-white'
-                    : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
-                }`}
-              >
-                ✨ Sign Up
-              </Button>
+      <div className="container mx-auto px-4 py-16 max-w-[520px]">
+        <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-8" style={{ boxShadow: 'var(--shadow)' }}>
+          {/* Tab Buttons */}
+          <div className="flex gap-3 mb-8">
+            <Button
+              type="button"
+              onClick={() => {
+                setMode('signin');
+                setError('');
+                setMessage('');
+                setEmail('');
+                setPassword('');
+              }}
+              className={`flex-1 py-6 text-base font-semibold rounded-full transition-all ${
+                mode === 'signin'
+                  ? 'bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] text-[#001018]'
+                  : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-dim)] hover:text-[var(--text)] hover:border-[var(--accent)]/50'
+              }`}
+            >
+              Sign In
+            </Button>
+            <Button
+              type="button"
+              onClick={() => {
+                setMode('signup');
+                setError('');
+                setMessage('');
+                setEmail('');
+                setPassword('');
+              }}
+              className={`flex-1 py-6 text-base font-semibold rounded-full transition-all ${
+                mode === 'signup'
+                  ? 'bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] text-[#001018]'
+                  : 'bg-[var(--surface-2)] border border-[var(--border)] text-[var(--text-dim)] hover:text-[var(--text)] hover:border-[var(--accent)]/50'
+              }`}
+            >
+              Sign Up
+            </Button>
+          </div>
+
+          <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-3 text-center tracking-[-0.01em]">
+            {mode === 'signin' ? 'Welcome Back!' : 'Create Your Account'}
+          </h1>
+          <p className="text-sm text-[var(--text-dim)] text-center mb-8">
+            {mode === 'signin' 
+              ? 'Sign in to access your dashboard and peptide stack' 
+              : 'Sign up to get personalized Medical Intelligence peptide recommendations'}
+          </p>
+
+          {message && (
+            <div className="mb-6 p-4 rounded-xl bg-[var(--ok)]/10 border border-[var(--ok)]/30">
+              <p className="text-[var(--ok)] text-center text-sm font-medium">{message}</p>
             </div>
+          )}
 
-            <h1 className="text-2xl sm:text-3xl font-bold text-cyan-400 mb-2 sm:mb-3 text-center">
-              {mode === 'signin' ? 'Welcome Back!' : 'Create Your Account'}
-            </h1>
-            <p className="text-sm sm:text-base text-slate-400 text-center mb-6 sm:mb-8 px-2">
-              {mode === 'signin' 
-                ? 'Sign in to access your dashboard and peptide stack' 
-                : 'Sign up to get personalized Medical Intelligence peptide recommendations'}
-            </p>
-
-            {message && (
-              <div className="mb-4 p-4 bg-green-900/20 border border-green-700 rounded-lg">
-                <p className="text-green-400 text-center text-sm sm:text-base">{message}</p>
-              </div>
-            )}
-
-            {error && (
-              <div className="mb-4 p-4 bg-red-900/20 border border-red-700 rounded-lg">
-                <p className="text-red-400 text-center">{error}</p>
-              </div>
-            )}
-
-            {mode === 'signin' ? (
-              <form onSubmit={handleSignIn} className="space-y-4">
-                <div>
-                  <Label htmlFor="email" className="text-slate-300">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="your.email@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-slate-900 border-slate-600 text-slate-100 mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="password" className="text-slate-300">
-                    Password
-                  </Label>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-slate-900 border-slate-600 text-slate-100 mt-2"
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
-                >
-                  {isLoading ? 'Signing in...' : 'Sign In'}
-                </Button>
-              </form>
-            ) : (
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div>
-                  <Label htmlFor="signup-email" className="text-slate-300">
-                    Email Address
-                  </Label>
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="your.email@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    className="bg-slate-900 border-slate-600 text-slate-100 mt-2"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="signup-password" className="text-slate-300">
-                    Password
-                  </Label>
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="Create a password (min 6 characters)"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    minLength={6}
-                    className="bg-slate-900 border-slate-600 text-slate-100 mt-2"
-                  />
-                  <p className="text-xs text-slate-400 mt-1">Must be at least 6 characters</p>
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-cyan-600 hover:bg-cyan-700 text-white"
-                >
-                  {isLoading ? 'Creating account...' : 'Create Account'}
-                </Button>
-              </form>
-            )}
-
-            <div className="mt-6 space-y-3">
-              {mode === 'signup' && (
-                <div className="p-4 bg-green-900/20 border border-green-700 rounded-lg">
-                  <p className="text-sm text-slate-300">
-                    <strong className="text-green-400">✨ New here?</strong> After creating your account, you'll verify your email and answer a quick questionnaire to get personalized Medical Intelligence recommendations.
-                  </p>
-                </div>
-              )}
-              
-              {mode === 'signin' && (
-                <div className="p-4 bg-blue-900/20 border border-blue-700 rounded-lg">
-                  <p className="text-sm text-slate-300">
-                    <strong className="text-blue-400">👋 Welcome back!</strong> Sign in to access your dashboard and view your personalized peptide stack.
-                  </p>
-                </div>
-              )}
-
-              <div className="text-center">
-                <button
-                  type="button"
-                  onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
-                  className="text-cyan-400 hover:text-cyan-300 text-sm underline"
-                >
-                  {mode === 'signin' 
-                    ? "Don't have an account? Sign Up" 
-                    : 'Already have an account? Sign In'}
-                </button>
-              </div>
+          {error && (
+            <div className="mb-6 p-4 rounded-xl bg-[var(--danger)]/10 border border-[var(--danger)]/30">
+              <p className="text-[var(--danger)] text-center text-sm font-medium">{error}</p>
             </div>
-          </Card>
-        </div>
+          )}
+
+          {mode === 'signin' ? (
+            <form onSubmit={handleSignIn} className="space-y-5">
+              <div>
+                <Label htmlFor="email" className="text-[var(--text)] font-medium">
+                  Email Address
+                </Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="password" className="text-[var(--text)] font-medium">
+                  Password
+                </Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
+                />
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] py-6 text-base font-semibold rounded-full mt-6"
+              >
+                {isLoading ? 'Signing in...' : 'Sign In'}
+              </Button>
+            </form>
+          ) : (
+            <form onSubmit={handleSignUp} className="space-y-5">
+              <div>
+                <Label htmlFor="signup-email" className="text-[var(--text)] font-medium">
+                  Email Address
+                </Label>
+                <Input
+                  id="signup-email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="signup-password" className="text-[var(--text)] font-medium">
+                  Password
+                </Label>
+                <Input
+                  id="signup-password"
+                  type="password"
+                  placeholder="Create a password (min 6 characters)"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={6}
+                  className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] py-6 rounded-xl focus:ring-2 focus:ring-[var(--ring)] focus:border-[var(--accent)]"
+                />
+                <p className="text-xs text-[var(--text-muted)] mt-2">Must be at least 6 characters</p>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] py-6 text-base font-semibold rounded-full mt-6"
+              >
+                {isLoading ? 'Creating account...' : 'Create Account'}
+              </Button>
+            </form>
+          )}
+
+          <div className="mt-8 space-y-4">
+            {mode === 'signup' && (
+              <div className="p-4 rounded-xl bg-[var(--accent)]/5 border border-[var(--accent)]/20">
+                <p className="text-sm text-[var(--text-dim)] leading-relaxed">
+                  <strong className="text-[var(--accent)]">✨ New here?</strong> After creating your account, you'll verify your email and answer a quick questionnaire to get personalized Medical Intelligence recommendations.
+                </p>
+              </div>
+            )}
+            
+            {mode === 'signin' && (
+              <div className="p-4 rounded-xl bg-[var(--accent-2)]/5 border border-[var(--accent-2)]/20">
+                <p className="text-sm text-[var(--text-dim)] leading-relaxed">
+                  <strong className="text-[var(--accent-2)]">👋 Welcome back!</strong> Sign in to access your dashboard and view your personalized peptide stack.
+                </p>
+              </div>
+            )}
+
+            <div className="text-center pt-2">
+              <button
+                type="button"
+                onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+                className="text-[var(--accent)] hover:text-[var(--accent-2)] text-sm font-medium transition-colors"
+              >
+                {mode === 'signin' 
+                  ? "Don't have an account? Sign Up →" 
+                  : 'Already have an account? Sign In →'}
+              </button>
+            </div>
+          </div>
+        </Card>
       </div>
     </MainLayout>
   );
 }
-

@@ -16,11 +16,17 @@ import { supabase } from '@/lib/supabase';
 import { 
   demographicsSchema, 
   medicalSchema, 
-  lifestyleSchema, 
+  lifestyleSchema,
+  dietarySchema,
+  stressSchema,
+  recoverySchema,
   goalsSchema,
   type DemographicsData,
   type MedicalData,
   type LifestyleData,
+  type DietaryData,
+  type StressData,
+  type RecoveryData,
   type GoalsData
 } from '@/lib/schemas';
 
@@ -138,7 +144,10 @@ export default function IntakePage() {
     { title: 'Demographics', component: StepA },
     { title: 'Medical History', component: StepB },
     { title: 'Lifestyle', component: StepC },
-    { title: 'Goals', component: StepD },
+    { title: 'Dietary Approach', component: StepD },
+    { title: 'Stress Level', component: StepE },
+    { title: 'Recovery Pattern', component: StepF },
+    { title: 'Goals', component: StepG },
   ];
 
   const CurrentStepComponent = steps[currentStep].component;
@@ -510,8 +519,143 @@ function StepC({ data, onNext, onBack, showBack }: any) {
   );
 }
 
-// Step D: Goals
-function StepD({ data, onNext, onBack, showBack }: any) {
+// Step D: Dietary Approach
+function StepD({ data, onNext, onBack }: any) {
+  const { handleSubmit, formState: { errors }, setValue, watch } = useForm<DietaryData>({
+    resolver: zodResolver(dietarySchema),
+    defaultValues: data.dietary || {},
+  });
+
+  const diet = watch('diet');
+
+  return (
+    <Card className="bg-slate-800/50 border-slate-700 p-8">
+      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step D: Dietary Approach</h2>
+      
+      <form onSubmit={handleSubmit((formData) => onNext({ dietary: formData }))} className="space-y-6">
+        <div>
+          <Label htmlFor="diet" className="text-slate-300">
+            What best describes your dietary approach?
+          </Label>
+          <Select onValueChange={(value) => setValue('diet', value as any)} value={diet}>
+            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+              <SelectValue placeholder="Select dietary approach" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="balanced">Balanced (carbs, protein, fats)</SelectItem>
+              <SelectItem value="high_protein_low_carb">High-protein / low-carb</SelectItem>
+              <SelectItem value="keto_low_carb">Keto / very low-carb</SelectItem>
+              <SelectItem value="plant_based_vegetarian">Plant-based / vegetarian</SelectItem>
+              <SelectItem value="intermittent_fasting">Intermittent fasting</SelectItem>
+              <SelectItem value="no_specific_diet">No specific diet</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.diet && <p className="text-red-400 text-sm mt-1">{errors.diet.message}</p>}
+        </div>
+
+        <div className="flex gap-4 pt-4">
+          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+            Back
+          </Button>
+          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+            Next
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+// Step E: Stress Level
+function StepE({ data, onNext, onBack }: any) {
+  const { handleSubmit, formState: { errors }, setValue, watch } = useForm<StressData>({
+    resolver: zodResolver(stressSchema),
+    defaultValues: data.stress || {},
+  });
+
+  const stress = watch('stress');
+
+  return (
+    <Card className="bg-slate-800/50 border-slate-700 p-8">
+      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step E: Stress Level</h2>
+      
+      <form onSubmit={handleSubmit((formData) => onNext({ stress: formData }))} className="space-y-6">
+        <div>
+          <Label htmlFor="stress" className="text-slate-300">
+            How would you describe your typical stress level?
+          </Label>
+          <Select onValueChange={(value) => setValue('stress', value as any)} value={stress}>
+            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+              <SelectValue placeholder="Select stress level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="low">Low - Rarely stressed</SelectItem>
+              <SelectItem value="moderate">Moderate - Occasional stress</SelectItem>
+              <SelectItem value="high">High - Chronic or frequent stress</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.stress && <p className="text-red-400 text-sm mt-1">{errors.stress.message}</p>}
+        </div>
+
+        <div className="flex gap-4 pt-4">
+          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+            Back
+          </Button>
+          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+            Next
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+// Step F: Recovery Pattern
+function StepF({ data, onNext, onBack }: any) {
+  const { handleSubmit, formState: { errors }, setValue, watch } = useForm<RecoveryData>({
+    resolver: zodResolver(recoverySchema),
+    defaultValues: data.recovery || {},
+  });
+
+  const recovery = watch('recovery');
+
+  return (
+    <Card className="bg-slate-800/50 border-slate-700 p-8">
+      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step F: Recovery & Fatigue Pattern</h2>
+      
+      <form onSubmit={handleSubmit((formData) => onNext({ recovery: formData }))} className="space-y-6">
+        <div>
+          <Label htmlFor="recovery" className="text-slate-300">
+            How quickly do you typically recover from workouts or physical exertion?
+          </Label>
+          <Select onValueChange={(value) => setValue('recovery', value as any)} value={recovery}>
+            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+              <SelectValue placeholder="Select recovery pattern" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="quick_1_day">Recover quickly - 1 day or less</SelectItem>
+              <SelectItem value="average_2_3_days">Average recovery - 2-3 days</SelectItem>
+              <SelectItem value="slow_4plus_days">Slow recovery - 4+ days, persistent soreness/fatigue</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.recovery && <p className="text-red-400 text-sm mt-1">{errors.recovery.message}</p>}
+        </div>
+
+        <div className="flex gap-4 pt-4">
+          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+            Back
+          </Button>
+          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+            Next
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+// Step G: Goals
+function StepG({ data, onNext, onBack, showBack }: any) {
   const { register, handleSubmit, formState: { errors }, setValue, watch } = useForm<GoalsData>({
     resolver: zodResolver(goalsSchema),
     defaultValues: data.goals || { selectedGoals: [], customGoal: '' },
@@ -529,7 +673,7 @@ function StepD({ data, onNext, onBack, showBack }: any) {
 
   return (
     <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step D: Goals</h2>
+      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step G: Goals</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ goals: { ...formData, selectedGoals } }))} className="space-y-6">
         <div>

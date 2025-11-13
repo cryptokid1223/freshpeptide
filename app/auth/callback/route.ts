@@ -36,6 +36,9 @@ export async function GET(request: Request) {
         intake.demographics && 
         intake.medical && 
         intake.lifestyle && 
+        intake.dietary &&
+        intake.stress &&
+        intake.recovery &&
         intake.goals;
 
       if (hasCompletedIntake) {

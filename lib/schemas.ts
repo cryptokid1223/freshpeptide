@@ -22,7 +22,22 @@ export const lifestyleSchema = z.object({
   alcohol: z.enum(['none', 'occasional_1_2_monthly', 'light_1_2_weekly', 'moderate_3_5_weekly', 'heavy_6plus_weekly', 'daily']),
 });
 
-// Goals schema (Step D)
+// Dietary Approach schema (Step D)
+export const dietarySchema = z.object({
+  diet: z.enum(['balanced', 'high_protein_low_carb', 'keto_low_carb', 'plant_based_vegetarian', 'intermittent_fasting', 'no_specific_diet']),
+});
+
+// Stress Level schema (Step E)
+export const stressSchema = z.object({
+  stress: z.enum(['low', 'moderate', 'high']),
+});
+
+// Recovery Pattern schema (Step F)
+export const recoverySchema = z.object({
+  recovery: z.enum(['quick_1_day', 'average_2_3_days', 'slow_4plus_days']),
+});
+
+// Goals schema (Step G)
 export const goalsSchema = z.object({
   selectedGoals: z.array(z.string()).min(1, 'Please select at least one goal'),
   customGoal: z.string().optional(),
@@ -33,12 +48,18 @@ export const intakeSchema = z.object({
   demographics: demographicsSchema,
   medical: medicalSchema,
   lifestyle: lifestyleSchema,
+  dietary: dietarySchema,
+  stress: stressSchema,
+  recovery: recoverySchema,
   goals: goalsSchema,
 });
 
 export type DemographicsData = z.infer<typeof demographicsSchema>;
 export type MedicalData = z.infer<typeof medicalSchema>;
 export type LifestyleData = z.infer<typeof lifestyleSchema>;
+export type DietaryData = z.infer<typeof dietarySchema>;
+export type StressData = z.infer<typeof stressSchema>;
+export type RecoveryData = z.infer<typeof recoverySchema>;
 export type GoalsData = z.infer<typeof goalsSchema>;
 export type IntakeFormData = z.infer<typeof intakeSchema>;
 
