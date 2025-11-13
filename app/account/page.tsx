@@ -49,7 +49,7 @@ export default function AccountPage() {
         .eq('user_id', session.user.id)
         .limit(1);
 
-      setBriefGenerated(briefRecords && briefRecords.length > 0);
+      setBriefGenerated(!!(briefRecords && briefRecords.length > 0));
     };
 
     loadAccountData();
