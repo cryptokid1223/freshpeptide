@@ -166,7 +166,7 @@ export default function LibraryPage() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-14 w-auto object-contain"
+              className="h-20 w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">
@@ -190,7 +190,7 @@ export default function LibraryPage() {
             <img 
               src="/library.png" 
               alt="Peptide Library" 
-              className="w-64 h-64 object-contain"
+              className="w-full max-w-md h-auto object-contain"
             />
           </div>
           <div className="text-3xl md:text-4xl font-light text-[#5C4A3A] min-h-[48px]">

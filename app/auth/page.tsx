@@ -130,7 +130,7 @@ export default function AuthPage() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-14 w-auto object-contain"
+              className="h-20 w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">
