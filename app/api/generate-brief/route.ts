@@ -240,30 +240,87 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    • Monitor for side effects before increasing
    
    PEPTIDE-SPECIFIC DOSING (with insulin syringe units):
-   • BPC-157: 
-     - First-time: 200-250 mcg SC/IM daily = 20-25 units on insulin syringe (if reconstituted 2mg/mL)
-     - Experienced: 250-500 mcg SC/IM daily = 25-50 units
-   • TB-500: 
-     - First-time: 2 mg SC/IM 2x/week = 20 units (if reconstituted 10mg/mL)
-     - Experienced: 2-2.5 mg SC/IM 2x/week loading = 20-25 units
+   
+   **WEIGHT LOSS / METABOLIC:**
+   • Semaglutide (GLP-1 agonist, FDA approved):
+     - First-time: 0.25 mg SC weekly, titrate up by 0.25 mg every 4 weeks
+     - Standard: 0.5-2.4 mg SC weekly
+   • Tirzepatide (GLP-1/GIP agonist, FDA approved):
+     - First-time: 2.5 mg SC weekly, titrate up
+     - Standard: 5-15 mg SC weekly
+   • Retatrutide (Triple agonist, research):
+     - Research protocols: 1-12 mg SC weekly (investigational)
+   • Tesamorelin (GHRH analog):
+     - Standard: 2 mg SC daily = 20 units (if 10mg/mL)
+   • AOD-9604 (Modified GH fragment):
+     - First-time: 250 mcg SC daily = 25 units (if 1mg/mL)
+     - Standard: 250-500 mcg SC daily
+   
+   **MUSCLE GROWTH / ANABOLIC:**
    • CJC-1295 (no DAC): 
      - First-time: 100 mcg SC 1-2x daily = 10 units (if 1mg/mL)
-     - Experienced: 100-200 mcg SC 2-3x daily = 10-20 units
+     - Experienced: 100-200 mcg SC 2-3x daily
    • CJC-1295 (with DAC): 
-     - First-time: 0.5-1 mg SC once weekly = 25-50 units (if 2mg/mL)
-     - Experienced: 1-2 mg SC once weekly = 50-100 units
+     - First-time: 0.5-1 mg SC weekly = 25-50 units (if 2mg/mL)
+     - Experienced: 1-2 mg SC weekly
    • Ipamorelin: 
      - First-time: 200 mcg SC 2x daily = 20 units (if 1mg/mL)
-     - Experienced: 200-300 mcg SC 2-3x daily = 20-30 units
-   • Selank: 250-500 mcg intranasal or SC 1-2x daily
-   • Semax: 300-600 mcg intranasal 1-2x daily
-   • GHK-Cu: 
+     - Experienced: 200-300 mcg SC 2-3x daily
+   • GHRP-6:
+     - First-time: 100 mcg SC 2x daily = 10 units (if 1mg/mL)
+     - Standard: 100-200 mcg SC 2-3x daily
+   • Follistatin-344:
+     - Research: 100 mcg SC daily (limited human data)
+   • IGF-1 LR3:
+     - Research: 20-40 mcg SC daily (research only)
+   
+   **INJURY RECOVERY / TISSUE REPAIR:**
+   • BPC-157: 
+     - First-time: 200-250 mcg SC/IM daily = 20-25 units (if 2mg/mL)
+     - Experienced: 250-500 mcg SC/IM daily
+   • TB-500: 
+     - First-time: 2 mg SC/IM 2x/week = 20 units (if 10mg/mL)
+     - Experienced: 2-2.5 mg SC/IM 2x/week loading
+   • KPV (Anti-inflammatory):
+     - Standard: 500-1000 mcg SC daily = 50-100 units (if 1mg/mL)
+   
+   **COGNITIVE ENHANCEMENT / NEUROPROTECTION:**
+   • Semax:
+     - First-time: 300 mcg intranasal 1x daily
+     - Standard: 300-600 mcg intranasal 1-2x daily
+   • Selank:
+     - First-time: 250 mcg intranasal 1x daily
+     - Standard: 250-500 mcg intranasal 1-2x daily
+   • Dihexa:
+     - Research: 5-10 mg oral daily (research only, limited data)
+   • P21 (Cerebrolysin derivative):
+     - Research: 10-30 mg SC daily (research only)
+   • NSI-189:
+     - Research: 40 mg oral 3x daily (clinical trials)
+   
+   **ANTI-AGING / LONGEVITY:**
+   • Epithalon (Epitalon):
+     - Cycle: 5-10 mg SC daily for 10-20 days, 2x/year
+   • GHK-Cu (Copper peptide):
      - First-time: 1 mg SC daily = 10 units (if 10mg/mL)
-     - Experienced: 1-3 mg SC daily = 10-30 units
-   • Semaglutide: 
-     - First-time: 0.25 mg SC once weekly = titrate per FDA protocol
-     - Standard: 0.5-2.4 mg SC weekly (FDA approved)
-   • PT-141: 1.75 mg SC as needed = per FDA approved dosing
+     - Standard: 1-3 mg SC daily or topical
+   • MOTS-c (Mitochondrial):
+     - Standard: 5-10 mg SC 2-3x/week
+   • Humanin:
+     - Research: 1-5 mg SC daily (limited human data)
+   
+   **SEXUAL HEALTH:**
+   • PT-141 (Bremelanotide, FDA approved):
+     - Standard: 1.75 mg SC as needed, max 1x/24h
+   • Kisspeptin:
+     - Research: 1-10 mcg/kg IV (research protocols)
+   
+   **SKIN / HAIR / COSMETIC:**
+   • GHK-Cu variants (topical or SC)
+   • PTD-DBM (Hair growth):
+     - Research: Topical application (limited data)
+   • Melanotan II (tanning):
+     - Research: 250-500 mcg SC 2-3x/week (not FDA approved)
    
    INSULIN SYRINGE CALCULATION:
    - Standard insulin syringes are 1mL (100 units)
@@ -289,19 +346,35 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    - Include drug interactions with their current medications
    - Use proper medical terminology with patient-friendly explanations
    
-4. PERSONALIZATION:
+4. PERSONALIZATION & PEPTIDE SELECTION:
    - Analyze demographics, medical history, medications, lifestyle, diet, stress, recovery, peptide experience, and goals
    - Write directly to the person using "you" and "your"
    - Tailor peptide selection to their specific profile
    - Address their specific health concerns and goals
-   - **CRITICAL**: Adjust dosing based on peptide experience:
-     * FIRST-TIME USERS (never_used): Use ONLY lower end of dosage ranges, emphasize starting slow
-     * BEGINNERS (1-3 months): Use lower-to-mid ranges, include titration instructions
-     * INTERMEDIATE/EXPERIENCED: Can use mid-to-upper ranges based on goals
-   - **CRITICAL**: Adjust injection guidance based on injection comfort:
-     * Never injected/Uncomfortable: Include detailed injection technique, site rotation, sterile practice
-     * Somewhat comfortable: Brief injection reminders only
-     * Very comfortable: Minimal injection instruction needed
+   
+   **CRITICAL - PEPTIDE VARIETY & GOAL MATCHING:**
+   - DO NOT default to the same peptides (BPC-157, TB-500, CJC-1295, Ipamorelin) for every user
+   - Match peptides SPECIFICALLY to their PRIMARY goals:
+     * **Fat loss/Weight management goals** → Semaglutide, Tirzepatide, Tesamorelin, AOD-9604, Retatrutide
+     * **Muscle growth goals** → GHRP-6, CJC-1295, Ipamorelin, Follistatin, IGF-1 LR3
+     * **Cognitive enhancement goals** → Semax, Selank, Dihexa, P21, NSI-189
+     * **Anti-aging goals** → Epithalon, GHK-Cu, MOTS-c, Humanin
+     * **Injury recovery goals** → BPC-157, TB-500, KPV
+     * **Sexual health goals** → PT-141, Kisspeptin
+     * **Skin/hair goals** → GHK-Cu, PTD-DBM, Melanotan II
+   - Consider previously used peptides (if provided) and avoid recommending the same ones if they didn't work
+   - Prioritize newer, more effective peptides when appropriate (e.g., Tirzepatide over Semaglutide for weight loss if suitable)
+   - Provide 2-4 peptides that create a synergistic stack for their SPECIFIC goals
+   
+   **CRITICAL - DOSING ADJUSTMENTS:**
+   - **FIRST-TIME USERS (never_used)**: Use ONLY lower end of dosage ranges, emphasize starting slow
+   - **BEGINNERS (1-3 months)**: Use lower-to-mid ranges, include titration instructions
+   - **INTERMEDIATE/EXPERIENCED**: Can use mid-to-upper ranges based on goals
+   
+   **CRITICAL - INJECTION GUIDANCE:**
+   - **Never injected/Uncomfortable**: Include detailed injection technique, site rotation, sterile practice
+   - **Somewhat comfortable**: Brief injection reminders only
+   - **Very comfortable**: Minimal injection instruction needed
    
 5. SAFETY EMPHASIS:
    - Always note research-only peptides lack FDA approval for human use

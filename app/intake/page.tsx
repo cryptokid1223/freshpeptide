@@ -21,13 +21,15 @@ import {
   stressSchema,
   recoverySchema,
   goalsSchema,
+  experienceSchema,
   type DemographicsData,
   type MedicalData,
   type LifestyleData,
   type DietaryData,
   type StressData,
   type RecoveryData,
-  type GoalsData
+  type GoalsData,
+  type ExperienceData
 } from '@/lib/schemas';
 
 const GOAL_OPTIONS = [
@@ -148,6 +150,7 @@ export default function IntakePage() {
     { title: 'Stress Level', component: StepE },
     { title: 'Recovery Pattern', component: StepF },
     { title: 'Goals', component: StepG },
+    { title: 'Peptide Experience', component: StepH },
   ];
 
   const CurrentStepComponent = steps[currentStep].component;
@@ -710,6 +713,103 @@ function StepG({ data, onNext, onBack, showBack }: any) {
             className="bg-slate-900 border-slate-600 text-slate-100 mt-2 min-h-[100px]"
             placeholder="Describe any additional goals or specific outcomes you'd like to achieve"
           />
+        </div>
+
+        <div className="flex gap-4 pt-4">
+          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+            Back
+          </Button>
+          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+            Continue
+          </Button>
+        </div>
+      </form>
+    </Card>
+  );
+}
+
+// Step H: Peptide Experience
+function StepH({ data, onNext, onBack }: any) {
+  const { register, handleSubmit, formState: { errors }, watch } = useForm<ExperienceData>({
+    resolver: zodResolver(experienceSchema),
+    defaultValues: data.experience || {
+      peptideExperience: 'never_used',
+      previousPeptides: '',
+      injectionComfort: 'never_injected',
+    },
+  });
+
+  const selectedExperience = watch('peptideExperience');
+
+  return (
+    <Card className="bg-slate-800/50 border-slate-700 p-8">
+      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step H: Peptide Experience</h2>
+      
+      <form onSubmit={handleSubmit((formData) => onNext({ experience: formData }))} className="space-y-6">
+        <div>
+          <Label htmlFor="peptideExperience" className="text-slate-300">
+            What is your experience level with peptides? *
+          </Label>
+          <Select
+            onValueChange={(value) => register('peptideExperience').onChange({ target: { value } })}
+            defaultValue={data.experience?.peptideExperience || 'never_used'}
+          >
+            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+              <SelectValue placeholder="Select your experience level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="never_used">Never used peptides before (FIRST-TIME USER)</SelectItem>
+              <SelectItem value="beginner_1_3_months">Beginner (1-3 months experience)</SelectItem>
+              <SelectItem value="intermediate_3_12_months">Intermediate (3-12 months experience)</SelectItem>
+              <SelectItem value="experienced_1plus_years">Experienced (1+ years)</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.peptideExperience && (
+            <p className="text-red-400 text-sm mt-1">{errors.peptideExperience.message}</p>
+          )}
+        </div>
+
+        {selectedExperience !== 'never_used' && (
+          <div>
+            <Label htmlFor="previousPeptides" className="text-slate-300">
+              Which peptides have you used before? (Optional)
+            </Label>
+            <Textarea
+              id="previousPeptides"
+              {...register('previousPeptides')}
+              className="bg-slate-900 border-slate-600 text-slate-100 mt-2 min-h-[100px]"
+              placeholder="e.g., BPC-157, CJC-1295, Ipamorelin, TB-500, Semaglutide, etc."
+            />
+            <p className="text-slate-400 text-xs mt-1">
+              This helps us avoid recommending peptides that didn't work well for you
+            </p>
+          </div>
+        )}
+
+        <div>
+          <Label htmlFor="injectionComfort" className="text-slate-300">
+            How comfortable are you with self-injecting peptides? *
+          </Label>
+          <Select
+            onValueChange={(value) => register('injectionComfort').onChange({ target: { value } })}
+            defaultValue={data.experience?.injectionComfort || 'never_injected'}
+          >
+            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+              <SelectValue placeholder="Select your comfort level" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="never_injected">Never self-injected before</SelectItem>
+              <SelectItem value="uncomfortable_need_guidance">Uncomfortable with injections - need detailed guidance</SelectItem>
+              <SelectItem value="somewhat_comfortable">Somewhat comfortable with injections</SelectItem>
+              <SelectItem value="very_comfortable">Very comfortable with self-injections</SelectItem>
+            </SelectContent>
+          </Select>
+          {errors.injectionComfort && (
+            <p className="text-red-400 text-sm mt-1">{errors.injectionComfort.message}</p>
+          )}
+          <p className="text-slate-400 text-xs mt-2">
+            We'll adjust our instructions based on your comfort level
+          </p>
         </div>
 
         <div className="flex gap-4 pt-4">
