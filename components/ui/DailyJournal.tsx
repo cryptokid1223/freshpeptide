@@ -65,8 +65,8 @@ export function DailyJournal({
   }) => (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <Label className="text-[var(--text)] font-medium">{label}</Label>
-        <span className="text-2xl font-bold text-[var(--accent)]">{value}</span>
+        <Label className="text-sm sm:text-base text-[var(--text)] font-medium">{label}</Label>
+        <span className="text-xl sm:text-2xl font-bold text-[var(--accent)]">{value}</span>
       </div>
       <input
         type="range"
@@ -87,8 +87,8 @@ export function DailyJournal({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid md:grid-cols-3 gap-6">
+    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
         <SliderInput
           label="Mood"
           value={mood}
@@ -115,7 +115,7 @@ export function DailyJournal({
       </div>
 
       <div>
-        <Label htmlFor="journal" className="text-[var(--text)] font-medium mb-2 block">
+        <Label htmlFor="journal" className="text-sm sm:text-base text-[var(--text)] font-medium mb-2 block">
           How are you feeling today? Any observations?
         </Label>
         <Textarea
@@ -123,15 +123,15 @@ export function DailyJournal({
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Describe your overall well-being, any changes you've noticed, thoughts about your stack..."
-          rows={6}
-          className="bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] leading-relaxed"
+          rows={5}
+          className="bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] leading-relaxed text-sm sm:text-base"
         />
       </div>
 
       <Button
         type="submit"
         disabled={isSaving}
-        className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold py-6"
+        className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold py-5 sm:py-6 text-base sm:text-lg"
       >
         {isSaving ? 'Saving...' : 'Save Journal Entry'}
       </Button>

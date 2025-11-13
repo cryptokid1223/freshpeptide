@@ -174,20 +174,20 @@ export default function JournalPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
-        <div className="mb-12">
-          <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
+      <div className="container mx-auto px-4 py-8 sm:py-16 max-w-[1180px]">
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
             Journal & Notes
           </h1>
-          <p className="text-[var(--text-dim)]">
+          <p className="text-sm sm:text-base text-[var(--text-dim)]">
             Track your daily well-being and observations about your peptide stack
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Daily Journal */}
           <div>
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6 mb-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6 mb-4 sm:mb-6" style={{ boxShadow: 'var(--shadow)' }}>
               <SectionTitle subtitle={new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}>
                 Daily Check-In
               </SectionTitle>
@@ -203,7 +203,7 @@ export default function JournalPage() {
 
           {/* Peptide-Specific Notes */}
           <div>
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
               <SectionTitle>Peptide-Specific Notes</SectionTitle>
               
               {brief && brief.candidatePeptides.length > 0 ? (
@@ -224,7 +224,7 @@ export default function JournalPage() {
                   </div>
 
                   {selectedPeptide && (
-                    <div className="max-h-[500px] overflow-y-auto">
+                    <div className="max-h-[400px] sm:max-h-[500px] overflow-y-auto">
                       <PeptideNotes
                         peptideName={selectedPeptide}
                         notes={peptideNotes}
@@ -235,9 +235,9 @@ export default function JournalPage() {
                   )}
                 </>
               ) : (
-                <div className="text-center py-12">
-                  <p className="text-[var(--text-dim)] mb-3">No peptide stack generated yet</p>
-                  <p className="text-sm text-[var(--text-muted)]">Generate your stack to start taking notes</p>
+                <div className="text-center py-8 sm:py-12">
+                  <p className="text-sm sm:text-base text-[var(--text-dim)] mb-3">No peptide stack generated yet</p>
+                  <p className="text-xs sm:text-sm text-[var(--text-muted)]">Generate your stack to start taking notes</p>
                 </div>
               )}
             </Card>
@@ -245,7 +245,7 @@ export default function JournalPage() {
         </div>
 
         {/* Weekly AI Summary */}
-        <div className="mt-8">
+        <div className="mt-6 sm:mt-8">
           <WeeklySummary
             summary={weeklySummary}
             isGenerating={isGeneratingSummary}

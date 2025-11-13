@@ -150,26 +150,28 @@ export default function TrackingPage() {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-16 max-w-[1180px]">
-        <div className="mb-12">
-          <h1 className="text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
+      <div className="container mx-auto px-4 py-8 sm:py-16 max-w-[1180px]">
+        <div className="mb-8 sm:mb-12">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-[-0.01em] text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-2">
             Peptide Tracking
           </h1>
-          <p className="text-[var(--text-dim)]">
+          <p className="text-sm sm:text-base text-[var(--text-dim)]">
             Log your peptide usage and monitor your progress
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Log Entry Form */}
           <div>
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle>Log New Entry</SectionTitle>
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
+              <h2 className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-4 sm:mb-6 tracking-[-0.01em]">
+                Log New Entry
+              </h2>
               
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                 {/* Peptide Selection */}
                 <div>
-                  <Label htmlFor="peptide" className="text-[var(--text)] font-medium">
+                  <Label htmlFor="peptide" className="text-sm sm:text-base text-[var(--text)] font-medium">
                     Peptide *
                   </Label>
                   {brief && brief.candidatePeptides.length > 0 ? (
@@ -192,14 +194,14 @@ export default function TrackingPage() {
                       onChange={(e) => setSelectedPeptide(e.target.value)}
                       placeholder="Enter peptide name"
                       required
-                      className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]"
+                      className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] text-sm sm:text-base"
                     />
                   )}
                 </div>
 
                 {/* Amount */}
                 <div>
-                  <Label htmlFor="amount" className="text-[var(--text)] font-medium">
+                  <Label htmlFor="amount" className="text-sm sm:text-base text-[var(--text)] font-medium">
                     Amount/Dosage
                   </Label>
                   <Input
@@ -207,13 +209,13 @@ export default function TrackingPage() {
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="e.g., 250 mcg"
-                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]"
+                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] text-sm sm:text-base"
                   />
                 </div>
 
                 {/* Route */}
                 <div>
-                  <Label htmlFor="route" className="text-[var(--text)] font-medium">
+                  <Label htmlFor="route" className="text-sm sm:text-base text-[var(--text)] font-medium">
                     Route of Administration
                   </Label>
                   <Select onValueChange={setRoute} value={route}>
@@ -233,7 +235,7 @@ export default function TrackingPage() {
 
                 {/* Date/Time */}
                 <div>
-                  <Label htmlFor="loggedAt" className="text-[var(--text)] font-medium">
+                  <Label htmlFor="loggedAt" className="text-sm sm:text-base text-[var(--text)] font-medium">
                     Date & Time *
                   </Label>
                   <Input
@@ -242,13 +244,13 @@ export default function TrackingPage() {
                     value={loggedAt}
                     onChange={(e) => setLoggedAt(e.target.value)}
                     required
-                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]"
+                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] text-sm sm:text-base"
                   />
                 </div>
 
                 {/* Effects */}
                 <div>
-                  <Label htmlFor="effects" className="text-[var(--text)] font-medium">
+                  <Label htmlFor="effects" className="text-sm sm:text-base text-[var(--text)] font-medium">
                     Positive Effects/Observations
                   </Label>
                   <Textarea
@@ -257,13 +259,13 @@ export default function TrackingPage() {
                     onChange={(e) => setEffects(e.target.value)}
                     placeholder="How did you feel? Any positive changes?"
                     rows={2}
-                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]"
+                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] text-sm sm:text-base"
                   />
                 </div>
 
                 {/* Side Effects */}
                 <div>
-                  <Label htmlFor="sideEffects" className="text-[var(--text)] font-medium">
+                  <Label htmlFor="sideEffects" className="text-sm sm:text-base text-[var(--text)] font-medium">
                     Side Effects
                   </Label>
                   <Textarea
@@ -272,13 +274,13 @@ export default function TrackingPage() {
                     onChange={(e) => setSideEffects(e.target.value)}
                     placeholder="Any adverse reactions or side effects?"
                     rows={2}
-                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]"
+                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] text-sm sm:text-base"
                   />
                 </div>
 
                 {/* Notes */}
                 <div>
-                  <Label htmlFor="notes" className="text-[var(--text)] font-medium">
+                  <Label htmlFor="notes" className="text-sm sm:text-base text-[var(--text)] font-medium">
                     Additional Notes
                   </Label>
                   <Textarea
@@ -287,14 +289,14 @@ export default function TrackingPage() {
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder="Any other observations or context?"
                     rows={3}
-                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)]"
+                    className="mt-2 bg-[var(--surface-2)] border-[var(--border)] text-[var(--text)] text-sm sm:text-base"
                   />
                 </div>
 
                 <Button
                   type="submit"
                   disabled={isSaving || !selectedPeptide}
-                  className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold py-6"
+                  className="w-full bg-gradient-to-b from-[#22C8FF] to-[#08A7E6] hover:opacity-90 text-[#001018] rounded-full font-semibold py-5 sm:py-6 text-base sm:text-lg"
                 >
                   {isSaving ? 'Saving...' : 'Save Log Entry'}
                 </Button>
@@ -304,54 +306,57 @@ export default function TrackingPage() {
 
           {/* Log History */}
           <div>
-            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
-              <SectionTitle>Recent Logs</SectionTitle>
+            <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-4 sm:p-6" style={{ boxShadow: 'var(--shadow)' }}>
+              <h2 className="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF] mb-4 sm:mb-6 tracking-[-0.01em]">
+                Recent Logs
+              </h2>
               
               {logs.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-[var(--text-dim)] mb-2">No logs yet</p>
-                  <p className="text-sm text-[var(--text-muted)]">Start tracking your peptide usage</p>
+                <div className="text-center py-8 sm:py-12">
+                  <p className="text-sm sm:text-base text-[var(--text-dim)] mb-2">No logs yet</p>
+                  <p className="text-xs sm:text-sm text-[var(--text-muted)]">Start tracking your peptide usage</p>
                 </div>
               ) : (
-                <div className="space-y-4 max-h-[600px] overflow-y-auto">
+                <div className="space-y-3 sm:space-y-4 max-h-[500px] sm:max-h-[600px] overflow-y-auto">
                   {logs.map((log) => (
                     <div
                       key={log.id}
-                      className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-4"
+                      className="rounded-xl border border-[var(--border)] bg-[var(--surface-2)] p-3 sm:p-4"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-[var(--accent)]">{log.peptide_name}</h3>
+                      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 sm:gap-2 mb-2">
+                        <h3 className="font-semibold text-sm sm:text-base text-[var(--accent)]">{log.peptide_name}</h3>
                         <span className="text-xs text-[var(--text-muted)]">
-                          {new Date(log.logged_at).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })} {new Date(log.logged_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                          {new Date(log.logged_at).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' })}{' '}
+                          {new Date(log.logged_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
                         </span>
                       </div>
                       
                       {log.amount && (
-                        <p className="text-sm text-[var(--text-dim)] mb-1">
+                        <p className="text-xs sm:text-sm text-[var(--text-dim)] mb-1">
                           <strong>Amount:</strong> {log.amount}
                         </p>
                       )}
                       
                       {log.route && (
-                        <p className="text-sm text-[var(--text-dim)] mb-1">
+                        <p className="text-xs sm:text-sm text-[var(--text-dim)] mb-1">
                           <strong>Route:</strong> {log.route.charAt(0).toUpperCase() + log.route.slice(1)}
                         </p>
                       )}
                       
                       {log.effects && (
-                        <p className="text-sm text-[var(--text-dim)] mb-1">
+                        <p className="text-xs sm:text-sm text-[var(--text-dim)] mb-1">
                           <strong className="text-[var(--ok)]">Effects:</strong> {log.effects}
                         </p>
                       )}
                       
                       {log.side_effects && (
-                        <p className="text-sm text-[var(--text-dim)] mb-1">
+                        <p className="text-xs sm:text-sm text-[var(--text-dim)] mb-1">
                           <strong className="text-[var(--warn)]">Side Effects:</strong> {log.side_effects}
                         </p>
                       )}
                       
                       {log.notes && (
-                        <p className="text-sm text-[var(--text-dim)]">
+                        <p className="text-xs sm:text-sm text-[var(--text-dim)]">
                           <strong>Notes:</strong> {log.notes}
                         </p>
                       )}
