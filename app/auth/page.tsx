@@ -105,25 +105,14 @@ export default function AuthPage() {
 
       if (authError) throw authError;
 
-      if (data.user) {
-        // Profile is automatically created by database trigger
-        // Wait a moment for the trigger to complete
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Verify profile was created
-        const { data: profileData, error: profileError } = await supabase
-          .from('profiles')
-          .select('id')
-          .eq('id', data.user.id)
-          .single();
-
-        if (profileError || !profileData) {
-          console.error('Profile verification error:', profileError);
-          setError('Account created but profile setup failed. Please try signing in or contact support.');
-        } else {
-          setMessage('Account created successfully! ' + (data.user.identities && data.user.identities.length > 0 ? 'Check your email to verify your account.' : 'You can now sign in!'));
-        }
-      }
+      // Success! Profile will be created automatically by database trigger
+      setMessage('Account created! You can now sign in.');
+      
+      // Auto-switch to sign in after 2 seconds
+      setTimeout(() => {
+        setMode('signin');
+        setMessage('');
+      }, 2000);
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
     } finally {

@@ -22,10 +22,7 @@ export async function GET(request: Request) {
       }
 
       if (data.user) {
-        // Profile is automatically created by database trigger
-        // Wait a moment to ensure trigger has completed
-        await new Promise(resolve => setTimeout(resolve, 500));
-
+        // Profile is created automatically by database trigger
         // Check if user has completed intake
         const { data: intakeRecord } = await supabase
           .from('intake')
