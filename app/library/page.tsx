@@ -6,7 +6,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { SectionTitle } from '@/components/ui/SectionTitle';
-import { StatusPill } from '@/components/ui/StatusPill';
 import { PeptideMiniCard } from '@/components/ui/PeptideMiniCard';
 import { CategoryChips } from '@/components/ui/CategoryChips';
 
@@ -4804,10 +4803,7 @@ export default function LibraryPage() {
             </p>
           </div>
           <h2 className="text-2xl font-bold text-[var(--accent)] mb-2 tracking-[-0.01em]">{peptideOfTheDay.name}</h2>
-          <div className="mb-3">
-            <StatusPill status={peptideOfTheDay.regulatory_status} />
-          </div>
-          <p className="text-sm text-[var(--text-dim)] mb-4 leading-relaxed">{peptideOfTheDay.summary}</p>
+          <p className="text-sm text-[var(--text-dim)] mb-4 leading-relaxed mt-3">{peptideOfTheDay.summary}</p>
           <Button
             onClick={() => {
               setSearchQuery('');
@@ -4911,12 +4907,9 @@ export default function LibraryPage() {
           <div className="hidden lg:block sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
             {selectedPeptide ? (
               <Card className="rounded-2xl border border-[var(--border)] bg-[var(--surface-1)] p-6" style={{ boxShadow: 'var(--shadow)' }}>
-                <h2 className="text-2xl font-bold text-[var(--accent)] mb-3 tracking-[-0.01em]">
+                <h2 className="text-2xl font-bold text-[var(--accent)] mb-4 tracking-[-0.01em]">
                     {selectedPeptide.name}
                   </h2>
-                <div className="mb-4">
-                  <StatusPill status={selectedPeptide.regulatory_status} />
-                </div>
 
                 <div className="space-y-6">
                     <div>
@@ -5039,10 +5032,6 @@ export default function LibraryPage() {
 
               {/* Content */}
               <div className="p-4">
-                <div className="mb-4">
-                  <StatusPill status={selectedPeptide.regulatory_status} />
-                </div>
-
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-base font-semibold text-[var(--text)] mb-2 flex items-center gap-2">

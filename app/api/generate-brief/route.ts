@@ -377,21 +377,38 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    - ALWAYS include both mcg/mg AND syringe units
    - Example: "250 mcg (25 units on insulin syringe if reconstituted at 1mg/mL)"
 
-2. EVIDENCE REQUIREMENTS (MANDATORY):
-   - Use your extensive training knowledge of peptide research literature
-   - Each peptide MUST have 1-2 research articles that DIRECTLY study THAT SPECIFIC peptide
-   - Draw from the thousands of studies in your training data
+2. EVIDENCE REQUIREMENTS (MANDATORY - EXTREMELY STRICT):
+   **CRITICAL: If you recommend a peptide, you MUST cite research that DIRECTLY studies THAT peptide by name**
+   
+   - Each peptide MUST have 1-2 research articles where the peptide name appears in the title, abstract, or is the primary subject
+   - **NEVER cite generic "peptide therapy" or unrelated studies**
+   - **NEVER make up fake research articles**
    - Include actual PubMed PMID numbers in URLs: https://pubmed.ncbi.nlm.nih.gov/[PMID]/
-   - Article must relate to the claimed benefits or mechanism
-   - NO generic peptide articles - each must be specific to the peptide recommended
-   - Use your knowledge of clinical trials, preclinical studies, and review papers
+   - The article MUST directly study the peptide you're recommending
+   - Use your knowledge of clinical trials, preclinical studies, and review papers FROM YOUR TRAINING
    
-   EXAMPLE VALID EVIDENCE FROM YOUR TRAINING:
-   If recommending BPC-157 → Cite specific BPC-157 research from your knowledge (e.g., PMID: 22698226)
-   If recommending Tirzepatide → Cite SURMOUNT or SURPASS trials from your training
-   If recommending Semax → Cite specific Semax neuroprotection studies you know
+   **STRICT VALIDATION RULES:**
+   - If recommending **Semaglutide** → MUST cite Semaglutide studies (STEP trials, SUSTAIN trials)
+   - If recommending **Tirzepatide** → MUST cite Tirzepatide studies (SURMOUNT, SURPASS trials)
+   - If recommending **BPC-157** → MUST cite BPC-157 specific research (NOT generic wound healing)
+   - If recommending **Semax** → MUST cite Semax specific studies (NOT generic nootropics)
+   - If recommending **Epithalon** → MUST cite Epithalon/Epitalon studies (NOT generic anti-aging)
    
-   **Draw from your extensive medical literature training to provide accurate, verifiable citations**
+   **IF YOU DON'T KNOW ACTUAL RESEARCH FOR A PEPTIDE:**
+   - State: "Limited published human studies available" in the evidence section
+   - Cite preclinical/animal studies if that's all that exists
+   - Be honest about the research status
+   - DO NOT make up fake studies
+   
+   **INVALID EXAMPLES (DO NOT DO THIS):**
+   ❌ Recommending BPC-157 → Citing generic "peptide wound healing" study
+   ❌ Recommending Selank → Citing generic "anxiety treatment" study
+   ❌ Making up fake journal names or PMIDs
+   
+   **VALID EXAMPLES:**
+   ✅ Recommending Semaglutide → Citing "Once-Weekly Semaglutide in Adults with Overweight or Obesity (STEP 1 trial)"
+   ✅ Recommending BPC-157 → Citing "Stable Gastric Pentadecapeptide BPC 157" with actual PMID
+   ✅ Admitting "Limited human data available; evidence based on animal studies" when that's the truth
    
 3. CLINICAL ACCURACY:
    - State regulatory status accurately (FDA-approved vs Research-only vs Compounded)
@@ -468,11 +485,11 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
   "keyRisks": ["Array of 6-10 specific risks considering YOUR health profile. Written directly to the person."],
   "evidenceList": [
     {
-      "title": "Actual published research title - MUST directly study the specific peptide recommended",
+      "title": "MUST be actual published research title that DIRECTLY studies the peptide by name. If citing BPC-157, title must mention BPC-157. If citing Semaglutide, title must mention Semaglutide.",
       "year": 2015,
-      "source": "Actual journal name",
-      "summary": "Detailed summary of findings. Explain what this study found about THIS specific peptide and how it supports YOUR recommendation.",
-      "url": "Actual PubMed URL with PMID (https://pubmed.ncbi.nlm.nih.gov/[PMID]/) - MUST be real and verifiable"
+      "source": "Actual journal name (e.g., New England Journal of Medicine, Journal of Clinical Endocrinology)",
+      "summary": "Detailed summary that PROVES this study is about the specific peptide. Start with: 'This study specifically investigated [PEPTIDE NAME]...' Explain what was found about THIS EXACT peptide.",
+      "url": "Actual PubMed URL with real PMID (https://pubmed.ncbi.nlm.nih.gov/[PMID]/) - MUST be verifiable. If unknown, use: 'Limited published data' in summary instead of fake URL"
     }
   ],
   "medicalConsiderations": {
