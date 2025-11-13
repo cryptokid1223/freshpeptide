@@ -45,8 +45,12 @@ export default function Home() {
       <main className="container mx-auto px-4 py-16 max-w-[1180px] relative z-10">
         {/* Hero Section */}
         <div className="text-center mb-16 pt-12">
-          <h1 className="text-5xl md:text-6xl font-extrabold tracking-[-0.01em] mb-4 text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF]">
-            FreshPeptide
+          <h1 className="text-5xl md:text-6xl font-extrabold tracking-[-0.01em] mb-4">
+            <TypeWriter 
+              text="FreshPeptide" 
+              speed={120}
+              className="text-transparent bg-clip-text bg-gradient-to-b from-[#6EE7F5] to-[#12B3FF]"
+            />
           </h1>
           <p className="text-xl text-[var(--text)] font-medium mb-3">
             Medical Intelligence Peptide Research Platform
