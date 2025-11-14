@@ -119,13 +119,14 @@ export default function AuthPage() {
           .eq('id', data.user.id);
       }
 
-      // Success! Redirect to consent page to start questionnaire
-      setMessage('Account created! Taking you to the questionnaire...');
+      // Success! Show message about verification
+      setMessage('✅ Account created! Check your email and click the verification link to get started.');
       
-      // Redirect to consent page after 1 second
-      setTimeout(() => {
-        router.push('/consent');
-      }, 1000);
+      // Clear form
+      setEmail('');
+      setPassword('');
+      setFirstName('');
+      setLastName('');
     } catch (error: any) {
       setError(error.message || 'Failed to create account');
     } finally {

@@ -217,36 +217,28 @@ export default function IntakePage() {
         </div>
       </nav>
 
-      <div className="container mx-auto px-6 pt-24 pb-24 max-w-4xl">
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-3xl mx-auto">
-          {/* Progress Indicator */}
-          <div className="mb-8">
-            <div className="flex justify-between items-center mb-4">
+      <div className="container mx-auto px-6 pt-24 pb-24 max-w-3xl">
+        {/* Progress Indicator */}
+        <div className="mb-10">
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-[#3E3028]">Health Questionnaire</h2>
+            <p className="text-[#5C4A3A] mt-2">Step {currentStep + 1} of {steps.length}</p>
+          </div>
+          <div className="flex justify-center items-center mb-8">
               {steps.map((step, index) => (
                 <div key={index} className="flex items-center flex-1">
                   <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 
                     ${index <= currentStep 
                       ? 'bg-[#8B6F47] border-[#8B6F47] text-white' 
-                      : 'border-[#D4C4B0] text-slate-500'}`}
+                      : 'bg-white border-[#D4C4B0] text-[#5C4A3A]'}`}
                   >
                     {index + 1}
                   </div>
                   {index < steps.length - 1 && (
-                    <div className={`flex-1 h-1 mx-2 
-                      ${index < currentStep ? 'bg-[#8B6F47]' : 'bg-slate-700'}`} 
+                    <div className={`flex-1 h-1 mx-2 rounded-full
+                      ${index < currentStep ? 'bg-[#8B6F47]' : 'bg-[#E8DCC8]'}`} 
                     />
                   )}
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between text-sm">
-              {steps.map((step, index) => (
-                <div 
-                  key={index} 
-                  className={`flex-1 text-center ${index === currentStep ? 'text-[#3E3028]' : 'text-slate-500'}`}
-                >
-                  {step.title}
                 </div>
               ))}
             </div>
@@ -267,15 +259,14 @@ export default function IntakePage() {
             showBack={currentStep > 0}
           />
         </div>
-      </div>
 
-      {/* Research Disclaimer - Small Bottom Right */}
-      <div className="absolute bottom-4 right-4">
-        <p className="text-xs text-gray-400">
-          Research purposes only
-        </p>
+        {/* Footer with Research Disclaimer */}
+        <div className="border-t border-[#D4C4B0] pt-6 mt-16">
+          <p className="text-xs text-gray-400 text-right">
+            Research purposes only
+          </p>
+        </div>
       </div>
-    </div>
     </div>
   );
 }
@@ -290,7 +281,7 @@ function StepA({ data, onNext, onBack, showBack }: any) {
   const sex = watch('sex');
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step A: Demographics</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ demographics: formData }))} className="space-y-6">
@@ -300,7 +291,7 @@ function StepA({ data, onNext, onBack, showBack }: any) {
             id="age"
             type="number"
             {...register('age', { valueAsNumber: true })}
-            className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2"
+            className="bg-white border-2 border-[#D4C4B0] text-[#3E3028] mt-2 focus:border-[#8B6F47] focus:ring-1 focus:ring-[#8B6F47]"
           />
           {errors.age && <p className="text-red-400 text-sm mt-1">{errors.age.message}</p>}
         </div>
@@ -326,7 +317,7 @@ function StepA({ data, onNext, onBack, showBack }: any) {
           <Input
             id="height"
             {...register('height')}
-            className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2"
+            className="bg-white border-2 border-[#D4C4B0] text-[#3E3028] mt-2 focus:border-[#8B6F47] focus:ring-1 focus:ring-[#8B6F47]"
             placeholder="5'10&quot; or 178cm"
           />
           {errors.height && <p className="text-red-400 text-sm mt-1">{errors.height.message}</p>}
@@ -337,7 +328,7 @@ function StepA({ data, onNext, onBack, showBack }: any) {
           <Input
             id="weight"
             {...register('weight')}
-            className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2"
+            className="bg-white border-2 border-[#D4C4B0] text-[#3E3028] mt-2 focus:border-[#8B6F47] focus:ring-1 focus:ring-[#8B6F47]"
             placeholder="170 lbs or 77 kg"
           />
           {errors.weight && <p className="text-red-400 text-sm mt-1">{errors.weight.message}</p>}
@@ -370,7 +361,7 @@ function StepB({ data, onNext, onBack, showBack }: any) {
   const allergies = watch('allergies');
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step B: Medical History</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ medical: formData }))} className="space-y-6">
@@ -463,7 +454,7 @@ function StepC({ data, onNext, onBack, showBack }: any) {
   const alcohol = watch('alcohol');
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step C: Lifestyle</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ lifestyle: formData }))} className="space-y-6">
@@ -550,7 +541,7 @@ function StepD({ data, onNext, onBack }: any) {
   const diet = watch('diet');
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step D: Dietary Approach</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ dietary: formData }))} className="space-y-6">
@@ -597,7 +588,7 @@ function StepE({ data, onNext, onBack }: any) {
   const stress = watch('stress');
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step E: Stress Level</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ stress: formData }))} className="space-y-6">
@@ -641,7 +632,7 @@ function StepF({ data, onNext, onBack }: any) {
   const recovery = watch('recovery');
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step F: Recovery & Fatigue Pattern</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ recovery: formData }))} className="space-y-6">
@@ -693,7 +684,7 @@ function StepG({ data, onNext, onBack, showBack }: any) {
   };
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step G: Goals</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ goals: { ...formData, selectedGoals } }))} className="space-y-6">
@@ -760,7 +751,7 @@ function StepH({ data, onNext, onBack }: any) {
   const selectedExperience = watch('peptideExperience');
 
   return (
-    <Card className="bg-white border-[#D4C4B0] p-8">
+    <Card className="bg-white border-2 border-[#D4C4B0] rounded-2xl p-10 shadow-sm">
       <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step H: Peptide Experience</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ experience: formData }))} className="space-y-6">
