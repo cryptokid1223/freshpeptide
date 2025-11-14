@@ -541,10 +541,10 @@ CRITICAL: For each peptide you recommend, you MUST include at least ONE research
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo-preview',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userMessage },
-      ],
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userMessage },
+        ],
       temperature: 0.3, // Lower for more accurate, clinical responses
       max_tokens: 6000, // More tokens for detailed evidence
       response_format: { type: 'json_object' },

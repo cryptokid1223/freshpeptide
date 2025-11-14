@@ -16,7 +16,7 @@ import { supabase } from '@/lib/supabase';
 import { 
   demographicsSchema, 
   medicalSchema, 
-  lifestyleSchema,
+  lifestyleSchema, 
   dietarySchema,
   stressSchema,
   recoverySchema,
@@ -61,7 +61,7 @@ export default function IntakePage() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        router.push('/auth');
+      router.push('/auth');
         return;
       }
       
@@ -191,7 +191,7 @@ export default function IntakePage() {
         }
       } catch (error) {
         console.error('Error verifying save:', error);
-        router.push('/generate');
+      router.push('/generate');
       }
     }
   };
@@ -212,7 +212,7 @@ export default function IntakePage() {
       <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
         <div className="container mx-auto px-6 py-3 max-w-7xl flex items-center justify-between">
           <Link href="/" className="hover:opacity-80 transition-opacity">
-            <img src="/logo.png" alt="FreshPeptide" className="h-12 w-auto object-contain" />
+            <img src="/logo.png" alt="FreshPeptide" className="h-16 w-auto object-contain" />
           </Link>
         </div>
       </nav>

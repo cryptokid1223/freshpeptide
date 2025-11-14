@@ -177,7 +177,7 @@ export default function LibraryPage() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-12 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">
@@ -196,12 +196,12 @@ export default function LibraryPage() {
       {/* Main Content */}
       <main className="container mx-auto px-6 pt-24 pb-24 max-w-5xl">
         {/* Header with Library Logo */}
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-4">
+        <div className="text-center mb-12">
+          <div className="flex justify-center mb-6">
             <img 
               src="/library.png" 
               alt="Peptide Library" 
-              className="w-48 h-auto object-contain"
+              className="w-full max-w-xl h-auto object-contain"
             />
           </div>
           <div className="text-3xl md:text-4xl font-light text-[#5C4A3A] min-h-[48px]">
@@ -351,6 +351,13 @@ export default function LibraryPage() {
             </div>
           )}
         </div>
+
+        {/* Footer with Research Disclaimer */}
+        <div className="border-t border-[#D4C4B0] pt-6 mt-16">
+          <p className="text-xs text-gray-400 text-right">
+            Research purposes only
+          </p>
+        </div>
       </main>
 
       {/* Modal for Details */}
@@ -450,13 +457,6 @@ export default function LibraryPage() {
           </div>
         </>
       )}
-
-      {/* Research Disclaimer - Small Bottom Right */}
-      <div className="absolute bottom-4 right-4">
-        <p className="text-xs text-gray-400">
-          Research purposes only
-        </p>
-      </div>
     </div>
   );
 }

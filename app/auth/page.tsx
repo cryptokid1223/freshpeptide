@@ -142,7 +142,7 @@ export default function AuthPage() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-12 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">
@@ -315,14 +315,14 @@ export default function AuthPage() {
             ← Back to home
           </Link>
         </div>
-      </main>
 
-      {/* Research Disclaimer - Small Bottom Right */}
-      <div className="absolute bottom-4 right-4">
-        <p className="text-xs text-gray-400">
-          Research purposes only
-        </p>
-      </div>
+        {/* Footer with Research Disclaimer */}
+        <div className="mt-12 pt-6 border-t border-gray-200">
+          <p className="text-xs text-gray-400 text-right">
+            Research purposes only
+          </p>
+        </div>
+      </main>
     </div>
   );
 }

@@ -23,7 +23,7 @@ export default function GeneratePage() {
         return;
       }
 
-      // Check if intake is completed
+    // Check if intake is completed
       const { data: intakeRecord } = await supabase
         .from('intake')
         .select('intake_data')
@@ -33,7 +33,7 @@ export default function GeneratePage() {
       if (!intakeRecord?.intake_data) {
         router.push('/consent');
         return;
-      }
+    }
 
       // Load existing brief
       const { data: briefRecords } = await supabase
@@ -104,7 +104,7 @@ export default function GeneratePage() {
       setError(err.message || 'Something went wrong');
     } finally {
       setTimeout(() => {
-        setIsGenerating(false);
+      setIsGenerating(false);
         setStatusMessage('');
       }, 1000);
     }
@@ -124,7 +124,7 @@ export default function GeneratePage() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-12 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">
@@ -150,11 +150,11 @@ export default function GeneratePage() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-[#3E3028] mb-3">
             Your Personalized Stack
-          </h1>
+              </h1>
           <p className="text-[#5C4A3A] text-lg">
             AI-generated peptide recommendations based on your health profile
-          </p>
-        </div>
+                </p>
+              </div>
 
         {/* Generate Button */}
         {!brief && (
@@ -169,24 +169,24 @@ export default function GeneratePage() {
             {statusMessage && (
               <p className="text-[#8B6F47] mt-4 font-medium">{statusMessage}</p>
             )}
-            {error && (
+              {error && (
               <p className="text-red-600 mt-4">{error}</p>
             )}
-          </div>
-        )}
+                </div>
+              )}
 
         {/* Regenerate Button */}
         {brief && (
           <div className="text-center mb-8">
-            <Button
-              onClick={handleGenerate}
-              disabled={isGenerating}
+              <Button
+                onClick={handleGenerate}
+                disabled={isGenerating}
               variant="outline"
               className="border-2 border-[#8B6F47] text-[#8B6F47] hover:bg-[#F5EFE7] font-semibold px-8 py-3 rounded-xl"
-            >
+              >
               {isGenerating ? 'Regenerating...' : '🔄 Regenerate Stack'}
-            </Button>
-          </div>
+                  </Button>
+                </div>
         )}
 
         {/* Brief Display */}
@@ -234,7 +234,7 @@ export default function GeneratePage() {
                             </li>
                           ))}
                         </ul>
-                      </div>
+                </div>
 
                       <div>
                         <p className="text-sm font-semibold text-red-700 mb-2">⚠️ Possible Side Effects</p>
@@ -294,7 +294,7 @@ export default function GeneratePage() {
                     </li>
                   ))}
                 </ul>
-              </div>
+                    </div>
             )}
 
             {/* Action Buttons */}
@@ -309,9 +309,9 @@ export default function GeneratePage() {
                   Back to Dashboard
                 </Button>
               </Link>
+              </div>
             </div>
-          </div>
-        )}
+          )}
       </main>
 
       {/* Research Disclaimer - Small Bottom Right */}

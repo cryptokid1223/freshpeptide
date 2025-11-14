@@ -100,7 +100,7 @@ export default function DashboardPage() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-12 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
           <div className="flex items-center gap-3">

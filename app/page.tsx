@@ -51,7 +51,7 @@ export default function Home() {
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="h-12 w-auto object-contain"
+              className="h-16 w-auto object-contain"
             />
           </Link>
 
@@ -70,15 +70,15 @@ export default function Home() {
                       </Button>
                     </Link>
                     <Link href="/generate">
-                      <Button 
+              <Button 
                         variant="ghost"
                         className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 font-medium"
-                      >
+              >
                         Generate Stack
-                      </Button>
-                    </Link>
-                    <Link href="/library">
-                      <Button 
+              </Button>
+            </Link>
+            <Link href="/library">
+              <Button 
                         variant="ghost"
                         className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 font-medium"
                       >
@@ -113,7 +113,7 @@ export default function Home() {
                     </Link>
                     <Link href="/auth">
                       <Button 
-                        className="bg-blue-600 text-white hover:bg-blue-700 font-medium px-6 rounded-full"
+                        className="bg-[#8B6F47] text-white hover:bg-[#6F5839] font-medium px-6 rounded-full"
                         onClick={() => localStorage.setItem('authMode', 'signup')}
                       >
                         Sign Up
@@ -131,11 +131,11 @@ export default function Home() {
       <main className="container mx-auto px-6 pt-24 pb-20 max-w-5xl">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-8">
             <img 
               src="/logo.png" 
               alt="FreshPeptide" 
-              className="w-full max-w-md h-auto object-contain"
+              className="w-full max-w-2xl h-auto object-contain"
             />
           </div>
           <div className="text-3xl md:text-4xl font-light text-gray-600 min-h-[48px]">
@@ -158,11 +158,11 @@ export default function Home() {
               <div className="w-2 h-2 rounded-full bg-[#8B6F47] mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                  Comprehensive Intake
-                </h3>
+              Comprehensive Intake
+            </h3>
                 <p className="text-gray-600 leading-relaxed">
                   Multi-step health questionnaire covering demographics, medical history, lifestyle, and goals
-                </p>
+            </p>
               </div>
             </div>
 
@@ -171,10 +171,10 @@ export default function Home() {
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
                   Medical Intelligence Analysis
-                </h3>
+            </h3>
                 <p className="text-gray-600 leading-relaxed">
                   Advanced analytical system generates educational briefs mapping goals to research-backed peptide classes with evidence citations
-                </p>
+            </p>
               </div>
             </div>
 
@@ -182,11 +182,11 @@ export default function Home() {
               <div className="w-2 h-2 rounded-full bg-[#8B6F47] mt-2.5 flex-shrink-0 group-hover:scale-150 transition-transform"></div>
               <div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-1">
-                  Searchable Library
-                </h3>
+              Searchable Library
+            </h3>
                 <p className="text-gray-600 leading-relaxed">
                   Explore a curated database of peptides with mechanisms, regulatory status, evidence, and safety information
-                </p>
+            </p>
               </div>
             </div>
           </div>
@@ -209,7 +209,7 @@ export default function Home() {
                 <p className="text-gray-600">Simple email authentication to get started</p>
               </div>
             </div>
-
+            
             <div className="flex items-center gap-6 group">
               <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 2
@@ -219,7 +219,7 @@ export default function Home() {
                 <p className="text-gray-600">Acknowledge research and educational purposes</p>
               </div>
             </div>
-
+            
             <div className="flex items-center gap-6 group">
               <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 3
@@ -229,7 +229,7 @@ export default function Home() {
                 <p className="text-gray-600">8-step comprehensive questionnaire with auto-save</p>
               </div>
             </div>
-
+            
             <div className="flex items-center gap-6 group">
               <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 4
@@ -239,7 +239,7 @@ export default function Home() {
                 <p className="text-gray-600">Medical Intelligence analyzes your inputs and creates educational content</p>
               </div>
             </div>
-
+            
             <div className="flex items-center gap-6 group">
               <div className="w-8 h-8 rounded-full bg-[#8B6F47] text-white flex items-center justify-center font-semibold flex-shrink-0 group-hover:scale-110 transition-transform">
                 5
@@ -259,15 +259,11 @@ export default function Home() {
             No medical advice is provided or implied. All system outputs are educational and should not guide medical decisions. 
             Consult qualified healthcare professionals for any health-related decisions.
           </p>
+          <p className="text-xs text-gray-400 text-right mt-4">
+            Research purposes only
+          </p>
         </div>
       </main>
-
-      {/* Research Disclaimer - Small Bottom Right */}
-      <div className="absolute bottom-4 right-4">
-        <p className="text-xs text-gray-400">
-          Research purposes only
-        </p>
-      </div>
     </div>
   );
 }
