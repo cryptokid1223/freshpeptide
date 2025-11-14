@@ -224,7 +224,7 @@ export default function IntakePage() {
             <h2 className="text-3xl font-bold text-[#3E3028]">Health Questionnaire</h2>
             <p className="text-[#5C4A3A] mt-2">Step {currentStep + 1} of {steps.length}</p>
           </div>
-          <div className="flex justify-center items-center mb-8">
+          <div className="flex justify-center items-center">
               {steps.map((step, index) => (
                 <div key={index} className="flex items-center flex-1">
                   <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 
@@ -241,24 +241,23 @@ export default function IntakePage() {
                   )}
                 </div>
               ))}
-            </div>
           </div>
-
-          {/* Auto-save indicator */}
-          {lastSaved && (
-            <div className="mb-4 text-sm text-[#8B6F47] text-right">
-              {isSaving ? 'Saving...' : `Last saved: ${lastSaved.toLocaleTimeString()}`}
-            </div>
-          )}
-
-          {/* Current Step */}
-          <CurrentStepComponent
-            data={intakeData}
-            onNext={handleNext}
-            onBack={handleBack}
-            showBack={currentStep > 0}
-          />
         </div>
+
+        {/* Auto-save indicator */}
+        {lastSaved && (
+          <div className="mb-4 text-sm text-[#8B6F47] text-right">
+            {isSaving ? 'Saving...' : `Last saved: ${lastSaved.toLocaleTimeString()}`}
+          </div>
+        )}
+
+        {/* Current Step */}
+        <CurrentStepComponent
+          data={intakeData}
+          onNext={handleNext}
+          onBack={handleBack}
+          showBack={currentStep > 0}
+        />
 
         {/* Footer with Research Disclaimer */}
         <div className="border-t border-[#D4C4B0] pt-6 mt-16">
