@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { MainLayout } from '@/components/MainLayout';
+import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -207,7 +207,17 @@ export default function IntakePage() {
   }
 
   return (
-    <MainLayout>
+    <div className="min-h-screen bg-[#FDFCFA]">
+      {/* Top Navigation */}
+      <nav className="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-[#D4C4B0] z-50">
+        <div className="container mx-auto px-6 py-3 max-w-7xl flex items-center justify-between">
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img src="/logo.png" alt="FreshPeptide" className="h-12 w-auto object-contain" />
+          </Link>
+        </div>
+      </nav>
+
+      <div className="container mx-auto px-6 pt-24 pb-24 max-w-4xl">
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-3xl mx-auto">
           {/* Progress Indicator */}
@@ -217,14 +227,14 @@ export default function IntakePage() {
                 <div key={index} className="flex items-center flex-1">
                   <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 
                     ${index <= currentStep 
-                      ? 'bg-cyan-600 border-cyan-600 text-white' 
-                      : 'border-slate-600 text-slate-500'}`}
+                      ? 'bg-[#8B6F47] border-[#8B6F47] text-white' 
+                      : 'border-[#D4C4B0] text-slate-500'}`}
                   >
                     {index + 1}
                   </div>
                   {index < steps.length - 1 && (
                     <div className={`flex-1 h-1 mx-2 
-                      ${index < currentStep ? 'bg-cyan-600' : 'bg-slate-700'}`} 
+                      ${index < currentStep ? 'bg-[#8B6F47]' : 'bg-slate-700'}`} 
                     />
                   )}
                 </div>
@@ -234,7 +244,7 @@ export default function IntakePage() {
               {steps.map((step, index) => (
                 <div 
                   key={index} 
-                  className={`flex-1 text-center ${index === currentStep ? 'text-cyan-400' : 'text-slate-500'}`}
+                  className={`flex-1 text-center ${index === currentStep ? 'text-[#3E3028]' : 'text-slate-500'}`}
                 >
                   {step.title}
                 </div>
@@ -244,7 +254,7 @@ export default function IntakePage() {
 
           {/* Auto-save indicator */}
           {lastSaved && (
-            <div className="mb-4 text-sm text-slate-400 text-right">
+            <div className="mb-4 text-sm text-[#8B6F47] text-right">
               {isSaving ? 'Saving...' : `Last saved: ${lastSaved.toLocaleTimeString()}`}
             </div>
           )}
@@ -258,7 +268,15 @@ export default function IntakePage() {
           />
         </div>
       </div>
-    </MainLayout>
+
+      {/* Research Disclaimer - Small Bottom Right */}
+      <div className="absolute bottom-4 right-4">
+        <p className="text-xs text-gray-400">
+          Research purposes only
+        </p>
+      </div>
+    </div>
+    </div>
   );
 }
 
@@ -272,25 +290,25 @@ function StepA({ data, onNext, onBack, showBack }: any) {
   const sex = watch('sex');
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step A: Demographics</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step A: Demographics</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ demographics: formData }))} className="space-y-6">
         <div>
-          <Label htmlFor="age" className="text-slate-300">Age</Label>
+          <Label htmlFor="age" className="text-[#5C4A3A]">Age</Label>
           <Input
             id="age"
             type="number"
             {...register('age', { valueAsNumber: true })}
-            className="bg-slate-900 border-slate-600 text-slate-100 mt-2"
+            className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2"
           />
           {errors.age && <p className="text-red-400 text-sm mt-1">{errors.age.message}</p>}
         </div>
 
         <div>
-          <Label htmlFor="sex" className="text-slate-300">Sex</Label>
+          <Label htmlFor="sex" className="text-[#5C4A3A]">Sex</Label>
           <Select onValueChange={(value) => setValue('sex', value as any)} value={sex}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select sex" />
             </SelectTrigger>
             <SelectContent>
@@ -304,22 +322,22 @@ function StepA({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div>
-          <Label htmlFor="height" className="text-slate-300">Height (e.g., 5'10" or 178cm)</Label>
+          <Label htmlFor="height" className="text-[#5C4A3A]">Height (e.g., 5'10" or 178cm)</Label>
           <Input
             id="height"
             {...register('height')}
-            className="bg-slate-900 border-slate-600 text-slate-100 mt-2"
+            className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2"
             placeholder="5'10&quot; or 178cm"
           />
           {errors.height && <p className="text-red-400 text-sm mt-1">{errors.height.message}</p>}
         </div>
 
         <div>
-          <Label htmlFor="weight" className="text-slate-300">Weight (e.g., 170 lbs or 77 kg)</Label>
+          <Label htmlFor="weight" className="text-[#5C4A3A]">Weight (e.g., 170 lbs or 77 kg)</Label>
           <Input
             id="weight"
             {...register('weight')}
-            className="bg-slate-900 border-slate-600 text-slate-100 mt-2"
+            className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2"
             placeholder="170 lbs or 77 kg"
           />
           {errors.weight && <p className="text-red-400 text-sm mt-1">{errors.weight.message}</p>}
@@ -327,11 +345,11 @@ function StepA({ data, onNext, onBack, showBack }: any) {
 
         <div className="flex gap-4 pt-4">
           {showBack && (
-            <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+            <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
               Back
             </Button>
           )}
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Next
           </Button>
         </div>
@@ -352,16 +370,16 @@ function StepB({ data, onNext, onBack, showBack }: any) {
   const allergies = watch('allergies');
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step B: Medical History</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step B: Medical History</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ medical: formData }))} className="space-y-6">
         <div>
-          <Label htmlFor="conditions" className="text-slate-300">
+          <Label htmlFor="conditions" className="text-[#5C4A3A]">
             Current Medical Conditions
           </Label>
           <Select onValueChange={(value) => setValue('conditions', value as any)} value={conditions}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select a condition" />
             </SelectTrigger>
             <SelectContent>
@@ -379,11 +397,11 @@ function StepB({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div>
-          <Label htmlFor="medications" className="text-slate-300">
+          <Label htmlFor="medications" className="text-[#5C4A3A]">
             Current Medications
           </Label>
           <Select onValueChange={(value) => setValue('medications', value as any)} value={medications}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select medication type" />
             </SelectTrigger>
             <SelectContent>
@@ -401,11 +419,11 @@ function StepB({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div>
-          <Label htmlFor="allergies" className="text-slate-300">
+          <Label htmlFor="allergies" className="text-[#5C4A3A]">
             Known Allergies
           </Label>
           <Select onValueChange={(value) => setValue('allergies', value as any)} value={allergies}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select allergy type" />
             </SelectTrigger>
             <SelectContent>
@@ -421,10 +439,10 @@ function StepB({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div className="flex gap-4 pt-4">
-          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+          <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
             Back
           </Button>
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Next
           </Button>
         </div>
@@ -445,16 +463,16 @@ function StepC({ data, onNext, onBack, showBack }: any) {
   const alcohol = watch('alcohol');
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step C: Lifestyle</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step C: Lifestyle</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ lifestyle: formData }))} className="space-y-6">
         <div>
-          <Label htmlFor="sleep" className="text-slate-300">
+          <Label htmlFor="sleep" className="text-[#5C4A3A]">
             Sleep Patterns (Hours per Night)
           </Label>
           <Select onValueChange={(value) => setValue('sleep', value as any)} value={sleep}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select sleep duration" />
             </SelectTrigger>
             <SelectContent>
@@ -470,11 +488,11 @@ function StepC({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div>
-          <Label htmlFor="exercise" className="text-slate-300">
+          <Label htmlFor="exercise" className="text-[#5C4A3A]">
             Exercise Habits
           </Label>
           <Select onValueChange={(value) => setValue('exercise', value as any)} value={exercise}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select exercise level" />
             </SelectTrigger>
             <SelectContent>
@@ -490,11 +508,11 @@ function StepC({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div>
-          <Label htmlFor="alcohol" className="text-slate-300">
+          <Label htmlFor="alcohol" className="text-[#5C4A3A]">
             Alcohol Consumption
           </Label>
           <Select onValueChange={(value) => setValue('alcohol', value as any)} value={alcohol}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select alcohol consumption" />
             </SelectTrigger>
             <SelectContent>
@@ -510,10 +528,10 @@ function StepC({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div className="flex gap-4 pt-4">
-          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+          <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
             Back
           </Button>
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Next
           </Button>
         </div>
@@ -532,16 +550,16 @@ function StepD({ data, onNext, onBack }: any) {
   const diet = watch('diet');
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step D: Dietary Approach</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step D: Dietary Approach</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ dietary: formData }))} className="space-y-6">
         <div>
-          <Label htmlFor="diet" className="text-slate-300">
+          <Label htmlFor="diet" className="text-[#5C4A3A]">
             What best describes your dietary approach?
           </Label>
           <Select onValueChange={(value) => setValue('diet', value as any)} value={diet}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select dietary approach" />
             </SelectTrigger>
             <SelectContent>
@@ -557,10 +575,10 @@ function StepD({ data, onNext, onBack }: any) {
         </div>
 
         <div className="flex gap-4 pt-4">
-          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+          <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
             Back
           </Button>
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Next
           </Button>
         </div>
@@ -579,16 +597,16 @@ function StepE({ data, onNext, onBack }: any) {
   const stress = watch('stress');
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step E: Stress Level</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step E: Stress Level</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ stress: formData }))} className="space-y-6">
         <div>
-          <Label htmlFor="stress" className="text-slate-300">
+          <Label htmlFor="stress" className="text-[#5C4A3A]">
             How would you describe your typical stress level?
           </Label>
           <Select onValueChange={(value) => setValue('stress', value as any)} value={stress}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select stress level" />
             </SelectTrigger>
             <SelectContent>
@@ -601,10 +619,10 @@ function StepE({ data, onNext, onBack }: any) {
         </div>
 
         <div className="flex gap-4 pt-4">
-          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+          <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
             Back
           </Button>
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Next
           </Button>
         </div>
@@ -623,16 +641,16 @@ function StepF({ data, onNext, onBack }: any) {
   const recovery = watch('recovery');
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step F: Recovery & Fatigue Pattern</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step F: Recovery & Fatigue Pattern</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ recovery: formData }))} className="space-y-6">
         <div>
-          <Label htmlFor="recovery" className="text-slate-300">
+          <Label htmlFor="recovery" className="text-[#5C4A3A]">
             How quickly do you typically recover from workouts or physical exertion?
           </Label>
           <Select onValueChange={(value) => setValue('recovery', value as any)} value={recovery}>
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select recovery pattern" />
             </SelectTrigger>
             <SelectContent>
@@ -645,10 +663,10 @@ function StepF({ data, onNext, onBack }: any) {
         </div>
 
         <div className="flex gap-4 pt-4">
-          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+          <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
             Back
           </Button>
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Next
           </Button>
         </div>
@@ -675,24 +693,24 @@ function StepG({ data, onNext, onBack, showBack }: any) {
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step G: Goals</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step G: Goals</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ goals: { ...formData, selectedGoals } }))} className="space-y-6">
         <div>
-          <Label className="text-slate-300 mb-3 block">
+          <Label className="text-[#5C4A3A] mb-3 block">
             Select your health and wellness goals (choose at least one):
           </Label>
           <div className="space-y-3">
             {GOAL_OPTIONS.map((goal) => (
-              <div key={goal} className="flex items-start gap-3 p-3 bg-slate-900/50 rounded-lg">
+              <div key={goal} className="flex items-start gap-3 p-3 bg-[#F5EFE7]/50 rounded-lg">
                 <Checkbox
                   id={goal}
                   checked={selectedGoals.includes(goal)}
                   onCheckedChange={() => handleGoalToggle(goal)}
                   className="mt-1"
                 />
-                <Label htmlFor={goal} className="text-slate-300 cursor-pointer flex-1">
+                <Label htmlFor={goal} className="text-[#5C4A3A] cursor-pointer flex-1">
                   {goal}
                 </Label>
               </div>
@@ -704,22 +722,22 @@ function StepG({ data, onNext, onBack, showBack }: any) {
         </div>
 
         <div>
-          <Label htmlFor="customGoal" className="text-slate-300">
+          <Label htmlFor="customGoal" className="text-[#5C4A3A]">
             Additional Goals or Notes (Optional)
           </Label>
           <Textarea
             id="customGoal"
             {...register('customGoal')}
-            className="bg-slate-900 border-slate-600 text-slate-100 mt-2 min-h-[100px]"
+            className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2 min-h-[100px]"
             placeholder="Describe any additional goals or specific outcomes you'd like to achieve"
           />
         </div>
 
         <div className="flex gap-4 pt-4">
-          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+          <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
             Back
           </Button>
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Continue
           </Button>
         </div>
@@ -742,19 +760,19 @@ function StepH({ data, onNext, onBack }: any) {
   const selectedExperience = watch('peptideExperience');
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700 p-8">
-      <h2 className="text-2xl font-bold text-cyan-400 mb-6">Step H: Peptide Experience</h2>
+    <Card className="bg-white border-[#D4C4B0] p-8">
+      <h2 className="text-2xl font-bold text-[#3E3028] mb-6">Step H: Peptide Experience</h2>
       
       <form onSubmit={handleSubmit((formData) => onNext({ experience: formData }))} className="space-y-6">
         <div>
-          <Label htmlFor="peptideExperience" className="text-slate-300">
+          <Label htmlFor="peptideExperience" className="text-[#5C4A3A]">
             What is your experience level with peptides? *
           </Label>
           <Select
             onValueChange={(value) => register('peptideExperience').onChange({ target: { value } })}
             defaultValue={data.experience?.peptideExperience || 'never_used'}
           >
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select your experience level" />
             </SelectTrigger>
             <SelectContent>
@@ -771,30 +789,30 @@ function StepH({ data, onNext, onBack }: any) {
 
         {selectedExperience !== 'never_used' && (
           <div>
-            <Label htmlFor="previousPeptides" className="text-slate-300">
+            <Label htmlFor="previousPeptides" className="text-[#5C4A3A]">
               Which peptides have you used before? (Optional)
             </Label>
             <Textarea
               id="previousPeptides"
               {...register('previousPeptides')}
-              className="bg-slate-900 border-slate-600 text-slate-100 mt-2 min-h-[100px]"
+              className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2 min-h-[100px]"
               placeholder="e.g., BPC-157, CJC-1295, Ipamorelin, TB-500, Semaglutide, etc."
             />
-            <p className="text-slate-400 text-xs mt-1">
+            <p className="text-[#8B6F47] text-xs mt-1">
               This helps us avoid recommending peptides that didn't work well for you
             </p>
           </div>
         )}
 
         <div>
-          <Label htmlFor="injectionComfort" className="text-slate-300">
+          <Label htmlFor="injectionComfort" className="text-[#5C4A3A]">
             How comfortable are you with self-injecting peptides? *
           </Label>
           <Select
             onValueChange={(value) => register('injectionComfort').onChange({ target: { value } })}
             defaultValue={data.experience?.injectionComfort || 'never_injected'}
           >
-            <SelectTrigger className="bg-slate-900 border-slate-600 text-slate-100 mt-2">
+            <SelectTrigger className="bg-[#F5EFE7] border-[#D4C4B0] text-[#3E3028] mt-2">
               <SelectValue placeholder="Select your comfort level" />
             </SelectTrigger>
             <SelectContent>
@@ -807,16 +825,16 @@ function StepH({ data, onNext, onBack }: any) {
           {errors.injectionComfort && (
             <p className="text-red-400 text-sm mt-1">{errors.injectionComfort.message}</p>
           )}
-          <p className="text-slate-400 text-xs mt-2">
+          <p className="text-[#8B6F47] text-xs mt-2">
             We'll adjust our instructions based on your comfort level
           </p>
         </div>
 
         <div className="flex gap-4 pt-4">
-          <Button type="button" onClick={onBack} variant="outline" className="border-slate-600">
+          <Button type="button" onClick={onBack} variant="outline" className="border-[#D4C4B0]">
             Back
           </Button>
-          <Button type="submit" className="flex-1 bg-cyan-600 hover:bg-cyan-700">
+          <Button type="submit" className="flex-1 bg-[#8B6F47] hover:bg-[#6F5839]">
             Complete & Continue
           </Button>
         </div>
