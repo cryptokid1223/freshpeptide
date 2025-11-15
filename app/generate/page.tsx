@@ -138,15 +138,35 @@ export default function GeneratePage() {
       
       setStatusMessage('Saving your stack...');
 
-      // Save to database
-      await supabase.from('briefs').insert({
-        user_id: session.user.id,
-        brief_output: result.brief,
-        model_name: result.model,
-      });
+      // First, delete any existing briefs for this user
+      await supabase
+        .from('briefs')
+        .delete()
+        .eq('user_id', session.user.id);
+
+      // Then insert the new brief
+      const { error: saveError } = await supabase
+        .from('briefs')
+        .insert({
+          user_id: session.user.id,
+          brief_output: result.brief,
+          model_name: result.model,
+        });
+
+      if (saveError) {
+        console.error('Error saving brief:', saveError);
+        throw new Error('Failed to save your stack. Please try again.');
+      }
+      
+      console.log('✅ Brief saved successfully to database');
 
       setBrief(result.brief);
       setStatusMessage('Complete!');
+      
+      // Refresh the page data after a short delay to ensure it's saved
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
     } catch (err: any) {
       const errorMessage = err.message || 'Something went wrong';
       setError(errorMessage);

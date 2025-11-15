@@ -373,45 +373,61 @@ CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
    
    **Use your extensive training knowledge to determine appropriate dosing from clinical trials, research protocols, and medical literature for whichever peptides you recommend.**
    
-   INSULIN SYRINGE CALCULATION:
-   - Standard insulin syringes are 1mL (100 units)
+   INSULIN SYRINGE CALCULATION (MANDATORY FOR ALL INJECTABLE PEPTIDES):
+   - Standard insulin syringes are 1mL (100 units total)
    - 1 unit = 0.01 mL
    - Units depend on reconstitution concentration
-   - ALWAYS include both mcg/mg AND syringe units
-   - Example: "250 mcg (25 units on insulin syringe if reconstituted at 1mg/mL)"
+   - **CRITICAL: You MUST include specific unit numbers (e.g., 10 units, 20 units, 30 units) in the dosage**
+   - Format MUST be: "[dose] [unit] [route] [frequency] ([X] units on insulin syringe if reconstituted at [Y]mg/mL)"
+   - Examples:
+     * "250 mcg subcutaneously once daily (25 units on insulin syringe if reconstituted at 1mg/mL)"
+     * "2 mg intramuscularly twice weekly (20 units if reconstituted at 10mg/mL)"
+     * "500 mcg subcutaneously daily (50 units if reconstituted at 1mg/mL)"
+   - **NEVER omit the unit number - always specify exact units (10, 15, 20, 25, 30, etc.)**
+   - For oral peptides, state "Oral administration" and omit syringe units
 
-2. EVIDENCE REQUIREMENTS (MANDATORY - EXTREMELY STRICT):
-   **CRITICAL: If you recommend a peptide, you MUST cite research that DIRECTLY studies THAT peptide by name**
+2. EVIDENCE REQUIREMENTS (MANDATORY - EXTREMELY STRICT - ZERO TOLERANCE FOR GENERIC ARTICLES):
+   **CRITICAL: If you recommend a peptide, you MUST cite research that DIRECTLY studies THAT EXACT peptide by name**
    
-   - Each peptide MUST have 1-2 research articles where the peptide name appears in the title, abstract, or is the primary subject
-   - **NEVER cite generic "peptide therapy" or unrelated studies**
-   - **NEVER make up fake research articles**
+   **ABSOLUTE REQUIREMENTS:**
+   - Each peptide MUST have 1-2 research articles where the peptide name appears EXPLICITLY in the title or is the PRIMARY subject
+   - The article title MUST contain the peptide name (e.g., "BPC-157", "Semaglutide", "Tirzepatide")
+   - **NEVER cite generic "peptide therapy", "growth hormone", "GLP-1 agonists" without the specific peptide name**
+   - **NEVER cite articles about different peptides or unrelated compounds**
+   - **NEVER make up fake research articles, PMIDs, or journal names**
    - Include actual PubMed PMID numbers in URLs: https://pubmed.ncbi.nlm.nih.gov/[PMID]/
-   - The article MUST directly study the peptide you're recommending
+   - The article MUST directly study the peptide you're recommending - not similar peptides, not related compounds
    - Use your knowledge of clinical trials, preclinical studies, and review papers FROM YOUR TRAINING
    
-   **STRICT VALIDATION RULES:**
-   - If recommending **Semaglutide** → MUST cite Semaglutide studies (STEP trials, SUSTAIN trials)
-   - If recommending **Tirzepatide** → MUST cite Tirzepatide studies (SURMOUNT, SURPASS trials)
-   - If recommending **BPC-157** → MUST cite BPC-157 specific research (NOT generic wound healing)
-   - If recommending **Semax** → MUST cite Semax specific studies (NOT generic nootropics)
-   - If recommending **Epithalon** → MUST cite Epithalon/Epitalon studies (NOT generic anti-aging)
+   **STRICT VALIDATION RULES - PEPTIDE NAME MUST BE IN TITLE:**
+   - If recommending **Semaglutide** → Title MUST contain "Semaglutide" (STEP trials, SUSTAIN trials)
+   - If recommending **Tirzepatide** → Title MUST contain "Tirzepatide" (SURMOUNT, SURPASS trials)
+   - If recommending **BPC-157** → Title MUST contain "BPC-157" or "BPC 157" (NOT generic wound healing)
+   - If recommending **Semax** → Title MUST contain "Semax" (NOT generic nootropics or ACTH)
+   - If recommending **Epithalon** → Title MUST contain "Epithalon" or "Epitalon" (NOT generic anti-aging)
+   - If recommending **Ipamorelin** → Title MUST contain "Ipamorelin" (NOT generic GHRP or growth hormone)
+   - If recommending **CJC-1295** → Title MUST contain "CJC-1295" or "CJC 1295" (NOT generic GHRH)
+   - If recommending **TB-500** → Title MUST contain "TB-500" or "Thymosin Beta-4" (NOT generic thymosin)
    
    **IF YOU DON'T KNOW ACTUAL RESEARCH FOR A PEPTIDE:**
-   - State: "Limited published human studies available" in the evidence section
-   - Cite preclinical/animal studies if that's all that exists
-   - Be honest about the research status
-   - DO NOT make up fake studies
+   - State: "Limited published human studies available for [PEPTIDE NAME]" in the evidence section
+   - Cite preclinical/animal studies ONLY if they specifically mention the peptide name
+   - Be honest about the research status - DO NOT fabricate evidence
+   - DO NOT make up fake studies, PMIDs, or journal names
+   - If no real research exists, state: "Preclinical research suggests potential benefits, but human clinical data is limited"
    
-   **INVALID EXAMPLES (DO NOT DO THIS):**
-   ❌ Recommending BPC-157 → Citing generic "peptide wound healing" study
-   ❌ Recommending Selank → Citing generic "anxiety treatment" study
-   ❌ Making up fake journal names or PMIDs
+   **INVALID EXAMPLES (ABSOLUTELY FORBIDDEN):**
+   ❌ Recommending BPC-157 → Citing "Peptide therapy for wound healing" (no BPC-157 in title)
+   ❌ Recommending Selank → Citing "Anxiety treatment with peptides" (no Selank in title)
+   ❌ Recommending Semaglutide → Citing "GLP-1 receptor agonists for diabetes" (too generic)
+   ❌ Making up fake journal names, PMIDs, or study titles
+   ❌ Citing research about similar but different peptides
    
    **VALID EXAMPLES:**
-   ✅ Recommending Semaglutide → Citing "Once-Weekly Semaglutide in Adults with Overweight or Obesity (STEP 1 trial)"
-   ✅ Recommending BPC-157 → Citing "Stable Gastric Pentadecapeptide BPC 157" with actual PMID
-   ✅ Admitting "Limited human data available; evidence based on animal studies" when that's the truth
+   ✅ Recommending Semaglutide → Citing "Once-Weekly Semaglutide in Adults with Overweight or Obesity" (STEP 1 trial) - Title contains "Semaglutide"
+   ✅ Recommending BPC-157 → Citing "Stable Gastric Pentadecapeptide BPC 157 in the Treatment of Gastrointestinal Disorders" - Title contains "BPC 157"
+   ✅ Recommending Tirzepatide → Citing "Tirzepatide Once Weekly for the Treatment of Obesity" - Title contains "Tirzepatide"
+   ✅ Admitting "Limited human data available for [PEPTIDE NAME]; evidence based on animal studies" when that's the truth
    
 3. CLINICAL ACCURACY:
    - State regulatory status accurately (FDA-approved vs Research-only vs Compounded)
@@ -474,7 +490,7 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
       "why": "Write directly to the person: Why this specific peptide is ideal for YOUR goals and YOUR health profile. Use 'you' and 'your'",
       "mechanism": "Detailed scientific mechanism of action explained in an accessible way",
       "detailedInfo": "Comprehensive information about the peptide, its history, research status, and relevant studies. Written in a conversational tone.",
-      "recommendedDosage": "MUST include: dose amount + unit + route + frequency + INSULIN SYRINGE UNITS. Example formats: '250 mcg subcutaneously once daily (25 units on insulin syringe if reconstituted at 1mg/mL)' OR '2 mg intramuscularly twice weekly (20 units if reconstituted at 10mg/mL)'. ALWAYS include syringe units for injectables. Start with FIRST-TIME USER dosing (lower end of range).",
+      "recommendedDosage": "MANDATORY FORMAT: [dose] [unit] [route] [frequency] ([X] units on insulin syringe if reconstituted at [Y]mg/mL). MUST include specific unit numbers (10, 20, 25, 30, etc.). Examples: '250 mcg subcutaneously once daily (25 units on insulin syringe if reconstituted at 1mg/mL)' OR '2 mg intramuscularly twice weekly (20 units if reconstituted at 10mg/mL)'. ALWAYS include exact unit numbers for injectables. Start with FIRST-TIME USER dosing (lower end of range). For oral peptides, omit syringe units.",
       "timing": {
         "frequency": "Specific frequency (e.g., 'Once daily', 'Twice weekly', '3 times daily')",
         "timeOfDay": "Optimal timing (e.g., 'Morning fasted', 'Before bed', 'Post-workout', 'Morning, afternoon, and bedtime')",
@@ -563,6 +579,66 @@ CRITICAL: For each peptide you recommend, you MUST include at least ONE research
     
     // Parse JSON response
     const brief = JSON.parse(content);
+    
+    // Validate and fix dosages to ensure insulin syringe units are included
+    if (brief.candidatePeptides && Array.isArray(brief.candidatePeptides)) {
+      brief.candidatePeptides = brief.candidatePeptides.map((peptide: any) => {
+        // Check if dosage includes syringe units for injectable peptides
+        const dosage = peptide.recommendedDosage || '';
+        const isInjectable = dosage.toLowerCase().includes('subcutaneous') || 
+                           dosage.toLowerCase().includes('intramuscular') ||
+                           dosage.toLowerCase().includes('inject');
+        
+        if (isInjectable && !dosage.includes('units') && !dosage.includes('unit')) {
+          // Try to extract dose and add units
+          const doseMatch = dosage.match(/(\d+)\s*(mcg|mg|μg)/i);
+          if (doseMatch) {
+            const dose = parseInt(doseMatch[1]);
+            const unit = doseMatch[2].toLowerCase();
+            
+            // Calculate approximate units (assuming 1mg/mL reconstitution for mcg, 10mg/mL for mg)
+            let syringeUnits = 0;
+            if (unit === 'mcg' || unit === 'μg') {
+              syringeUnits = Math.round(dose / 10); // 1mg/mL = 10mcg per unit
+            } else if (unit === 'mg') {
+              syringeUnits = Math.round(dose * 10); // 10mg/mL = 1mg per 10 units
+            }
+            
+            if (syringeUnits > 0) {
+              peptide.recommendedDosage = `${dosage} (${syringeUnits} units on insulin syringe if reconstituted at ${unit === 'mg' ? '10' : '1'}mg/mL)`;
+              console.log(`Added syringe units to ${peptide.name}: ${syringeUnits} units`);
+            }
+          }
+        }
+        return peptide;
+      });
+    }
+    
+    // Validate evidence - ensure peptide names are in titles
+    if (brief.evidenceList && Array.isArray(brief.evidenceList)) {
+      const peptideNames = brief.candidatePeptides?.map((p: any) => p.name) || [];
+      brief.evidenceList = brief.evidenceList.map((evidence: any, index: number) => {
+        const title = evidence.title || '';
+        const summary = evidence.summary || '';
+        
+        // Check if any peptide name appears in title or summary
+        const hasPeptideName = peptideNames.some((name: string) => {
+          const nameParts = name.split(/[\s-]/).filter(p => p.length > 2);
+          return nameParts.some(part => 
+            title.toLowerCase().includes(part.toLowerCase()) ||
+            summary.toLowerCase().includes(part.toLowerCase())
+          );
+        });
+        
+        if (!hasPeptideName && title) {
+          console.warn(`Evidence ${index + 1} may not be peptide-specific: "${title}"`);
+          // Don't remove it, but log a warning
+        }
+        
+        return evidence;
+      });
+    }
+    
     return brief;
   } catch (error) {
     console.error('Error calling OpenAI:', error);

@@ -27,18 +27,33 @@ export default function TrackingPage() {
         return;
       }
 
-      // Get peptides from brief
-      const { data: briefRecords } = await supabase
-        .from('briefs')
-        .select('brief_output')
-        .eq('user_id', session.user.id)
-        .order('created_at', { ascending: false })
-        .limit(1);
+      // Get peptides from brief - try multiple times if needed
+      let briefRecords = null;
+      for (let i = 0; i < 3; i++) {
+        const { data: records } = await supabase
+          .from('briefs')
+          .select('brief_output')
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (records && records.length > 0) {
+          briefRecords = records;
+          break;
+        }
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
 
       if (briefRecords && briefRecords.length > 0) {
         const brief = briefRecords[0].brief_output as any;
         const peptideNames = brief.candidatePeptides?.map((p: any) => p.name) || [];
+        console.log('Loaded peptides from brief:', peptideNames);
         setPeptides(peptideNames);
+      } else {
+        console.log('No brief found, peptides list will be empty');
+        setPeptides([]);
       }
 
       // Load logs
