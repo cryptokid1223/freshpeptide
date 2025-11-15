@@ -120,6 +120,13 @@ export default function GeneratePage() {
 
       setStatusMessage('Generating personalized recommendations...');
 
+      console.log('📡 Calling generate-brief API...');
+      console.log('Request data:', {
+        userId: session.user.id,
+        hasIntakeData: !!intakeRecord.intake_data,
+        intakeDataKeys: intakeRecord.intake_data ? Object.keys(intakeRecord.intake_data) : [],
+      });
+
       // Call API to generate brief
       const response = await fetch('/api/generate-brief', {
         method: 'POST',
@@ -130,32 +137,97 @@ export default function GeneratePage() {
         }),
       });
 
+      console.log('API Response status:', response.status, response.statusText);
+
       if (!response.ok) {
-        throw new Error('Failed to generate brief');
+        const errorText = await response.text();
+        console.error('API Error response:', errorText);
+        throw new Error(`Failed to generate brief: ${response.statusText}`);
       }
 
       const result = await response.json();
+      console.log('✅ API Response received:', {
+        success: result.success,
+        hasBrief: !!result.brief,
+        model: result.model,
+        peptideCount: result.brief?.candidatePeptides?.length || 0,
+      });
       
       setStatusMessage('Saving your stack...');
 
-      // First, delete any existing briefs for this user
-      await supabase
+      // Check if brief already exists
+      const { data: existingBriefs, error: checkError } = await supabase
         .from('briefs')
-        .delete()
+        .select('id')
         .eq('user_id', session.user.id);
 
-      // Then insert the new brief
-      const { error: saveError } = await supabase
-        .from('briefs')
-        .insert({
-          user_id: session.user.id,
-          brief_output: result.brief,
-          model_name: result.model,
-        });
+      if (checkError) {
+        console.warn('Error checking existing briefs:', checkError);
+      }
+
+      let saveError = null;
+
+      if (existingBriefs && existingBriefs.length > 0) {
+        // Try to update existing brief
+        console.log('Updating existing brief...');
+        const { error: updateError } = await supabase
+          .from('briefs')
+          .update({
+            brief_output: result.brief,
+            model_name: result.model,
+            created_at: new Date().toISOString(),
+          })
+          .eq('user_id', session.user.id);
+
+        saveError = updateError;
+        
+        if (updateError) {
+          console.warn('Update failed, trying insert instead:', updateError.message);
+          // If update fails (no UPDATE policy), try insert
+          const { error: insertError } = await supabase
+            .from('briefs')
+            .insert({
+              user_id: session.user.id,
+              brief_output: result.brief,
+              model_name: result.model,
+            });
+          saveError = insertError;
+          console.log('Inserted new brief (after update failed):', insertError ? 'ERROR' : 'SUCCESS');
+        } else {
+          console.log('✅ Updated existing brief successfully');
+        }
+      } else {
+        // Insert new brief
+        console.log('Inserting new brief...');
+        const { error: insertError } = await supabase
+          .from('briefs')
+          .insert({
+            user_id: session.user.id,
+            brief_output: result.brief,
+            model_name: result.model,
+          });
+
+        saveError = insertError;
+        console.log('Inserted new brief:', insertError ? 'ERROR' : 'SUCCESS');
+      }
 
       if (saveError) {
-        console.error('Error saving brief:', saveError);
-        throw new Error('Failed to save your stack. Please try again.');
+        console.error('❌ Error saving brief:', saveError);
+        console.error('Error details:', JSON.stringify(saveError, null, 2));
+        console.error('Error code:', saveError.code);
+        console.error('Error hint:', saveError.hint);
+        
+        // Provide helpful error message
+        let errorMessage = 'Failed to save your stack. ';
+        if (saveError.code === '42501') {
+          errorMessage += 'Database permission error. Please contact support.';
+        } else if (saveError.message) {
+          errorMessage += saveError.message;
+        } else {
+          errorMessage += 'Please try again.';
+        }
+        
+        throw new Error(errorMessage);
       }
       
       console.log('✅ Brief saved successfully to database');

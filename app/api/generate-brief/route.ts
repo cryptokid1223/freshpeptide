@@ -682,30 +682,49 @@ export async function POST(request: NextRequest) {
     // Check if we should use mock or real AI
     const useMockAI = process.env.USE_MOCK_AI === 'true';
     const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
+    const openAIKeyLength = process.env.OPENAI_API_KEY?.length || 0;
 
-    console.log('Generating brief with:', { useMockAI, hasOpenAIKey });
+    console.log('🔍 AI Configuration Check:', { 
+      useMockAI, 
+      hasOpenAIKey, 
+      openAIKeyLength,
+      openAIKeyPrefix: process.env.OPENAI_API_KEY?.substring(0, 7) + '...' || 'none'
+    });
 
     let brief: BriefOutput;
     let modelName = 'mock';
     
-    if (useMockAI || !hasOpenAIKey) {
-      // Use mock AI for testing or if no API key
-      console.log('Using mock AI', useMockAI ? '(explicitly enabled)' : '(no OpenAI API key)');
+    if (useMockAI) {
+      // Use mock AI for testing
+      console.log('⚠️ Using MOCK AI (explicitly enabled via USE_MOCK_AI=true)');
+      brief = generateMockBrief(intakeData);
+    } else if (!hasOpenAIKey) {
+      // No API key configured
+      console.error('❌ No OpenAI API key found! Using mock AI as fallback.');
+      console.error('💡 To use real AI, set OPENAI_API_KEY in your environment variables.');
       brief = generateMockBrief(intakeData);
     } else {
       // Use real AI provider
-      console.log('Using real AI (GPT-4 Turbo)');
+      console.log('✅ Using REAL AI (GPT-4 Turbo)');
       try {
         brief = await generateRealBrief(intakeData);
         modelName = 'gpt-4-turbo-preview';
+        console.log('✅ Successfully generated brief with OpenAI');
       } catch (error: any) {
-        console.error('Error generating brief with OpenAI:', error);
+        console.error('❌ Error generating brief with OpenAI:', error);
+        console.error('Error details:', error.message || error);
         // Fallback to mock if OpenAI fails
-        console.log('Falling back to mock AI due to OpenAI error');
+        console.log('⚠️ Falling back to mock AI due to OpenAI error');
         brief = generateMockBrief(intakeData);
         modelName = 'mock-fallback';
       }
     }
+    
+    console.log('📊 Final brief summary:', {
+      model: modelName,
+      peptideCount: brief.candidatePeptides?.length || 0,
+      hasEvidence: !!brief.evidenceList && brief.evidenceList.length > 0,
+    });
 
     return NextResponse.json({
       success: true,
