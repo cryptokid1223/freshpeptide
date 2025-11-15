@@ -180,8 +180,26 @@ export default function GeneratePage() {
 
         if (profileCreateError) {
           console.error('❌ Failed to create profile:', profileCreateError);
+          
+          // Check if error is due to email conflict (profile exists with different ID)
+          if (profileCreateError.code === '23505' && profileCreateError.message?.includes('email')) {
+            console.log('⚠️ Profile with this email exists but different ID. Checking...');
+            
+            // Check if there's a profile with this email
+            const { data: emailProfile } = await supabase
+              .from('profiles')
+              .select('id, email')
+              .eq('email', session.user.email)
+              .maybeSingle();
+            
+            if (emailProfile && emailProfile.id !== session.user.id) {
+              // Profile exists with different ID - this is a data integrity issue
+              throw new Error(`Profile mismatch detected. Please run the SQL fix script in Supabase to resolve this. Error: ${profileCreateError.message}`);
+            }
+          }
+          
           // If we can't create profile, we can't save the brief
-          throw new Error(`Failed to create user profile: ${profileCreateError.message || 'Database error'}. Please contact support.`);
+          throw new Error(`Failed to create user profile: ${profileCreateError.message || 'Database error'}. Please contact support or run the SQL fix script.`);
         }
         console.log('✅ Profile created successfully');
       } else {
