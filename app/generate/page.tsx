@@ -155,6 +155,39 @@ export default function GeneratePage() {
       
       setStatusMessage('Saving your stack...');
 
+      // CRITICAL: Ensure user profile exists before saving brief
+      console.log('🔍 Checking if profile exists for user:', session.user.id);
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', session.user.id)
+        .maybeSingle();
+
+      if (profileCheckError) {
+        console.warn('Error checking profile:', profileCheckError);
+      }
+
+      if (!existingProfile) {
+        console.log('⚠️ Profile not found, creating profile...');
+        // Create profile if it doesn't exist
+        const { error: profileCreateError } = await supabase
+          .from('profiles')
+          .insert({
+            id: session.user.id,
+            email: session.user.email || '',
+            created_at: new Date().toISOString(),
+          });
+
+        if (profileCreateError) {
+          console.error('❌ Failed to create profile:', profileCreateError);
+          // If we can't create profile, we can't save the brief
+          throw new Error(`Failed to create user profile: ${profileCreateError.message || 'Database error'}. Please contact support.`);
+        }
+        console.log('✅ Profile created successfully');
+      } else {
+        console.log('✅ Profile exists');
+      }
+
       // Check if brief already exists
       const { data: existingBriefs, error: checkError } = await supabase
         .from('briefs')
