@@ -161,7 +161,10 @@ async function generateRealBrief(intakeData: any): Promise<BriefOutput> {
   const openai = new OpenAI({ apiKey });
 
   // Helper function to format medical/lifestyle data
-  const formatCondition = (value: string) => {
+  const formatCondition = (value: string | null | undefined) => {
+    if (!value || value === 'null' || value === 'undefined') {
+      return 'Not specified';
+    }
     const mapping: { [key: string]: string } = {
       none: 'None',
       diabetes: 'Diabetes',
@@ -502,10 +505,10 @@ Return ONLY valid JSON in this exact structure (no markdown, no additional text)
   const userMessage = `Analyze this individual's complete health profile and create a personalized peptide stack. Write the analysis as if you're speaking DIRECTLY to them using "you" and "your":
 
 DEMOGRAPHICS:
-- Age: ${intakeData.demographics?.age} years old
+- Age: ${intakeData.demographics?.age || 'Not specified'} years old
 - Sex: ${formatCondition(intakeData.demographics?.sex)}
-- Height: ${intakeData.demographics?.height}
-- Weight: ${intakeData.demographics?.weight}
+- Height: ${intakeData.demographics?.height || 'Not specified'}
+- Weight: ${intakeData.demographics?.weight || 'Not specified'}
 
 MEDICAL HISTORY:
 - Current Medical Conditions: ${formatCondition(intakeData.medical?.conditions)}
@@ -531,7 +534,9 @@ PEPTIDE EXPERIENCE LEVEL:
 - Injection Comfort: ${formatCondition(intakeData.experience?.injectionComfort)}
 
 GOALS:
-${intakeData.goals?.selectedGoals?.map((goal: string) => `- ${goal}`).join('\n')}
+${intakeData.goals?.selectedGoals && Array.isArray(intakeData.goals.selectedGoals) 
+  ? intakeData.goals.selectedGoals.map((goal: string) => `- ${goal}`).join('\n')
+  : 'No specific goals selected'}
 ${intakeData.goals?.customGoal ? `\nAdditional Goals/Notes: ${intakeData.goals.customGoal}` : ''}
 
 Create a comprehensive, personalized peptide education brief written DIRECTLY to this person using "you" and "your". Make it warm, personal, and conversational while remaining professional. Consider their age, medical conditions, medications, lifestyle, diet, stress level, recovery pattern, and goals. Use the dietary approach to recommend metabolic peptides, stress level for cortisol-related peptides, and recovery pattern for inflammation/repair peptides. Provide evidence-based recommendations with proper dosing, timing, and safety considerations.
@@ -576,23 +581,54 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate intake data structure
+    console.log('Received intake data structure:', {
+      hasDemographics: !!intakeData.demographics,
+      hasMedical: !!intakeData.medical,
+      hasLifestyle: !!intakeData.lifestyle,
+      hasDietary: !!intakeData.dietary,
+      hasStress: !!intakeData.stress,
+      hasRecovery: !!intakeData.recovery,
+      hasGoals: !!intakeData.goals,
+      hasExperience: !!intakeData.experience,
+      goalsType: typeof intakeData.goals,
+      selectedGoals: intakeData.goals?.selectedGoals,
+    });
+
+    // Ensure goals is properly structured
+    if (!intakeData.goals) {
+      intakeData.goals = { selectedGoals: [] };
+    }
+    if (!Array.isArray(intakeData.goals.selectedGoals)) {
+      intakeData.goals.selectedGoals = [];
+    }
+
     // Check if we should use mock or real AI
     const useMockAI = process.env.USE_MOCK_AI === 'true';
+    const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
 
-    console.log('Generating brief with:', { useMockAI, hasOpenAIKey: !!process.env.OPENAI_API_KEY });
+    console.log('Generating brief with:', { useMockAI, hasOpenAIKey });
 
     let brief: BriefOutput;
     let modelName = 'mock';
     
-    if (useMockAI) {
-      // Use mock AI for testing
-      console.log('Using mock AI');
+    if (useMockAI || !hasOpenAIKey) {
+      // Use mock AI for testing or if no API key
+      console.log('Using mock AI', useMockAI ? '(explicitly enabled)' : '(no OpenAI API key)');
       brief = generateMockBrief(intakeData);
     } else {
       // Use real AI provider
       console.log('Using real AI (GPT-4 Turbo)');
-      brief = await generateRealBrief(intakeData);
-      modelName = 'gpt-4-turbo-preview';
+      try {
+        brief = await generateRealBrief(intakeData);
+        modelName = 'gpt-4-turbo-preview';
+      } catch (error: any) {
+        console.error('Error generating brief with OpenAI:', error);
+        // Fallback to mock if OpenAI fails
+        console.log('Falling back to mock AI due to OpenAI error');
+        brief = generateMockBrief(intakeData);
+        modelName = 'mock-fallback';
+      }
     }
 
     return NextResponse.json({
