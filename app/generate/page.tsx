@@ -23,17 +23,40 @@ export default function GeneratePage() {
         return;
       }
 
-    // Check if intake is completed
-      const { data: intakeRecord } = await supabase
-        .from('intake')
-        .select('intake_data')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
+      // Check if intake is completed - retry a few times in case data is still being saved
+      let intakeRecord = null;
+      for (let i = 0; i < 5; i++) {
+        const { data: record } = await supabase
+          .from('intake')
+          .select('intake_data')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        if (record?.intake_data) {
+          intakeRecord = record;
+          break;
+        }
+        
+        // Wait before retry (longer wait for first few attempts)
+        await new Promise(resolve => setTimeout(resolve, i < 2 ? 1000 : 500));
+      }
 
       if (!intakeRecord?.intake_data) {
+        // Check if user just completed intake (has it in localStorage)
+        const intakeCompleted = localStorage.getItem('intake_completed');
+        const intakeData = localStorage.getItem('intake_data');
+        
+        if (intakeCompleted === 'true' && intakeData) {
+          // User just completed intake, data might still be syncing
+          // Don't redirect, let them try to generate
+          console.log('Intake completed but data not yet in Supabase, allowing generation attempt');
+          return;
+        }
+        
+        // No intake data found, redirect to consent
         router.push('/consent');
         return;
-    }
+      }
 
       // Load existing brief
       const { data: briefRecords } = await supabase
@@ -60,15 +83,39 @@ export default function GeneratePage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      // Get intake data
-      const { data: intakeRecord } = await supabase
-        .from('intake')
-        .select('intake_data')
-        .eq('user_id', session.user.id)
-        .single();
+      // Get intake data - try multiple times if needed
+      let intakeRecord = null;
+      for (let i = 0; i < 3; i++) {
+        const { data: record } = await supabase
+          .from('intake')
+          .select('intake_data')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
 
-      if (!intakeRecord) {
-        throw new Error('Please complete your health intake first');
+        if (record?.intake_data) {
+          intakeRecord = record;
+          break;
+        }
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+
+      // If still not found, try localStorage as fallback
+      if (!intakeRecord?.intake_data) {
+        const localData = localStorage.getItem('intake_data');
+        if (localData) {
+          try {
+            intakeRecord = { intake_data: JSON.parse(localData) };
+            console.log('Using intake data from localStorage as fallback');
+          } catch (e) {
+            console.error('Failed to parse localStorage data:', e);
+          }
+        }
+      }
+
+      if (!intakeRecord?.intake_data) {
+        throw new Error('Please complete your health intake first. Redirecting...');
       }
 
       setStatusMessage('Generating personalized recommendations...');
@@ -101,7 +148,15 @@ export default function GeneratePage() {
       setBrief(result.brief);
       setStatusMessage('Complete!');
     } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+      const errorMessage = err.message || 'Something went wrong';
+      setError(errorMessage);
+      
+      // If error is about missing intake, redirect after a moment
+      if (errorMessage.includes('complete your health intake')) {
+        setTimeout(() => {
+          router.push('/consent');
+        }, 2000);
+      }
     } finally {
       setTimeout(() => {
       setIsGenerating(false);

@@ -102,7 +102,7 @@ export default function IntakePage() {
   }, [router]);
 
   // Auto-save function
-  const saveData = async (data: any) => {
+  const saveData = async (data: any): Promise<boolean> => {
     setIsSaving(true);
     const updatedData = { ...intakeData, ...data };
     setIntakeData(updatedData);
@@ -118,7 +118,7 @@ export default function IntakePage() {
         console.log('Data being saved:', updatedData);
         console.log('Data sections:', Object.keys(updatedData));
         
-        const { data: result, error: upsertError } = await supabase
+        const { error: upsertError } = await supabase
           .from('intake')
           .upsert({
             user_id: user.id,
@@ -128,18 +128,27 @@ export default function IntakePage() {
         
         if (upsertError) {
           console.error('❌ Supabase upsert error:', upsertError);
+          setLastSaved(new Date());
+          setTimeout(() => setIsSaving(false), 500);
+          return false;
         } else {
           console.log('✅ Intake data saved successfully to Supabase');
+          setLastSaved(new Date());
+          setTimeout(() => setIsSaving(false), 500);
+          return true;
         }
       } else {
         console.error('❌ No user found when trying to save');
+        setLastSaved(new Date());
+        setTimeout(() => setIsSaving(false), 500);
+        return false;
       }
     } catch (error) {
       console.error('❌ Error saving to Supabase:', error);
+      setLastSaved(new Date());
+      setTimeout(() => setIsSaving(false), 500);
+      return false;
     }
-    
-    setLastSaved(new Date());
-    setTimeout(() => setIsSaving(false), 500);
   };
 
   const steps = [
@@ -156,28 +165,43 @@ export default function IntakePage() {
   const CurrentStepComponent = steps[currentStep].component;
 
   const handleNext = async (data: any) => {
-    await saveData(data);
+    const saved = await saveData(data);
     
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       // Final step completed - ensure data is fully saved
       console.log('🎉 All intake steps completed!');
-      console.log('Final intake data:', { ...intakeData, ...data });
+      const finalData = { ...intakeData, ...data };
+      console.log('Final intake data:', finalData);
       
       // Mark as completed
       localStorage.setItem('intake_completed', 'true');
+      
+      // Wait a moment for Supabase to process, then verify and redirect
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
       // Verify data is in Supabase before proceeding
       try {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
-          // Double-check the data was saved
-          const { data: verifyRecord } = await supabase
-            .from('intake')
-            .select('intake_data')
-            .eq('user_id', user.id)
-            .maybeSingle();
+          // Retry up to 3 times to check if data was saved
+          let verifyRecord = null;
+          for (let i = 0; i < 3; i++) {
+            const { data: record } = await supabase
+              .from('intake')
+              .select('intake_data')
+              .eq('user_id', user.id)
+              .maybeSingle();
+            
+            if (record?.intake_data) {
+              verifyRecord = record;
+              break;
+            }
+            
+            // Wait before retry
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
           
           console.log('✅ Verification: Data in Supabase:', verifyRecord?.intake_data);
           
@@ -185,13 +209,17 @@ export default function IntakePage() {
             console.log('✅ Confirmed: All data saved. Routing to /generate');
             router.push('/generate');
           } else {
-            console.error('⚠️ Warning: Data not found in Supabase after save');
+            console.error('⚠️ Warning: Data not found in Supabase after save, but proceeding anyway');
+            // Still redirect - the generate page will handle it
             router.push('/generate');
           }
+        } else {
+          console.error('No user found');
+          router.push('/generate');
         }
       } catch (error) {
         console.error('Error verifying save:', error);
-      router.push('/generate');
+        router.push('/generate');
       }
     }
   };
