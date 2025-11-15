@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { Logo } from '@/components/Logo';
 
 export default function Home() {
   const router = useRouter();
@@ -47,8 +46,14 @@ export default function Home() {
       {/* Top Navigation */}
       <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md border-b border-gray-200 z-50">
         <div className="container mx-auto px-6 py-3 max-w-7xl flex items-center justify-between">
-          {/* Logo - using reusable component with nav variant */}
-          <Logo variant="nav" href="/" />
+          {/* Logo */}
+          <Link href="/" className="hover:opacity-80 transition-opacity">
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="h-16 w-auto object-contain"
+            />
+          </Link>
 
           {/* Right Side Buttons */}
           <div className="flex items-center gap-3">
@@ -126,9 +131,12 @@ export default function Home() {
       <main className="container mx-auto px-6 pt-24 pb-20 max-w-5xl">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          {/* Hero logo - using reusable component with hero variant for proper sizing */}
           <div className="flex justify-center mb-8">
-            <Logo variant="hero" href={null} />
+            <img 
+              src="/logo.png" 
+              alt="FreshPeptide" 
+              className="w-full max-w-2xl h-auto object-contain"
+            />
           </div>
           <div className="text-3xl md:text-4xl font-light text-gray-600 min-h-[48px]">
             <TypeWriter 
