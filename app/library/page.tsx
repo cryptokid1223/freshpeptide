@@ -175,7 +175,7 @@ export default function LibraryPage() {
         <div className="container mx-auto px-6 py-3 max-w-7xl flex items-center justify-between">
           <Link href="/" className="hover:opacity-80 transition-opacity">
             <img 
-              src="/logo.png" 
+              src="/updatedlogo.png" 
               alt="FreshPeptide" 
               className="h-16 w-auto object-contain"
             />

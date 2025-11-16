@@ -49,7 +49,7 @@ export default function Home() {
           {/* Logo */}
           <Link href="/" className="hover:opacity-80 transition-opacity">
             <img 
-              src="/logo.png" 
+              src="/updatedlogo.png" 
               alt="FreshPeptide" 
               className="h-16 w-auto object-contain"
             />
@@ -133,7 +133,7 @@ export default function Home() {
         <div className="text-center mb-16">
           <div className="flex justify-center mb-8">
             <img 
-              src="/logo.png" 
+              src="/updatedlogo.png" 
               alt="FreshPeptide" 
               className="w-full max-w-2xl h-auto object-contain"
             />
