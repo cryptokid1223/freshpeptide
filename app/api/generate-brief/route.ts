@@ -160,414 +160,71 @@ async function generateRealBrief(intakeData: any): Promise<BriefOutput> {
 
   const openai = new OpenAI({ apiKey });
 
-  // Helper function to format medical/lifestyle data
-  const formatCondition = (value: string | null | undefined) => {
-    if (!value || value === 'null' || value === 'undefined') {
-      return 'Not specified';
-    }
-    const mapping: { [key: string]: string } = {
-      none: 'None',
-      diabetes: 'Diabetes',
-      hypertension: 'Hypertension',
-      heart_disease: 'Heart Disease',
-      thyroid_disorder: 'Thyroid Disorder',
-      autoimmune: 'Autoimmune Condition',
-      mental_health: 'Mental Health Condition',
-      blood_pressure: 'Blood Pressure Medication',
-      antidepressants: 'Antidepressants',
-      pain_medication: 'Pain Medication',
-      supplements_only: 'Supplements Only',
-      food_allergies: 'Food Allergies',
-      drug_allergies: 'Drug Allergies',
-      environmental: 'Environmental Allergies',
-      multiple: 'Multiple Allergies',
-      less_than_5: 'Less than 5 hours',
-      '5_to_6': '5-6 hours',
-      '6_to_7': '6-7 hours',
-      '7_to_8': '7-8 hours',
-      more_than_8: 'More than 8 hours',
-      irregular: 'Irregular sleep',
-      sedentary: 'Sedentary',
-      'light_1_2x_week': 'Light exercise (1-2x/week)',
-      'moderate_3_4x_week': 'Moderate exercise (3-4x/week)',
-      'active_5_6x_week': 'Active (5-6x/week)',
-      very_active_daily: 'Very active daily',
-      athlete: 'Athlete level',
-      'occasional_1_2_monthly': 'Occasional (1-2x/month)',
-      'light_1_2_weekly': 'Light (1-2 drinks/week)',
-      'moderate_3_5_weekly': 'Moderate (3-5 drinks/week)',
-      'heavy_6plus_weekly': 'Heavy (6+ drinks/week)',
-      daily: 'Daily consumption',
-      balanced: 'Balanced diet (carbs, protein, fats)',
-      high_protein_low_carb: 'High-protein / low-carb',
-      keto_low_carb: 'Keto / very low-carb',
-      plant_based_vegetarian: 'Plant-based / vegetarian',
-      intermittent_fasting: 'Intermittent fasting',
-      no_specific_diet: 'No specific diet',
-      low: 'Low stress (rarely stressed)',
-      moderate: 'Moderate stress (occasional)',
-      high: 'High stress (chronic or frequent)',
-      quick_1_day: 'Quick recovery (1 day or less)',
-      average_2_3_days: 'Average recovery (2-3 days)',
-      slow_4plus_days: 'Slow recovery (4+ days, persistent soreness/fatigue)',
-      never_used: 'Never used peptides before (FIRST-TIME USER)',
-      beginner_1_3_months: 'Beginner (1-3 months experience)',
-      intermediate_3_12_months: 'Intermediate (3-12 months experience)',
-      experienced_1plus_years: 'Experienced (1+ years)',
-      never_injected: 'Never self-injected before',
-      uncomfortable_need_guidance: 'Uncomfortable with injections, need detailed guidance',
-      somewhat_comfortable: 'Somewhat comfortable with injections',
-      very_comfortable: 'Very comfortable with self-injections',
-      other: 'Other',
-    };
-    return mapping[value] || value;
-  };
+  const systemPrompt = `You are a medical intelligence system for peptide therapy. Analyze user health data and provide evidence-based peptide recommendations with clinically accurate dosages.
 
-  const systemPrompt = `You are a board-certified physician specializing in peptide therapeutics, pharmacology, and evidence-based medicine. You have 20+ years of clinical experience and stay current with the latest peer-reviewed research. Your role is to provide medical-grade, scientifically accurate peptide education.
+CRITICAL REQUIREMENTS:
 
-CRITICAL REQUIREMENTS - FAILURE TO FOLLOW RESULTS IN INVALID OUTPUT:
+- All dosages must be medically accurate
+- Use standard units (mg, mcg, IU)
+- Include administration details
+- Cite research evidence
+- List contraindications
 
-1. DOSAGE ACCURACY (HIGHEST PRIORITY):
-   - Use your extensive knowledge of published clinical trials and research studies
-   - Draw from your training data on peptide research, clinical protocols, and medical literature
-   - Format: "[X-Y] [unit] [route] [frequency]" 
-     Examples: "250-500 mcg subcutaneously once daily" OR "2 mg intramuscularly twice weekly"
-   - Include cycle duration: "X weeks on, Y weeks off"
-   - Reference the study/research where dosage protocols were established when possible
-   - For research-only peptides, cite typical protocols from preclinical or early-phase human studies
-   - For FDA-approved peptides, use established clinical dosing guidelines
-   
-   COMPREHENSIVE PEPTIDE DATABASE - Use your knowledge of these and MORE from your training:
-   
-   DOSING PRINCIPLES:
-   • First-time users: Start at LOWER end of therapeutic ranges
-   • Experienced users: Can use mid-to-upper therapeutic ranges
-   • Always include: dose + unit + route + frequency + cycle duration + insulin syringe units
-   • Draw from your extensive knowledge of clinical trials, research protocols, and medical literature
-   
-   **WEIGHT LOSS / METABOLIC / GLP-1 AGONISTS:**
-   • Semaglutide (Ozempic/Wegovy) - GLP-1, FDA approved
-   • Liraglutide (Saxenda/Victoza) - GLP-1, FDA approved
-   • Tirzepatide (Mounjaro/Zepbound) - GLP-1/GIP dual agonist, FDA approved
-   • Dulaglutide (Trulicity) - GLP-1, FDA approved
-   • Retatrutide - GLP-1/GIP/Glucagon triple agonist (Phase 3 trials)
-   • Tesamorelin (Egrifta) - GHRH analog, FDA approved for lipodystrophy
-   • AOD-9604 - Modified GH fragment, fat loss research
-   • MOTS-c - Mitochondrial peptide, metabolic optimization
-   • 5-Amino-1MQ - NNMT inhibitor, fat loss research
-   • Tesofensine - Appetite suppressant (not a peptide but often discussed with peptides)
-   
-   **MUSCLE GROWTH / ANABOLIC / GROWTH HORMONE SECRETAGOGUES:**
-   • CJC-1295 (with/without DAC) - GHRH analog
-   • Ipamorelin - Selective GH secretagogue
-   • GHRP-2 - GH releasing peptide
-   • GHRP-6 - GH releasing peptide, increases appetite
-   • Hexarelin - Potent GH secretagogue
-   • MK-677 (Ibutamoren) - Oral GH secretagogue
-   • Sermorelin - GHRH analog
-   • Tesamorelin - GHRH analog (also metabolic)
-   • Follistatin-344 - Myostatin inhibitor
-   • ACE-031 - Myostatin inhibitor
-   • YK-11 - Myostatin inhibitor (SARM-like)
-   • IGF-1 LR3 - Long-acting IGF-1 analog
-   • IGF-1 DES - Short-acting IGF-1 analog
-   • PEG-MGF - Mechano growth factor
-   • HGH Fragment 176-191 - Fat loss/muscle preservation
-   
-   **INJURY RECOVERY / TISSUE REPAIR / HEALING:**
-   • BPC-157 - Body Protection Compound, multi-tissue repair
-   • TB-500 (Thymosin Beta-4) - Tissue regeneration, inflammation
-   • KPV - Anti-inflammatory tripeptide
-   • GHK-Cu - Copper peptide, wound healing
-   • Larazotide - Tight junction regulation (celiac, leaky gut)
-   • Dihexa - Neurogenic/cognitive (also cognitive category)
-   • LL-37 - Antimicrobial peptide, wound healing
-   • Cerebrolysin - Neurotrophic peptide mix
-   • Cortexin - Neuroprotective peptide complex
-   • Actovegin - Tissue metabolism enhancer
-   
-   **COGNITIVE ENHANCEMENT / NEUROPROTECTION / NOOTROPICS:**
-   • Semax - ACTH analog, neuroprotection
-   • Selank - Anxiolytic, cognitive enhancement
-   • P21 (Cerebrolysin derivative) - BDNF mimetic
-   • Dihexa - Potent cognitive enhancer
-   • NSI-189 - Neurogenesis stimulator
-   • Noopept - Cognitive enhancement (racetam-like)
-   • Cerebrolysin - Neurotrophic factor mix
-   • Cortexin - Polypeptide neuroprotector
-   • NA-Semax-Amidate - Enhanced Semax variant
-   • NA-Selank - Enhanced Selank variant
-   • Adamax (Adamentane derivatives) - Cognitive/antiviral
-   • Pinealon - Pineal gland peptide bioregulator
-   • Cortagen - Immune/brain peptide
-   
-   **ANTI-AGING / LONGEVITY / CELLULAR HEALTH:**
-   • Epithalon (Epitalon) - Telomerase activator
-   • GHK-Cu - Copper peptide, tissue remodeling
-   • MOTS-c - Mitochondrial peptide
-   • Humanin - Mitochondrial-derived peptide
-   • SS-31 (Elamipretide) - Mitochondrial protector
-   • NAD+ precursors (NMN, NR) - Cellular energy (not peptides but related)
-   • Thymalin - Thymus peptide, immune regulation
-   • Vilon - Epithelial tissue peptide
-   • Bronchogen - Bronchial mucosa peptide
-   • Cardiogen - Cardiac peptide bioregulator
-   • Hepatogen - Liver peptide bioregulator
-   • Pielotax - Kidney peptide bioregulator
-   • Ovagen - Metabolic/liver peptide
-   • Vezugen - Vascular peptide
-   • Vladonix - Thymus peptide
-   
-   **IMMUNE SYSTEM / ANTIMICROBIAL:**
-   • Thymosin Alpha-1 (Thymalfasin) - Immune modulator, FDA approved
-   • LL-37 - Antimicrobial peptide
-   • Thymalin - Thymus extract
-   • Cortagen - Immune peptide
-   • Vladonix - Thymus peptide
-   • Beta-Glucan peptides - Immune activation (not true peptides)
-   
-   **SEXUAL HEALTH / LIBIDO:**
-   • PT-141 (Bremelanotide) - Melanocortin agonist, FDA approved
-   • Kisspeptin-10 - Reproductive hormone regulation
-   • Melanotan II - Melanocortin agonist (also tanning)
-   • Oxytocin - Social bonding, sexual function
-   • HCG (Human Chorionic Gonadotropin) - Testosterone/fertility
-   • HMG (Human Menopausal Gonadotropin) - Fertility
-   • Gonadorelin - GnRH analog
-   • Triptorelin - GnRH analog
-   
-   **SKIN / HAIR / COSMETIC / AESTHETICS:**
-   • GHK-Cu - Copper peptide, collagen synthesis
-   • Matrixyl (Palmitoyl Pentapeptide) - Anti-aging skincare
-   • Argireline (Acetyl Hexapeptide-8) - Wrinkle reduction
-   • Copper Peptide GHK - Skin regeneration
-   • PTD-DBM - Hair growth peptide
-   • RU58841 - Hair loss prevention (not peptide, often grouped)
-   • Melanotan I - Tanning peptide
-   • Melanotan II - Tanning/sexual health
-   • SNAP-8 - Anti-wrinkle peptide
-   • Pentapeptide-18 - Botox-like effects
-   
-   **SLEEP / RECOVERY / RELAXATION:**
-   • DSIP (Delta Sleep-Inducing Peptide) - Sleep regulation
-   • Selank - Anxiolytic/sleep aid
-   • Epithalon - Sleep/circadian rhythm
-   • Melatonin peptides - Circadian regulation
-   
-   **ATHLETIC PERFORMANCE / ENDURANCE:**
-   • EPO peptides - Endurance (use with extreme caution)
-   • Hexarelin - GH/endurance
-   • AICAR peptide - AMPK activation, endurance
-   • GW501516 (Cardarine) - PPARδ agonist (not peptide, often grouped)
-   
-   **SPECIALIZED / RESEARCH / EMERGING:**
-   • FGL (Fibroblast Growth Loop) - Neuroprotection
-   • Splenopentin - Immune modulation
-   • Pinealon - Pineal gland bioregulator
-   • Retinalamin - Eye health peptide
-   • Prostatilen - Prostate health peptide
-   • Thyreogen - Thyroid bioregulator
-   • Endoluten - Pineal peptide complex
-   • Cerluten - Brain peptide complex
-   • Crystagen - Immune/aging peptide
-   
-   **Use your extensive training knowledge to determine appropriate dosing from clinical trials, research protocols, and medical literature for whichever peptides you recommend.**
-   
-   INSULIN SYRINGE CALCULATION (MANDATORY FOR ALL INJECTABLE PEPTIDES):
-   - Standard insulin syringes are 1mL (100 units total)
-   - 1 unit = 0.01 mL
-   - Units depend on reconstitution concentration
-   - **CRITICAL: You MUST include specific unit numbers (e.g., 10 units, 20 units, 30 units) in the dosage**
-   - Format MUST be: "[dose] [unit] [route] [frequency] ([X] units on insulin syringe if reconstituted at [Y]mg/mL)"
-   - Examples:
-     * "250 mcg subcutaneously once daily (25 units on insulin syringe if reconstituted at 1mg/mL)"
-     * "2 mg intramuscularly twice weekly (20 units if reconstituted at 10mg/mL)"
-     * "500 mcg subcutaneously daily (50 units if reconstituted at 1mg/mL)"
-   - **NEVER omit the unit number - always specify exact units (10, 15, 20, 25, 30, etc.)**
-   - For oral peptides, state "Oral administration" and omit syringe units
+RESPOND ONLY WITH VALID JSON IN THIS EXACT FORMAT:
 
-2. EVIDENCE REQUIREMENTS (MANDATORY - EXTREMELY STRICT - ZERO TOLERANCE FOR GENERIC ARTICLES):
-   **CRITICAL: If you recommend a peptide, you MUST cite research that DIRECTLY studies THAT EXACT peptide by name**
-   
-   **ABSOLUTE REQUIREMENTS:**
-   - Each peptide MUST have 1-2 research articles where the peptide name appears EXPLICITLY in the title or is the PRIMARY subject
-   - The article title MUST contain the peptide name (e.g., "BPC-157", "Semaglutide", "Tirzepatide")
-   - **NEVER cite generic "peptide therapy", "growth hormone", "GLP-1 agonists" without the specific peptide name**
-   - **NEVER cite articles about different peptides or unrelated compounds**
-   - **NEVER make up fake research articles, PMIDs, or journal names**
-   - Include actual PubMed PMID numbers in URLs: https://pubmed.ncbi.nlm.nih.gov/[PMID]/
-   - The article MUST directly study the peptide you're recommending - not similar peptides, not related compounds
-   - Use your knowledge of clinical trials, preclinical studies, and review papers FROM YOUR TRAINING
-   
-   **STRICT VALIDATION RULES - PEPTIDE NAME MUST BE IN TITLE:**
-   - If recommending **Semaglutide** → Title MUST contain "Semaglutide" (STEP trials, SUSTAIN trials)
-   - If recommending **Tirzepatide** → Title MUST contain "Tirzepatide" (SURMOUNT, SURPASS trials)
-   - If recommending **BPC-157** → Title MUST contain "BPC-157" or "BPC 157" (NOT generic wound healing)
-   - If recommending **Semax** → Title MUST contain "Semax" (NOT generic nootropics or ACTH)
-   - If recommending **Epithalon** → Title MUST contain "Epithalon" or "Epitalon" (NOT generic anti-aging)
-   - If recommending **Ipamorelin** → Title MUST contain "Ipamorelin" (NOT generic GHRP or growth hormone)
-   - If recommending **CJC-1295** → Title MUST contain "CJC-1295" or "CJC 1295" (NOT generic GHRH)
-   - If recommending **TB-500** → Title MUST contain "TB-500" or "Thymosin Beta-4" (NOT generic thymosin)
-   
-   **IF YOU DON'T KNOW ACTUAL RESEARCH FOR A PEPTIDE:**
-   - State: "Limited published human studies available for [PEPTIDE NAME]" in the evidence section
-   - Cite preclinical/animal studies ONLY if they specifically mention the peptide name
-   - Be honest about the research status - DO NOT fabricate evidence
-   - DO NOT make up fake studies, PMIDs, or journal names
-   - If no real research exists, state: "Preclinical research suggests potential benefits, but human clinical data is limited"
-   
-   **INVALID EXAMPLES (ABSOLUTELY FORBIDDEN):**
-   ❌ Recommending BPC-157 → Citing "Peptide therapy for wound healing" (no BPC-157 in title)
-   ❌ Recommending Selank → Citing "Anxiety treatment with peptides" (no Selank in title)
-   ❌ Recommending Semaglutide → Citing "GLP-1 receptor agonists for diabetes" (too generic)
-   ❌ Making up fake journal names, PMIDs, or study titles
-   ❌ Citing research about similar but different peptides
-   
-   **VALID EXAMPLES:**
-   ✅ Recommending Semaglutide → Citing "Once-Weekly Semaglutide in Adults with Overweight or Obesity" (STEP 1 trial) - Title contains "Semaglutide"
-   ✅ Recommending BPC-157 → Citing "Stable Gastric Pentadecapeptide BPC 157 in the Treatment of Gastrointestinal Disorders" - Title contains "BPC 157"
-   ✅ Recommending Tirzepatide → Citing "Tirzepatide Once Weekly for the Treatment of Obesity" - Title contains "Tirzepatide"
-   ✅ Admitting "Limited human data available for [PEPTIDE NAME]; evidence based on animal studies" when that's the truth
-   
-3. CLINICAL ACCURACY:
-   - State regulatory status accurately (FDA-approved vs Research-only vs Compounded)
-   - Flag contraindications based on user's medical conditions
-   - Include drug interactions with their current medications
-   - Use proper medical terminology with patient-friendly explanations
-   
-4. PERSONALIZATION & PEPTIDE SELECTION:
-   - Analyze demographics, medical history, medications, lifestyle, diet, stress, recovery, peptide experience, and goals
-   - Write directly to the person using "you" and "your"
-   - Tailor peptide selection to their specific profile
-   - Address their specific health concerns and goals
-   
-   **CRITICAL - PEPTIDE VARIETY & GOAL MATCHING:**
-   - DO NOT default to the same peptides (BPC-157, TB-500, CJC-1295, Ipamorelin) for every user
-   - Use your extensive knowledge of peptide research to select the BEST peptides for each user's goals
-   - Match peptides SPECIFICALLY to their PRIMARY goals from the 100+ peptides you know:
-     * **Fat loss/Weight management** → Semaglutide, Tirzepatide, Liraglutide, Retatrutide, Tesamorelin, AOD-9604, 5-Amino-1MQ, MOTS-c, HGH Fragment 176-191
-     * **Muscle growth/Anabolism** → CJC-1295, Ipamorelin, GHRP-2, GHRP-6, Hexarelin, MK-677, Follistatin-344, IGF-1 LR3, IGF-1 DES, PEG-MGF, ACE-031, YK-11
-     * **Cognitive enhancement** → Semax, Selank, P21, Dihexa, NSI-189, Noopept, Cerebrolysin, Cortexin, NA-Semax-Amidate, Pinealon
-     * **Anti-aging/Longevity** → Epithalon, GHK-Cu, MOTS-c, Humanin, SS-31, Thymalin, Vilon, Cardiogen, Hepatogen, Ovagen, Vezugen
-     * **Injury recovery/Healing** → BPC-157, TB-500, KPV, GHK-Cu, LL-37, Cerebrolysin, Actovegin
-     * **Sexual health/Libido** → PT-141, Kisspeptin-10, Melanotan II, Oxytocin, HCG, Gonadorelin
-     * **Skin/hair/Cosmetic** → GHK-Cu, Matrixyl, Argireline, PTD-DBM, Melanotan I/II, SNAP-8, Pentapeptide-18
-     * **Immune support** → Thymosin Alpha-1, LL-37, Thymalin, Cortagen, Vladonix
-     * **Sleep/Recovery** → DSIP, Selank, Epithalon
-     * **Athletic performance/Endurance** → Hexarelin, AICAR, EPO peptides (with caution)
-   - Consider previously used peptides (if provided) and AVOID recommending the same ones if they didn't work
-   - Prioritize newer, more effective peptides when appropriate
-   - Provide 2-4 peptides that create a synergistic stack for their SPECIFIC goals
-   - Use your training knowledge to determine optimal dosing from research you know about
-   
-   **CRITICAL - DOSING ADJUSTMENTS:**
-   - **FIRST-TIME USERS (never_used)**: Use ONLY lower end of dosage ranges, emphasize starting slow
-   - **BEGINNERS (1-3 months)**: Use lower-to-mid ranges, include titration instructions
-   - **INTERMEDIATE/EXPERIENCED**: Can use mid-to-upper ranges based on goals
-   
-   **CRITICAL - INJECTION GUIDANCE:**
-   - **Never injected/Uncomfortable**: Include detailed injection technique, site rotation, sterile practice
-   - **Somewhat comfortable**: Brief injection reminders only
-   - **Very comfortable**: Minimal injection instruction needed
-   
-5. SAFETY EMPHASIS:
-   - Always note research-only peptides lack FDA approval for human use
-   - Emphasize medical supervision requirement
-   - Warn about quality/purity variations in compounded peptides
-   - Include monitoring recommendations (blood work, vitals, etc.)
-
-Return ONLY valid JSON in this exact structure (no markdown, no additional text):
 {
-  "goalAlignment": "Write directly to the person using 'you' and 'your'. Explain how YOUR specific goals, health profile, age, and lifestyle factors align with peptide research. Reference YOUR specific conditions and goals in a warm, personal way.",
-  "recommendedStack": {
-    "name": "Creative stack name based on their goals",
-    "description": "Detailed description of why this specific combination was chosen for THIS user",
-    "synergies": "Explain how these specific peptides work together synergistically for their goals"
-  },
-  "candidatePeptides": [
+  "peptideStack": [
     {
-      "name": "Full peptide name with abbreviation",
-      "why": "Write directly to the person: Why this specific peptide is ideal for YOUR goals and YOUR health profile. Use 'you' and 'your'",
-      "mechanism": "Detailed scientific mechanism of action explained in an accessible way",
-      "detailedInfo": "Comprehensive information about the peptide, its history, research status, and relevant studies. Written in a conversational tone.",
-      "recommendedDosage": "MANDATORY FORMAT: [dose] [unit] [route] [frequency] ([X] units on insulin syringe if reconstituted at [Y]mg/mL). MUST include specific unit numbers (10, 20, 25, 30, etc.). Examples: '250 mcg subcutaneously once daily (25 units on insulin syringe if reconstituted at 1mg/mL)' OR '2 mg intramuscularly twice weekly (20 units if reconstituted at 10mg/mL)'. ALWAYS include exact unit numbers for injectables. Start with FIRST-TIME USER dosing (lower end of range). For oral peptides, omit syringe units.",
-      "timing": {
-        "frequency": "Specific frequency (e.g., 'Once daily', 'Twice weekly', '3 times daily')",
-        "timeOfDay": "Optimal timing (e.g., 'Morning fasted', 'Before bed', 'Post-workout', 'Morning, afternoon, and bedtime')",
-        "withFood": "Specific instructions (e.g., 'On empty stomach - wait 30 min before eating', 'Can be taken with or without food')",
-        "cycleDuration": "Recommended cycle length and breaks (e.g., '8-12 weeks, then 4 week break')"
+      "name": "Peptide Name",
+      "class": "Peptide class (e.g., GLP-1, Growth Hormone Secretagogue)",
+      "dosage": {
+        "amount": "X mg or X mcg (MUST include unit)",
+        "frequency": "once daily / twice weekly / etc",
+        "timing": "morning fasted / before bed / etc",
+        "route": "subcutaneous / oral / etc"
       },
-      "potentialBenefits": ["Array of 4-6 specific benefits relevant to YOUR goals. Use personal language."],
-      "sideEffects": ["Array of 3-6 potential side effects YOU should monitor"]
+      "duration": "12 weeks / 3-6 months / etc",
+      "mechanism": "How it works",
+      "benefits": ["benefit 1", "benefit 2"],
+      "sideEffects": ["side effect 1", "side effect 2"],
+      "contraindications": ["contraindication 1"],
+      "researchEvidence": "Research citation or study reference",
+      "regulatoryStatus": "FDA-approved / Research use / etc"
     }
   ],
-  "keyRisks": ["Array of 6-10 specific risks considering YOUR health profile. Written directly to the person."],
-  "evidenceList": [
-    {
-      "title": "MUST be actual published research title that DIRECTLY studies the peptide by name. If citing BPC-157, title must mention BPC-157. If citing Semaglutide, title must mention Semaglutide.",
-      "year": 2015,
-      "source": "Actual journal name (e.g., New England Journal of Medicine, Journal of Clinical Endocrinology)",
-      "summary": "Detailed summary that PROVES this study is about the specific peptide. Start with: 'This study specifically investigated [PEPTIDE NAME]...' Explain what was found about THIS EXACT peptide.",
-      "url": "Actual PubMed URL with real PMID (https://pubmed.ncbi.nlm.nih.gov/[PMID]/) - MUST be verifiable. If unknown, use: 'Limited published data' in summary instead of fake URL"
-    }
-  ],
-  "medicalConsiderations": {
-    "drugInteractions": ["Specific interactions with YOUR current medications. Use 'you' and 'your'."],
-    "contraindications": ["Specific contraindications based on YOUR conditions"],
-    "monitoringRecommendations": ["Specific tests and monitoring recommendations for YOU based on YOUR profile"]
-  }
-}`;
+  "stackRationale": "Why these peptides work together",
+  "safetyConsiderations": ["safety note 1", "safety note 2"],
+  "consultationAdvice": "Consult healthcare provider before use"
+}
 
-  const userMessage = `Analyze this individual's complete health profile and create a personalized peptide stack. Write the analysis as if you're speaking DIRECTLY to them using "you" and "your":
+DOSAGE GUIDELINES (USE THESE):
 
-DEMOGRAPHICS:
-- Age: ${intakeData.demographics?.age || 'Not specified'} years old
-- Sex: ${formatCondition(intakeData.demographics?.sex)}
-- Height: ${intakeData.demographics?.height || 'Not specified'}
-- Weight: ${intakeData.demographics?.weight || 'Not specified'}
+- Semaglutide: Start 0.25mg weekly, titrate to 1-2.4mg weekly
+- Tirzepatide: Start 2.5mg weekly, titrate to 5-15mg weekly
+- Liraglutide: Start 0.6mg daily, titrate to 3mg daily
+- Ipamorelin: 200-300mcg before bed
+- CJC-1295: 100-200mcg 2-3x weekly
+- BPC-157: 250-500mcg daily or twice daily
+- TB-500: 2-5mg twice weekly for 4-6 weeks
+- Thymosin Alpha-1: 1.6mg twice weekly
 
-MEDICAL HISTORY:
-- Current Medical Conditions: ${formatCondition(intakeData.medical?.conditions)}
-- Current Medications: ${formatCondition(intakeData.medical?.medications)}
-- Known Allergies: ${formatCondition(intakeData.medical?.allergies)}
+NEVER recommend peptides without complete dosage information.`;
 
-LIFESTYLE:
-- Sleep Patterns: ${formatCondition(intakeData.lifestyle?.sleep)} per night
-- Exercise Habits: ${formatCondition(intakeData.lifestyle?.exercise)}
-- Alcohol Consumption: ${formatCondition(intakeData.lifestyle?.alcohol)}
+  const userMessage = `Analyze this user's health profile and recommend a peptide stack:
 
-DIETARY APPROACH:
-- Diet Type: ${formatCondition(intakeData.dietary?.diet)}
+${JSON.stringify(intakeData, null, 2)}
 
-STRESS PROFILE:
-- Stress Level: ${formatCondition(intakeData.stress?.stress)}
-
-RECOVERY PATTERN:
-- Recovery Speed: ${formatCondition(intakeData.recovery?.recovery)}
-
-PEPTIDE EXPERIENCE LEVEL:
-- Experience: ${formatCondition(intakeData.experience?.peptideExperience)}${intakeData.experience?.previousPeptides ? `\n- Previously Used: ${intakeData.experience.previousPeptides}` : ''}
-- Injection Comfort: ${formatCondition(intakeData.experience?.injectionComfort)}
-
-GOALS:
-${intakeData.goals?.selectedGoals && Array.isArray(intakeData.goals.selectedGoals) 
-  ? intakeData.goals.selectedGoals.map((goal: string) => `- ${goal}`).join('\n')
-  : 'No specific goals selected'}
-${intakeData.goals?.customGoal ? `\nAdditional Goals/Notes: ${intakeData.goals.customGoal}` : ''}
-
-Create a comprehensive, personalized peptide education brief written DIRECTLY to this person using "you" and "your". Make it warm, personal, and conversational while remaining professional. Consider their age, medical conditions, medications, lifestyle, diet, stress level, recovery pattern, and goals. Use the dietary approach to recommend metabolic peptides, stress level for cortisol-related peptides, and recovery pattern for inflammation/repair peptides. Provide evidence-based recommendations with proper dosing, timing, and safety considerations.
-
-CRITICAL: For each peptide you recommend, you MUST include at least ONE research article that specifically studies THAT exact peptide. Do not include generic peptide research - each article must be about the specific peptide being recommended. Verify PubMed URLs are real and accurate.`;
+Provide your response in the exact JSON format specified.`;
 
   try {
     const completion = await openai.chat.completions.create({
       model: 'gpt-4-turbo-preview',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userMessage },
-        ],
-      temperature: 0.3, // Lower for more accurate, clinical responses
-      max_tokens: 6000, // More tokens for detailed evidence
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userMessage },
+      ],
+      temperature: 0.3,
+      max_tokens: 2500,
       response_format: { type: 'json_object' },
     });
 
@@ -576,73 +233,95 @@ CRITICAL: For each peptide you recommend, you MUST include at least ONE research
     if (!content) {
       throw new Error('No content received from OpenAI');
     }
-    
-    // Parse JSON response
-    const brief = JSON.parse(content);
-    
-    // Validate and fix dosages to ensure insulin syringe units are included
-    if (brief.candidatePeptides && Array.isArray(brief.candidatePeptides)) {
-      brief.candidatePeptides = brief.candidatePeptides.map((peptide: any) => {
-        // Check if dosage includes syringe units for injectable peptides
-        const dosage = peptide.recommendedDosage || '';
-        const isInjectable = dosage.toLowerCase().includes('subcutaneous') || 
-                           dosage.toLowerCase().includes('intramuscular') ||
-                           dosage.toLowerCase().includes('inject');
-        
-        if (isInjectable && !dosage.includes('units') && !dosage.includes('unit')) {
-          // Try to extract dose and add units
-          const doseMatch = dosage.match(/(\d+)\s*(mcg|mg|μg)/i);
-          if (doseMatch) {
-            const dose = parseInt(doseMatch[1]);
-            const unit = doseMatch[2].toLowerCase();
-            
-            // Calculate approximate units (assuming 1mg/mL reconstitution for mcg, 10mg/mL for mg)
-            let syringeUnits = 0;
-            if (unit === 'mcg' || unit === 'μg') {
-              syringeUnits = Math.round(dose / 10); // 1mg/mL = 10mcg per unit
-            } else if (unit === 'mg') {
-              syringeUnits = Math.round(dose * 10); // 10mg/mL = 1mg per 10 units
-            }
-            
-            if (syringeUnits > 0) {
-              peptide.recommendedDosage = `${dosage} (${syringeUnits} units on insulin syringe if reconstituted at ${unit === 'mg' ? '10' : '1'}mg/mL)`;
-              console.log(`Added syringe units to ${peptide.name}: ${syringeUnits} units`);
-            }
-          }
-        }
-        return peptide;
-      });
+
+    // Parse JSON response from OpenAI
+    const raw = JSON.parse(content);
+
+    // Validate structure
+    if (!raw.peptideStack || !Array.isArray(raw.peptideStack)) {
+      throw new Error('Invalid API response structure: missing peptideStack array');
     }
-    
-    // Validate evidence - ensure peptide names are in titles
-    if (brief.evidenceList && Array.isArray(brief.evidenceList)) {
-      const peptideNames = brief.candidatePeptides?.map((p: any) => p.name) || [];
-      brief.evidenceList = brief.evidenceList.map((evidence: any, index: number) => {
-        const title = evidence.title || '';
-        const summary = evidence.summary || '';
-        
-        // Check if any peptide name appears in title or summary
-        const hasPeptideName = peptideNames.some((name: string) => {
-          const nameParts = name.split(/[\s-]/).filter(p => p.length > 2);
-          return nameParts.some(part => 
-            title.toLowerCase().includes(part.toLowerCase()) ||
-            summary.toLowerCase().includes(part.toLowerCase())
-          );
-        });
-        
-        if (!hasPeptideName && title) {
-          console.warn(`Evidence ${index + 1} may not be peptide-specific: "${title}"`);
-          // Don't remove it, but log a warning
-        }
-        
-        return evidence;
-      });
-    }
-    
+
+    // Validate dosage fields for each peptide
+    raw.peptideStack.forEach((peptide: any) => {
+      if (
+        !peptide.dosage?.amount ||
+        !peptide.dosage?.frequency ||
+        !peptide.dosage?.timing ||
+        !peptide.dosage?.route
+      ) {
+        throw new Error(`Incomplete dosage for ${peptide.name || 'Unnamed peptide'}`);
+      }
+
+      if (!/\d+\.?\d*\s*(mg|mcg|IU)/i.test(peptide.dosage.amount)) {
+        throw new Error(
+          `Invalid dosage format for ${peptide.name || 'Unnamed peptide'}: ${peptide.dosage.amount}`
+        );
+      }
+    });
+
+    console.log('✅ OpenAI raw peptideStack response:', raw);
+
+    // Map the validated OpenAI response into the existing BriefOutput structure
+    const brief: BriefOutput = {
+      goalAlignment:
+        raw.stackRationale ||
+        'This peptide stack is designed to align with your reported goals and health profile.',
+      recommendedStack: {
+        name: 'Personalized Peptide Stack',
+        description:
+          raw.stackRationale ||
+          'A combination of peptides selected based on your health questionnaire and goals.',
+        synergies:
+          raw.stackRationale ||
+          'These peptides have complementary mechanisms that may support your goals in a synergistic way.',
+      },
+      candidatePeptides: raw.peptideStack.map((p: any) => ({
+        name: p.name,
+        why: p.mechanism || '',
+        mechanism: p.mechanism || '',
+        detailedInfo: `Class: ${p.class || 'Not specified'}. Regulatory status: ${
+          p.regulatoryStatus || 'Not specified'
+        }. Research: ${p.researchEvidence || 'Not specified'}.`,
+        recommendedDosage: p.dosage?.amount
+          ? `${p.dosage.amount} ${p.dosage.route ? p.dosage.route : ''} ${
+              p.dosage.frequency || ''
+            }`.trim()
+          : '',
+        timing: {
+          frequency: p.dosage?.frequency || '',
+          timeOfDay: p.dosage?.timing || '',
+          withFood: '',
+          cycleDuration: p.duration || '',
+        },
+        potentialBenefits: Array.isArray(p.benefits) ? p.benefits : [],
+        sideEffects: Array.isArray(p.sideEffects) ? p.sideEffects : [],
+      })),
+      keyRisks: Array.isArray(raw.safetyConsiderations)
+        ? raw.safetyConsiderations
+        : ['Use only under the supervision of a qualified healthcare professional.'],
+      evidenceList: raw.peptideStack
+        .filter((p: any) => !!p.researchEvidence)
+        .map((p: any) => ({
+          title: p.researchEvidence,
+          year: 0,
+          source: '',
+          summary: p.researchEvidence,
+          url: '',
+        })),
+      medicalConsiderations: {
+        drugInteractions: [],
+        contraindications: raw.peptideStack
+          .flatMap((p: any) => (Array.isArray(p.contraindications) ? p.contraindications : [])),
+        monitoringRecommendations: [],
+      },
+    };
+
     return brief;
   } catch (error) {
-    console.error('Error calling OpenAI:', error);
-    throw error;
+    console.error('OpenAI API Error:', error);
+    console.error('User data sent:', JSON.stringify(intakeData, null, 2));
+    throw new Error('Failed to generate peptide recommendations');
   }
 }
 
